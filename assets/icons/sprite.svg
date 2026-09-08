@@ -1,0 +1,343 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="50%" stop-color="#b44dff"/>
+      <stop offset="100%" stop-color="#ff44cc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ИКОНКИ УСТРОЙСТВ (СТИЛИЗОВАННЫЙ КИБЕРПАНК МИНИМАЛИЗМ) -->
+  <!-- 1. PC -->
+  <symbol id="icon-device-pc" viewBox="0 0 24 24">
+    <rect x="2" y="3" width="20" height="13" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <rect x="4" y="5" width="16" height="9" rx="1" fill="currentColor" fill-opacity="0.12"/>
+    <line x1="12" y1="16" x2="12" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M7 20h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="12" cy="9.5" r="2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.2"/>
+  </symbol>
+
+  <!-- 2. PlayStation -->
+  <symbol id="icon-device-playstation" viewBox="0 0 24 24">
+    <path d="M4 14.5c-1 3 0 5 2 5 2.5 0 3.5-3 6-3s3.5 3 6 3c2 0 3-2 2-5L19 7a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3l-1 7.5z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+    <path d="M7 9v3M5.5 10.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="16.5" cy="9" r="0.9" fill="currentColor"/>
+    <circle cx="15" cy="10.5" r="0.9" fill="currentColor"/>
+    <circle cx="18" cy="10.5" r="0.9" fill="currentColor"/>
+    <circle cx="16.5" cy="12" r="0.9" fill="currentColor"/>
+    <rect x="10" y="7" width="4" height="2.5" rx="0.8" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+  </symbol>
+
+  <!-- 3. Xbox -->
+  <symbol id="icon-device-xbox" viewBox="0 0 24 24">
+    <path d="M4 14.5c-1.2 3.2 0 5.5 2.2 5.5 2.2 0 3.8-3.2 5.8-3.2s3.6 3.2 5.8 3.2c2.2 0 3.4-2.3 2.2-5.5L19 7a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3l-1 7.5z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+    <circle cx="12" cy="7.2" r="2.2" stroke="currentColor" stroke-width="1.3" fill="none"/>
+    <path d="M10.8 6.2l2.4 2M13.2 6.2l-2.4 2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+    <circle cx="7.5" cy="10" r="1.6" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="14" cy="13.2" r="1.6" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.2"/>
+    <path d="M9.5 13.5h2M10.5 12.5v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 4. Nintendo Switch -->
+  <symbol id="icon-device-nintendo" viewBox="0 0 24 24">
+    <rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <rect x="7" y="6.5" width="10" height="11" rx="0.5" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="4.8" cy="9.5" r="1.2" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.1"/>
+    <circle cx="4.8" cy="14" r="0.7" fill="currentColor"/>
+    <circle cx="19.2" cy="13.5" r="1.2" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.1"/>
+    <circle cx="19.2" cy="9" r="0.7" fill="currentColor"/>
+    <line x1="4.8" y1="6.8" x2="4.8" y2="7.8" stroke="currentColor" stroke-width="1.2"/>
+    <line x1="18.7" y1="7.3" x2="19.7" y2="7.3" stroke="currentColor" stroke-width="1.2"/>
+  </symbol>
+
+  <!-- 5. Mobile -->
+  <symbol id="icon-device-mobile" viewBox="0 0 24 24">
+    <rect x="5.5" y="2" width="13" height="20" rx="2.8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <rect x="7.5" y="4.5" width="9" height="15" rx="1.2" fill="currentColor" fill-opacity="0.12"/>
+    <circle cx="12" cy="3.5" r="0.75" fill="currentColor"/>
+    <circle cx="12" cy="11" r="2.2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 1.5" fill="none"/>
+    <circle cx="12" cy="11" r="0.75" fill="currentColor"/>
+    <line x1="10" y1="18" x2="14" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 6. Other / VR / Gear -->
+  <symbol id="icon-device-other" viewBox="0 0 24 24">
+    <path d="M3 9a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V9z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="8.5" cy="11" r="2.2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.3"/>
+    <circle cx="15.5" cy="11" r="2.2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M3 11C1.8 11 1 12 1 13.5S2 16 3 16M21 11c1.2 0 2 1 2 2.5s-1 2.5-2 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="10" y1="7.8" x2="14" y2="7.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+  </symbol>
+
+  <!-- ГЛАВНАЯ ИКОНКА LOBBIVO -->
+  <symbol id="icon-main" viewBox="0 0 100 100">
+    <rect x="5" y="5" width="90" height="90" rx="20" fill="url(#brandGrad)" stroke="none"/>
+    <rect x="18" y="18" width="64" height="64" rx="14" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.5"/>
+    <circle cx="35" cy="42" r="7" fill="rgba(255,255,255,0.3)" stroke="none"/>
+    <circle cx="65" cy="42" r="7" fill="rgba(255,255,255,0.3)" stroke="none"/>
+    <circle cx="35" cy="42" r="3.5" fill="rgba(255,255,255,0.7)" stroke="none"/>
+    <circle cx="65" cy="42" r="3.5" fill="rgba(255,255,255,0.7)" stroke="none"/>
+    <path d="M 32 60 Q 50 75 68 60" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="25" cy="25" r="3" fill="rgba(255,255,255,0.15)"/>
+    <circle cx="75" cy="25" r="3" fill="rgba(255,255,255,0.15)"/>
+    <circle cx="25" cy="75" r="3" fill="rgba(255,255,255,0.15)"/>
+    <circle cx="75" cy="75" r="3" fill="rgba(255,255,255,0.15)"/>
+  </symbol>
+
+  <!-- ИКОНКИ ДЛЯ 25 ИГР (МИНИМАЛИСТИЧНЫЕ УЗНАВАЕМЫЕ ЛОГОТИПЫ) -->
+  <!-- 1. CS 2 -->
+  <symbol id="icon-csgo" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M8 8h3v8H8zm5 0h3v8h-3z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+    <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <!-- 2. Dota 2 -->
+  <symbol id="icon-dota2" viewBox="0 0 24 24">
+    <rect x="3" y="3" width="18" height="18" rx="3.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M6 6h4.5v4.5H6z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+    <path d="M13.5 13.5H18V18h-4.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+    <path d="M18.5 5.5L5.5 18.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 3. Valorant -->
+  <symbol id="icon-valorant" viewBox="0 0 24 24">
+    <path d="M3.5 4h5.5l7 14h-5.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M16 4h4.5l-4 7.5h-4.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- 4. GTA V Online -->
+  <symbol id="icon-gta5" viewBox="0 0 24 24">
+    <path d="M4 3h5l3 11 3-11h5l-6 18h-4L4 3z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M8.5 8.5h7M10 13h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 5. Rust -->
+  <symbol id="icon-rust" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M12 3v6M4.2 16.5l5.2-3M19.8 16.5l-5.2-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M9.5 5.5a7 7 0 0 1 5 0M4.5 14.5a7 7 0 0 1 2.5-4.5M19.5 14.5a7 7 0 0 0-2.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 6. Apex Legends -->
+  <symbol id="icon-apex" viewBox="0 0 24 24">
+    <path d="M12 2L3 19h4.5l4.5-9 4.5 9H21L12 2z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M8.5 15.5h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 7. Fortnite -->
+  <symbol id="icon-fortnite" viewBox="0 0 24 24">
+    <path d="M6 3h12v4.5h-7v3.5h6v4h-6V21H6V3z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="15.5" cy="17" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <!-- 8. Minecraft -->
+  <symbol id="icon-minecraft" viewBox="0 0 24 24">
+    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <rect x="6.5" y="7" width="3.5" height="3.5" fill="currentColor"/>
+    <rect x="14" y="7" width="3.5" height="3.5" fill="currentColor"/>
+    <path d="M10 10.5h4v3h2v4.5h-2.5v-2h-3v2H8V13.5h2v-3z" fill="currentColor"/>
+  </symbol>
+
+  <!-- 9. Warzone -->
+  <symbol id="icon-warzone" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" stroke-dasharray="4 2" fill="none"/>
+    <path d="M7.5 11c0-3 2-5 4.5-5s4.5 2 4.5 5c0 2-.8 3.2-1.5 4v2.5h-6V15c-.7-.8-1.5-2-1.5-4z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="10" cy="11.5" r="1" fill="currentColor"/>
+    <circle cx="14" cy="11.5" r="1" fill="currentColor"/>
+    <path d="M10 17.5v2M12 17.5v2M14 17.5v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 10. PUBG -->
+  <symbol id="icon-pubg" viewBox="0 0 24 24">
+    <path d="M4 13C4 7.5 7.5 4 12 4s8 3.5 8 9v4c0 1.5-1 2-2 2H6c-1 0-2-.5-2-2v-4z" fill="currentColor" fill-opacity="0.25" stroke="currentColor" stroke-width="1.8"/>
+    <path d="M5 11h14v4H5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="7" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M8 17h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 11. Rocket League -->
+  <symbol id="icon-rocket" viewBox="0 0 24 24">
+    <path d="M12 2l8 4v7c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-4z" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    <path d="M9 13.5l3-6 3 6-1 2h-4l-1-2z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M10.5 15.5l-1.5 2M13.5 15.5l1.5 2M12 15.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 12. Rainbow Six Siege -->
+  <symbol id="icon-rainbow" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M14 6h-3.5a4.5 4.5 0 0 0-4.5 4.5V13a4.5 4.5 0 1 0 9 0v-1h-4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="12" cy="14" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <!-- 13. Overwatch 2 -->
+  <symbol id="icon-overwatch" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M7 6l5 4 5-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M6 14.5l3.5-3 2.5 2 2.5-2 3.5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M9.5 11.5v6M14.5 11.5v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 14. League of Legends -->
+  <symbol id="icon-league" viewBox="0 0 24 24">
+    <path d="M4 3h4v13h10v4H4V3z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M11 6l5 4-5 4M14 3l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- 15. Escape from Tarkov -->
+  <symbol id="icon-tarkov" viewBox="0 0 24 24">
+    <polygon points="12,2 22,7 22,17 12,22 2,17 2,7" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+    <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/>
+  </symbol>
+
+  <!-- 16. Destiny 2 -->
+  <symbol id="icon-destiny" viewBox="0 0 24 24">
+    <path d="M12 3l3.5 6.5h-7L12 3z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M4 14l6.5-1.5-3.5 6L4 14z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M20 14l-6.5-1.5 3.5 6L20 14z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="12" cy="12" r="2" fill="currentColor"/>
+  </symbol>
+
+  <!-- 17. World of Warcraft -->
+  <symbol id="icon-wow" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    <path d="M5 7l3 10 4-7 4 7 3-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M9 13.5h6" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="12" cy="6.5" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <!-- 18. Deadlock -->
+  <symbol id="icon-deadlock" viewBox="0 0 24 24">
+    <polygon points="12,2 21,12 12,22 3,12" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="12" cy="10" r="3" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M10.5 12.5L9.5 17h5l-1-4.5" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="12" cy="10" r="1" fill="currentColor"/>
+  </symbol>
+
+  <!-- 19. Marvel Rivals -->
+  <symbol id="icon-marvel" viewBox="0 0 24 24">
+    <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M6 16V8l3.5 5L13 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M15.5 16v-8h2.5a2 2 0 0 1 0 4h-2.5l2.5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- 20. XDefiant -->
+  <symbol id="icon-xdefiant" viewBox="0 0 24 24">
+    <path d="M4 4l6 8-6 8h4.5l3.5-5 3.5 5H20l-6-8 6-8h-4.5L12 9 8.5 4H4z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <!-- 21. The Finals -->
+  <symbol id="icon-thefinals" viewBox="0 0 24 24">
+    <polygon points="12,3 21,19 3,19" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <polygon points="12,8 17,17 7,17" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="12" cy="14.5" r="1" fill="currentColor"/>
+  </symbol>
+
+  <!-- 22. Ready or Not -->
+  <symbol id="icon-readyornot" viewBox="0 0 24 24">
+    <polygon points="12,2 21,6 21,14 12,22 3,14 3,6" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M12 6l1.8 3.8 4.2.6-3 3 .7 4.2-3.7-2-3.7 2 .7-4.2-3-3 4.2-.6z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+  </symbol>
+
+  <!-- 23. Helldivers 2 -->
+  <symbol id="icon-helldivers2" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M8 8l4-3 4 3v4c0 3-1.5 5-4 6-2.5-1-4-3-4-6V8z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M10 10.5h.01M14 10.5h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M10.5 14h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M4 12h3M17 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 24. Palworld -->
+  <symbol id="icon-palworld" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M12 4c2 3 4 5.5 4 8.5a4 4 0 1 1-8 0c0-3 2-5.5 4-8.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="12" cy="13.5" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <!-- 25. Baldur's Gate 3 -->
+  <symbol id="icon-bg3" viewBox="0 0 24 24">
+    <polygon points="12,2 21,7 21,17 12,22 3,17 3,7" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M9 8a3 3 0 0 1 6 0c0 2-1 3-1 4.5v3.5l-2-1.5-2 1.5v-3.5C10 11 9 10 9 8z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M7 11c0 2 1 3.5 2 4M17 11c0 2-1 3.5-2 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="12" cy="8.5" r="1" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-default" viewBox="0 0 24 24">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="2" fill="none"/>
+    <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.3"/>
+  </symbol>
+
+  <!-- ИКОНКИ ДЛЯ МЕНЮ ПРОФИЛЯ (ФОТО 2) И ШАПКИ-КАПСУЛЫ -->
+  <symbol id="icon-user-round" viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M5 20c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-palette-menu" viewBox="0 0 24 24">
+    <path d="M12 2C6.48 2 2 6.48 2 12c0 3.31 2.69 6 6 6h1.2c.66 0 1.2.54 1.2 1.2 0 .33-.13.63-.35.85-.22.22-.35.52-.35.85 0 .66.54 1.2 1.2 1.2 5.52 0 10-4.48 10-10C21 5.92 16.98 2 12 2z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="7.5" cy="10.5" r="1.3" fill="currentColor"/>
+    <circle cx="11" cy="7" r="1.3" fill="currentColor"/>
+    <circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/>
+    <circle cx="16.5" cy="13" r="1.3" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-nodes-menu" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="2.8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="5" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="19" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="5" cy="17.5" r="1.8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <circle cx="19" cy="17.5" r="1.8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <line x1="6.5" y1="8" x2="9.8" y2="10.2" stroke="currentColor" stroke-width="1.6"/>
+    <line x1="17.5" y1="8" x2="14.2" y2="10.2" stroke="currentColor" stroke-width="1.6"/>
+    <line x1="6.5" y1="16" x2="9.8" y2="13.8" stroke="currentColor" stroke-width="1.6"/>
+    <line x1="17.5" y1="16" x2="14.2" y2="13.8" stroke="currentColor" stroke-width="1.6"/>
+  </symbol>
+
+  <symbol id="icon-logout-door" viewBox="0 0 24 24">
+    <rect x="3" y="4" width="9" height="16" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    <path d="M14 8l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="12" x2="18" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-l-badge" viewBox="0 0 28 28">
+    <rect x="0" y="0" width="28" height="28" rx="7" fill="url(#fcGrad)"/>
+    <text x="8.5" y="20" font-family="'Orbitron', sans-serif" font-weight="900" font-size="16" fill="#ffffff" letter-spacing="-0.5">L</text>
+  </symbol>
+
+  <!-- ИКОНКИ ИНТЕРФЕЙСА -->
+  <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="icon-send" viewBox="0 0 24 24"><path d="M2 21L23 12 2 3v7l15 2-15 2z" fill="currentColor"/></symbol>
+  <symbol id="icon-profile" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+  <symbol id="icon-about" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="16" r="1" fill="currentColor"/><path d="M12 8v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="icon-back" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="icon-game" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><line x1="6" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="2"/><line x1="8" y1="10" x2="8" y2="14" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="10" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></symbol>
+  <symbol id="icon-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="icon-flag" viewBox="0 0 24 24"><path d="M4 21V4h16l-4 6 4 6H4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+  <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+
+  <defs>
+    <linearGradient id="fcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff007a"/>
+      <stop offset="50%" stop-color="#7928ca"/>
+      <stop offset="100%" stop-color="#0070f3"/>
+    </linearGradient>
+  </defs>
+</svg>
