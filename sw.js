@@ -1,20 +1,51 @@
 // ============================================================
-//  LOBBIVO SERVICE WORKER (BACKGROUND WEB PUSH & NOTIFICATIONS)
+//  LOBBIVO SERVICE WORKER (ULTRA-RESILIENT MOBILE & PWA CACHE)
 // ============================================================
 
-const CACHE_NAME = 'lobbivo-cache-v2.8.6';
+const CACHE_NAME = 'lobbivo-cache-v2.8.7';
 const OFFLINE_URL = './index.html';
 
+const CORE_ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './css/variables.css?v=2.8.7',
+  './css/base.css?v=2.8.7',
+  './css/components.css?v=2.8.7',
+  './css/animations.css?v=2.8.7',
+  './css/media.css?v=2.8.7',
+  './js/data.js?v=2.8.7',
+  './js/security-shield.js?v=2.8.7',
+  './js/firebase-sync.js?v=2.8.7',
+  './js/storage.js?v=2.8.7',
+  './js/auth.js?v=2.8.7',
+  './js/games.js?v=2.8.7',
+  './js/chat.js?v=2.8.7',
+  './js/profile.js?v=2.8.7',
+  './js/admin.js?v=2.8.7',
+  './js/app.js?v=2.8.7',
+  './assets/icons/sprite.svg'
+];
+
+// Установка: Мгновенный предзагруз всех критических файлов в кэш
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(CORE_ASSETS).catch((err) => {
+        console.warn('[SW Precache Warning] Some non-critical assets skipped:', err);
+      });
+    }).then(() => self.skipWaiting())
+  );
 });
 
+// Активация: Очистка старых версий кэша
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', key);
             return caches.delete(key);
           }
         })
@@ -23,7 +54,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Автоматическое обновление: Network-First для всех локальных файлов (HTML, JS, CSS, Media)
+// Обработка запросов (Stale-While-Revalidate для ассетов, Network-First с таймаутом для HTML)
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -35,33 +66,76 @@ self.addEventListener('fetch', (event) => {
     url.origin.includes('firebaseio.com') ||
     url.origin.includes('googleapis.com') ||
     url.origin.includes('firestore') ||
-    url.origin.includes('gstatic.com')
+    url.origin.includes('gstatic.com') ||
+    url.origin.includes('google-analytics.com')
   ) {
     return;
   }
 
-  // Network-First: запрашиваем сеть для получения свежих файлов с GitHub Pages, при успехе обновляем кэш, при отсутствии сети — отдаем из кэша
-  event.respondWith(
-    fetch(request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseToCache);
+  // 1. Страницы навигации (HTML) — Network-First с быстрым таймаутом 1.8s
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith(
+      new Promise((resolve) => {
+        let hasResolved = false;
+
+        const networkTimeout = setTimeout(() => {
+          if (!hasResolved) {
+            hasResolved = true;
+            caches.match(OFFLINE_URL).then((cached) => {
+              if (cached) resolve(cached);
+            });
+          }
+        }, 1800);
+
+        fetch(request)
+          .then((networkResponse) => {
+            clearTimeout(networkTimeout);
+            if (!hasResolved) {
+              hasResolved = true;
+              if (networkResponse && networkResponse.status === 200) {
+                const copy = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+              }
+              resolve(networkResponse);
+            }
+          })
+          .catch(() => {
+            clearTimeout(networkTimeout);
+            if (!hasResolved) {
+              hasResolved = true;
+              caches.match(OFFLINE_URL).then((cached) => {
+                resolve(cached || new Response('Offline', { status: 503, statusText: 'Offline' }));
+              });
+            }
           });
-        }
-        return networkResponse;
       })
-      .catch(() => {
-        return caches.match(request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
+    );
+    return;
+  }
+
+  // 2. Статические файлы (CSS, JS, Картинки, SVG, Шрифты) — Stale-While-Revalidate
+  event.respondWith(
+    caches.match(request).then((cachedResponse) => {
+      const fetchPromise = fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
           }
-          if (request.mode === 'navigate') {
-            return caches.match(OFFLINE_URL);
-          }
-        });
-      })
+          return networkResponse;
+        })
+        .catch(() => null);
+
+      // Если файл уже есть в кэше — отдаем его мгновенно (0мс), а в фоне обновляем
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // Если в кэше нет — ждем сеть
+      return fetchPromise.then((networkRes) => {
+        return networkRes || caches.match(OFFLINE_URL);
+      });
+    })
   );
 });
 
@@ -114,7 +188,6 @@ self.addEventListener('notificationclick', (event) => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Если уже есть открытая вкладка — фокусируемся на ней и открываем нужный чат
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
         if ('focus' in client) {
@@ -124,7 +197,6 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus();
         }
       }
-      // Если вкладка была закрыта — открываем сайт с параметром чата
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
       }

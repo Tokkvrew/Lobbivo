@@ -46,17 +46,20 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts (Non-blocking async load with instant system fallback) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" media="print" onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" />
+  </noscript>
 
-  <!-- CSS Стили (с авто-обновлением кэша) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.8.6" />
-  <link rel="stylesheet" href="css/base.css?v=2.8.6" />
-  <link rel="stylesheet" href="css/components.css?v=2.8.6" />
-  <link rel="stylesheet" href="css/animations.css?v=2.8.6" />
-  <link rel="stylesheet" href="css/media.css?v=2.8.6" />
+  <!-- CSS Стили (с авто-обновлением кэша v2.8.7) -->
+  <link rel="stylesheet" href="css/variables.css?v=2.8.7" />
+  <link rel="stylesheet" href="css/base.css?v=2.8.7" />
+  <link rel="stylesheet" href="css/components.css?v=2.8.7" />
+  <link rel="stylesheet" href="css/animations.css?v=2.8.7" />
+  <link rel="stylesheet" href="css/media.css?v=2.8.7" />
 </head>
 <body>
 
@@ -2710,21 +2713,20 @@
     </div>
   </div>
 
-  <!-- FIREBASE CLOUD REALTIME SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <!-- FIREBASE CLOUD REALTIME SDK (Асинхронная загрузка с defer) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (с авто-обновлением кэша) -->
-  <script src="js/data.js?v=2.8.6"></script>
-  <script src="js/security-shield.js?v=2.8.6"></script>
-  <script src="js/firebase-sync.js?v=2.8.6"></script>
-  <script src="js/storage.js?v=2.8.6"></script>
-  <script src="js/auth.js?v=2.8.6"></script>
-  <script src="js/games.js?v=2.8.6"></script>
-  <script src="js/chat.js?v=2.8.6"></script>
-  <script src="js/profile.js?v=2.8.6"></script>
-  <script src="js/admin.js?v=2.8.6"></script>
-  <script src="js/app.js?v=2.8.6"></script>
+  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (v2.8.7) -->
+  <script src="js/data.js?v=2.8.7"></script>
+  <script src="js/security-shield.js?v=2.8.7"></script>
+  <script src="js/firebase-sync.js?v=2.8.7"></script>
+  <script src="js/storage.js?v=2.8.7"></script>
+  <script src="js/auth.js?v=2.8.7"></script>
+  <script src="js/games.js?v=2.8.7"></script>
+  <script src="js/chat.js?v=2.8.7"></script>
+  <script src="js/profile.js?v=2.8.7"></script>
+  <script src="js/admin.js?v=2.8.7"></script>
+  <script src="js/app.js?v=2.8.7"></script>
 </body>
 </html>

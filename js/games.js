@@ -50,12 +50,16 @@ function renderGames(searchQuery = '', force = false) {
     return;
   }
 
-  grid.innerHTML = filtered.map(game => {
+  grid.innerHTML = filtered.map((game, idx) => {
     const imgSrc = game.image || `assets/images/games/${game.id}.jpg`;
+    const loadStrategy = idx < 6 ? 'eager' : 'lazy';
     return `
       <div class="game-poster-card ${!isAuth ? 'guest-preview' : ''}" data-game="${escapeHtml(game.id)}" style="--card-glow:${escapeHtml(game.glow || '#00d4ff')};">
         <div class="poster-art-wrapper">
-          <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(game.name)}" class="poster-image" decoding="async" loading="eager" onerror="this.style.display='none'" />
+          <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(game.name)}" class="poster-image" decoding="async" loading="${loadStrategy}" onerror="this.onerror=null; this.classList.add('img-fallback-hidden');" />
+          <div class="poster-fallback-backdrop">
+            <svg class="poster-fallback-icon"><use href="#${escapeHtml(game.icon || 'icon-game')}"/></svg>
+          </div>
           <div class="poster-fade-overlay"></div>
         </div>
         <div class="poster-info-wrapper">

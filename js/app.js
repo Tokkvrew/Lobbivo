@@ -1883,35 +1883,34 @@ function init() {
     });
   });
 
-  // Регистрация PWA Service Worker с авто-обновлением кэша (Network-First) и Push-уведомлениями
+  // Регистрация PWA Service Worker с устойчивым Stale-While-Revalidate кэшем и Push-уведомлениями
   if ('serviceWorker' in navigator) {
+    let hadPreviousController = !!navigator.serviceWorker.controller;
     let swRefreshing = false;
+
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!swRefreshing) {
+      // Перезагружаем ТОЛЬКО при смене старой версии на новую при явном фокусе, а не на первом открытии
+      if (hadPreviousController && !swRefreshing) {
         swRefreshing = true;
-        window.location.reload();
+        console.log('[Lobbivo SW] Обновление Service Worker активировано.');
       }
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.8.6', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.8.7', { updateViaCache: 'none' })
         .then((reg) => {
-          // Проверяем обновления файлов немедленно при загрузке страницы
-          reg.update();
-          console.log('[Lobbivo SW] Service Worker v2.8.6 активен:', reg.scope);
+          reg.update().catch(() => {});
+          console.log('[Lobbivo SW] Service Worker v2.8.7 активен:', reg.scope);
 
-          // Проверяем обновления при возврате пользователя на вкладку (на телефоне и ПК)
+          // Проверяем обновления при возврате пользователя на вкладку
           document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
-              reg.update();
+              reg.update().catch(() => {});
             }
-          });
-          window.addEventListener('focus', () => {
-            reg.update();
           });
         })
         .catch((err) => {
-          console.warn('Service Worker registration issue:', err);
+          console.warn('[Lobbivo SW] Service Worker registration note:', err);
         });
     });
 

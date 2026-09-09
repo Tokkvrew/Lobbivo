@@ -36,6 +36,36 @@
     --header-height: 48px;
   }
 
+  /* Оптимизация производительности для Android и мобильных GPU */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+
+  /* Облегченный быстрый блюр вместо тяжелого 40px для 60/120 FPS на смартфонах */
+  .game-poster-card,
+  .capsule-header,
+  .modal-cyber-body,
+  .profile-hero-card,
+  .custom-frame-card,
+  .custom-theme-card,
+  .world-msg-item,
+  .chat-container,
+  .dialog-item {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  .game-poster-card {
+    contain: content;
+  }
+
   /* Предотвращение авто-зума на iOS Safari при фокусе в поле ввода */
   input[type="text"],
   input[type="password"],

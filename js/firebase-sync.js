@@ -19,7 +19,19 @@ const FirebaseSync = {
 
   init() {
     if (typeof firebase === 'undefined') {
-      console.warn('Firebase SDK не загружен. Работа в режиме оффлайн LocalStorage.');
+      console.warn('[Lobbivo Sync] Firebase SDK еще не загружен. Работа в режиме локального кэша.');
+      if (!this._retryInitTimer) {
+        let attempts = 0;
+        const tryConnect = () => {
+          attempts++;
+          if (typeof firebase !== 'undefined' && !this.initialized) {
+            this.init();
+          } else if (attempts < 6) {
+            this._retryInitTimer = setTimeout(tryConnect, 700);
+          }
+        };
+        this._retryInitTimer = setTimeout(tryConnect, 700);
+      }
       return;
     }
 
@@ -37,8 +49,9 @@ const FirebaseSync = {
       if (AppState.currentUser) {
         this.startPresenceHeartbeat(AppState.currentUser);
       }
+      console.log('[Lobbivo Sync] Firebase Realtime Database успешно подключена онлайн.');
     } catch (err) {
-      console.warn('Ошибка подключения Firebase Realtime Database:', err);
+      console.warn('[Lobbivo Sync] Ошибка подключения Firebase Realtime Database:', err);
     }
   },
 
