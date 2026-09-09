@@ -455,12 +455,10 @@
 /* 3. Огненная ярость (Flame) */
 @keyframes flameBorderGlow {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(255, 68, 0, 0.7), 0 0 20px rgba(255, 170, 0, 0.4);
-    filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
+    box-shadow: 0 0 8px rgba(255, 68, 0, 0.8), 0 0 16px rgba(255, 170, 0, 0.5);
   }
   50% {
-    box-shadow: 0 0 16px rgba(255, 30, 0, 0.95), 0 0 28px rgba(255, 200, 0, 0.6);
-    filter: drop-shadow(0 0 10px rgba(255, 120, 0, 1));
+    box-shadow: 0 0 14px rgba(255, 30, 0, 1), 0 0 22px rgba(255, 200, 0, 0.7);
   }
 }
 

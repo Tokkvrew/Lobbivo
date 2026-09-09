@@ -658,10 +658,35 @@
     justify-content: center;
   }
 
+  /* Оптимизация GPU для Android/Chrome: убирает черный экран и задержки отрисовки при скролле */
+  .profile-hero-card,
+  .profile-unified-section,
+  .custom-wardrobe-block,
+  .custom-frame-card,
+  .custom-theme-card,
+  .edit-clean-card,
+  .game-card,
+  .players-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 18, 36, 0.95) !important;
+    transform: none !important;
+  }
+
   .profile-hero-coins-box {
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    background: rgba(8, 20, 42, 0.92) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(0, 212, 255, 0.35) !important;
+    border-radius: 16px !important;
+    padding: 12px 14px !important;
+    box-sizing: border-box !important;
+    margin-top: 8px !important;
   }
 
   .profile-nav-tabs {
@@ -725,7 +750,60 @@
     justify-content: center;
   }
 
-  /* Кастомные селекторы на мобильных */
+  /* Поле ввода тегов на мобильных */
+  .custom-tag-input-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .custom-tag-input-wrapper {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 4px 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .custom-tag-cyber-input {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 0.84rem !important;
+  }
+
+  .btn-add-custom-tag {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    padding: 9px 14px !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* Кастомные триггеры выбора игры и платформы на мобильных */
+  .game-picker-trigger,
+  .device-picker-trigger {
+    width: 100% !important;
+    min-height: 48px !important;
+    background: rgba(6, 14, 30, 0.95) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1.5px solid rgba(0, 212, 255, 0.35) !important;
+    border-radius: 14px !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+
+  .game-picker-trigger:active,
+  .device-picker-trigger:active {
+    border-color: var(--neon-cyan) !important;
+    background: rgba(12, 26, 54, 0.98) !important;
+  }
+
+  /* Кастомные всплывающие панели на мобильных */
   .game-picker-panel,
   .device-select-panel {
     position: fixed !important;
@@ -737,7 +815,7 @@
     max-height: 70vh !important;
     border-radius: 24px 24px 0 0 !important;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8) !important;
-    z-index: 1000 !important;
+    z-index: 100000 !important;
     padding: 18px 14px max(16px, env(safe-area-inset-bottom)) !important;
   }
 
