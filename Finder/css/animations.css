@@ -1,0 +1,519 @@
+/* ============================================================
+   АНИМАЦИИ И ЭФФЕКТЫ (KEYFRAME ANIMATIONS)
+   ============================================================ */
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(105vh) rotate(0deg) scale(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+    transform: translateY(85vh) rotate(90deg) scale(1);
+  }
+  85% {
+    opacity: 0.7;
+    transform: translateY(15vh) rotate(540deg) scale(1);
+  }
+  100% {
+    transform: translateY(-5vh) rotate(720deg) scale(0);
+    opacity: 0;
+  }
+}
+
+/* АНИМАЦИЯ ПАРЯЩИХ СВЕТЯЩИХСЯ БУКВ L ДЛЯ ТЕМЫ LOBBIVO */
+@keyframes floatParticleL {
+  0% {
+    transform: translateY(105vh) translateX(0) rotate(var(--rot-init, 0deg)) scale(0.6);
+    opacity: 0;
+    filter: blur(2px);
+  }
+  15% {
+    opacity: 0.85;
+    filter: blur(0px);
+    transform: translateY(85vh) translateX(calc(var(--sway-x, 20px) * 0.5)) rotate(calc(var(--rot-init, 0deg) + 12deg)) scale(1);
+  }
+  50% {
+    transform: translateY(50vh) translateX(var(--sway-x, 20px)) rotate(calc(var(--rot-init, 0deg) + 35deg)) scale(1.08);
+  }
+  85% {
+    opacity: 0.75;
+    transform: translateY(15vh) translateX(calc(var(--sway-x, 20px) * -0.5)) rotate(var(--rot-end, 60deg)) scale(0.95);
+  }
+  100% {
+    transform: translateY(-8vh) translateX(var(--sway-x, 20px)) rotate(var(--rot-end, 90deg)) scale(0.5);
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+
+@keyframes floatParticleF {
+  0% {
+    transform: translateY(105vh) translateX(0) rotate(var(--rot-init, 0deg)) scale(0.6);
+    opacity: 0;
+    filter: blur(2px);
+  }
+  15% {
+    opacity: 0.85;
+    filter: blur(0px);
+    transform: translateY(85vh) translateX(calc(var(--sway-x, 20px) * 0.5)) rotate(calc(var(--rot-init, 0deg) + 12deg)) scale(1);
+  }
+  50% {
+    transform: translateY(50vh) translateX(var(--sway-x, 20px)) rotate(calc(var(--rot-init, 0deg) + 35deg)) scale(1.08);
+  }
+  85% {
+    opacity: 0.75;
+    transform: translateY(15vh) translateX(calc(var(--sway-x, 20px) * -0.5)) rotate(var(--rot-end, 60deg)) scale(0.95);
+  }
+  100% {
+    transform: translateY(-8vh) translateX(var(--sway-x, 20px)) rotate(var(--rot-end, 90deg)) scale(0.5);
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+
+@keyframes glassShineSweep {
+  0% {
+    transform: translateX(-160%) skewX(-25deg);
+  }
+  60%, 100% {
+    transform: translateX(260%) skewX(-25deg);
+  }
+}
+
+
+@keyframes headerGlow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes logoSquarePulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  }
+  50% {
+    transform: scale(1.05) rotate(1.5deg);
+    box-shadow: 0 0 35px rgba(0, 212, 255, 0.55);
+  }
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 8px rgba(68, 255, 136, 0.4);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.25);
+    box-shadow: 0 0 20px rgba(68, 255, 136, 0.95);
+    opacity: 1;
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97) translateY(-10px);
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rippleAnim {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes heroFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes fabPulse {
+  0%, 100% {
+    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.35);
+  }
+  50% {
+    box-shadow: 0 8px 45px rgba(0, 212, 255, 0.65);
+  }
+}
+
+@keyframes chatSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+  }
+}
+
+@keyframes msgAppear {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes typingPulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* АНИМАЦИИ ДЛЯ ПРИВЕТСТВЕННОЙ СТРАНИЦЫ И СИСТЕМНОГО ЛОАДЕРА */
+@keyframes spinOrbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinOrbitReverse {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes floatBadge {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.04);
+  }
+}
+
+@keyframes pulseBadgeGlow {
+  0% {
+    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.7));
+  }
+  100% {
+    filter: drop-shadow(0 0 24px rgba(180, 77, 255, 0.9));
+  }
+}
+
+@keyframes spinLoaderRing {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinLoaderRingReverse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+@keyframes pulseLoaderCore {
+  0% {
+    transform: scale(0.92);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+  }
+  100% {
+    transform: scale(1.08);
+    box-shadow: 0 0 22px rgba(0, 240, 255, 0.7);
+  }
+}
+
+@keyframes laserScan {
+  0% { left: 0%; width: 35%; }
+  50% { width: 55%; }
+  100% { left: 65%; width: 35%; }
+}
+
+@keyframes glowOrbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  50% { transform: translate(30px, -20px) scale(1.15); opacity: 0.85; }
+}
+
+@keyframes glowOrbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50% { transform: translate(-35px, 25px) scale(1.2); opacity: 0.8; }
+}
+
+/* ============================================================
+   LOBBIVO COIN & REWARDS ANIMATIONS
+   ============================================================ */
+@keyframes coinSpin3D {
+  0% { transform: rotateY(0deg) scale(1); }
+  50% { transform: rotateY(180deg) scale(1.05); }
+  100% { transform: rotateY(360deg) scale(1); }
+}
+
+@keyframes coinGoldShine {
+  0% {
+    transform: translateX(-150%) rotate(25deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  60%, 100% {
+    transform: translateX(180%) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes coinPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px rgba(255, 200, 50, 0.4));
+  }
+  50% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.8));
+  }
+}
+
+@keyframes coinEarnedFlash {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.9);
+  }
+  40% {
+    transform: scale(1.22);
+    box-shadow: 0 0 35px 12px rgba(255, 215, 0, 0.7);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+  }
+}
+
+@keyframes coinOrbitPulse {
+  0% { transform: rotate(0deg) scale(0.96); opacity: 0.5; }
+  50% { transform: rotate(180deg) scale(1.04); opacity: 0.9; }
+  100% { transform: rotate(360deg) scale(0.96); opacity: 0.5; }
+}
+
+@keyframes goldButtonGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 200, 50, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(255, 215, 0, 0.7), inset 0 1px 4px rgba(255, 255, 255, 0.8);
+  }
+}
+
+/* ============================================================
+   RAINBOW EASTER EGG (GAY TAG)
+   ============================================================ */
+@keyframes rainbowFlow {
+  0% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 4px rgba(255, 0, 128, 0.7));
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 0 7px rgba(0, 240, 255, 0.85));
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 4px rgba(255, 0, 128, 0.7));
+  }
+}
+
+.rainbow-gay-tag {
+  display: inline-block;
+  font-weight: 850;
+  letter-spacing: 0.6px;
+  background: linear-gradient(
+    90deg, 
+    #ff0055 0%, 
+    #ff6600 18%, 
+    #ffee00 36%, 
+    #00ff77 54%, 
+    #00e5ff 72%, 
+    #b000ff 88%, 
+    #ff0055 100%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbowFlow 2.8s ease infinite;
+  padding: 0 3px;
+  border-radius: 4px;
+  vertical-align: baseline;
+  text-transform: none;
+}
+
+/* ============================================================
+   CHAT TELEGRAM-STYLE ANIMATIONS (TYPING & REPLIES)
+   ============================================================ */
+@keyframes typingDotBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+    background-color: #00e5ff;
+    box-shadow: 0 0 6px #00e5ff;
+  }
+}
+
+@keyframes msgHighlightFlash {
+  0% {
+    background-color: rgba(0, 229, 255, 0.35);
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+@keyframes pulseBadge {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 8px rgba(255, 51, 102, 0.8);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 16px rgba(255, 51, 102, 1);
+  }
+}
+
+@keyframes modalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================================
+   АНИМАЦИИ МАГАЗИНА, РАМОК И ПРЕМИУМ-ЭФФЕКТОВ
+   ============================================================ */
+
+/* 1. Переливающийся градиентный никнейм */
+@keyframes rainbowAuthorShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 2. Вращение конического градиента для рамок */
+@keyframes rotateConicFrame {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 3. Огненная ярость (Flame) */
+@keyframes flameBorderGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 68, 0, 0.7), 0 0 20px rgba(255, 170, 0, 0.4);
+    filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 30, 0, 0.95), 0 0 28px rgba(255, 200, 0, 0.6);
+    filter: drop-shadow(0 0 10px rgba(255, 120, 0, 1));
+  }
+}
+
+/* 4. Киберпанк неон (Cyber) */
+@keyframes cyberNeonPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.7), inset 0 0 8px rgba(255, 0, 128, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 0, 128, 0.85), inset 0 0 12px rgba(0, 240, 255, 0.6);
+  }
+}
+
+/* 5. Золото 24k (Gold Imperial) */
+@keyframes goldImperialGleam {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(255, 200, 50, 0.65), 0 0 22px rgba(255, 170, 0, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 225, 100, 0.95), 0 0 32px rgba(255, 190, 30, 0.6);
+  }
+}
+
+/* 6. Ледяной шторм (Glacier Ice) */
+@keyframes glacierIcePulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(100, 220, 255, 0.6), 0 0 20px rgba(0, 150, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(180, 245, 255, 0.9), 0 0 26px rgba(0, 200, 255, 0.5);
+  }
+}
+
+/* 7. Фиолетовый фантом (Ghost Void) */
+@keyframes ghostVoidMist {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(180, 50, 255, 0.6), inset 0 0 6px rgba(120, 0, 255, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(210, 80, 255, 0.9), inset 0 0 10px rgba(180, 0, 255, 0.7);
+    transform: scale(1.02);
+  }
+}
+
+/* 8. VIP Pinned Capsule Pulse */
+@keyframes vipCapsulePulse {
+  0%, 100% {
+    border-color: rgba(255, 190, 30, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(255, 190, 30, 0.15);
+  }
+  50% {
+    border-color: rgba(255, 215, 0, 0.85);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 215, 0, 0.3);
+  }
+}
