@@ -270,6 +270,37 @@ function getUserAdminRole(username) {
   return null;
 }
 
+// Назначение роли пользователю
+function setUserRole(username, role = 'user') {
+  if (!username || !AppState.users[username]) {
+    console.error(`[Role] Пользователь ${username} не найден`);
+    return false;
+  }
+  const u = AppState.users[username];
+  u.role = role;
+  u.isAdmin = (role === 'moderator' || role === 'admin' || role === 'ceo' || role === 'ga');
+  if (role === 'moderator') {
+    if (!u.adminBadgeType) u.adminBadgeType = 'moderator';
+    if (!u.adminBadgeStyle) u.adminBadgeStyle = 'moderator';
+  }
+  saveUsers(username, true);
+  console.log(`[Role] Пользователю ${username} установлена роль: ${role}`);
+  return true;
+}
+window.setUserRole = setUserRole;
+
+// Быстрое назначение модератора
+function setModerator(username) {
+  return setUserRole(username, 'moderator');
+}
+window.setModerator = setModerator;
+
+// Быстрое снятие модератора
+function removeModerator(username) {
+  return setUserRole(username, 'user');
+}
+window.removeModerator = removeModerator;
+
 // Проверка права наказания: модератор НЕ может банить/мутить других модераторов и CEO
 function canAdminPunishTarget(actorUsername, targetUsername) {
   if (!actorUsername || !targetUsername) return false;

@@ -234,6 +234,8 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
     return;
   }
 
+  const isViewerCEO = typeof isUserCEO === 'function' && isUserCEO(AppState.currentUser);
+
   container.innerHTML = filtered.map(name => {
     const u = AppState.users[name];
     const safeName = escapeHtml(name);
@@ -271,6 +273,9 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
         <td>
           <div class="admin-row-actions">
             <button class="admin-mini-btn" onclick="showUserProfileModal('${safeName}')" title="Профиль"><svg style="width:14px;height:14px;"><use href="#icon-eye"/></svg></button>
+            ${isViewerCEO && !isCEO 
+              ? `<button class="admin-mini-btn btn-role ${isMod ? 'is-mod' : ''}" onclick="toggleModeratorRole('${safeName}')" title="${isMod ? 'Снять права Модератора' : 'Выдать права Модератора'}"><svg style="width:14px;height:14px;${isMod ? 'color:#00f0ff;' : 'opacity:0.5;'}"><use href="#icon-shield"/></svg></button>`
+              : ''}
             ${isBanned 
               ? (canPunish 
                   ? `<button class="admin-mini-btn btn-unban" onclick="adminUnbanUser('${safeName}')" title="Снять бан"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`
@@ -285,7 +290,7 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
                   : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может снять мут с персонала"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`)
               : (canPunish 
                   ? `<button class="admin-mini-btn btn-mute" onclick="openMuteModal('${safeName}')" title="Замьютить"><svg style="width:14px;height:14px;"><use href="#icon-mute"/></svg></button>`
-                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может мутить модераторов и GA"><svg style="width:14px;height:14px;"><use href="#icon-mute"/></svg></button>`)
+                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может мутить модераторов и CEO"><svg style="width:14px;height:14px;"><use href="#icon-mute"/></svg></button>`)
             }
           </div>
         </td>
@@ -841,6 +846,53 @@ function saveAdminBadgeSettings() {
   if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
   if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
 }
+
+/**
+ * Назначение или снятие прав модератора (только для CEO)
+ */
+function toggleModeratorRole(targetUsername) {
+  if (!targetUsername) return;
+  const current = AppState.currentUser;
+  if (!isUserCEO(current)) {
+    showNotification('Отказано в доступе', 'Только Главный Администратор (CEO) может управлять правами модераторов');
+    return;
+  }
+  const u = AppState.users[targetUsername];
+  if (!u) {
+    showNotification('Ошибка', 'Пользователь не найден');
+    return;
+  }
+  if (isUserCEO(targetUsername)) {
+    showNotification('Недоступно', 'Нельзя изменить роль CEO');
+    return;
+  }
+
+  const isMod = isUserModerator(targetUsername);
+  if (isMod) {
+    if (confirm(`Снять права Модератора с игрока ${targetUsername}?`)) {
+      u.role = 'user';
+      u.isAdmin = false;
+      saveUsers(targetUsername, true);
+      showNotification('Роль обновлена', `Пользователь ${targetUsername} больше не является модератором`);
+      renderAdminUsers();
+      updateAdminBadges();
+      if (typeof renderWorldChat === 'function') renderWorldChat();
+    }
+  } else {
+    if (confirm(`Назначить игрока ${targetUsername} Модератором платформы Lobbivo?`)) {
+      u.role = 'moderator';
+      u.isAdmin = true;
+      if (!u.adminBadgeType) u.adminBadgeType = 'moderator';
+      if (!u.adminBadgeStyle) u.adminBadgeStyle = 'moderator';
+      saveUsers(targetUsername, true);
+      showNotification('Модератор назначен', `Пользователь ${targetUsername} успешно назначен модератором!`);
+      renderAdminUsers();
+      updateAdminBadges();
+      if (typeof renderWorldChat === 'function') renderWorldChat();
+    }
+  }
+}
+window.toggleModeratorRole = toggleModeratorRole;
 
 document.addEventListener('DOMContentLoaded', initAdminControls);
 
