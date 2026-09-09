@@ -263,27 +263,6 @@ function switchChatTab(tab) {
   updateChatBadge();
 }
 
-function getChatPartnerFromKey(key, currentUser) {
-  if (!key || !currentUser) return '';
-  if (key.includes('___')) {
-    const parts = key.split('___');
-    if (parts.length === 2 && parts.includes(currentUser)) {
-      return parts[0] === currentUser ? parts[1] : parts[0];
-    }
-    return '';
-  }
-  if (key.startsWith(currentUser + '_')) {
-    return key.slice(currentUser.length + 1);
-  }
-  if (key.endsWith('_' + currentUser)) {
-    return key.slice(0, key.length - currentUser.length - 1);
-  }
-  const parts = key.split('_');
-  if (parts.includes(currentUser)) {
-    return parts[0] === currentUser ? parts[1] : parts[0];
-  }
-  return '';
-}
 
 // ============================================================
 //  5. МИРОВОЙ ЧАТ (WORLD CHAT STREAM)
@@ -449,7 +428,9 @@ function renderWorldChat() {
 
   renderVipSquadPinnedBar();
 
-  loadWorldMessages();
+  if (!AppState.worldMessages || !AppState.worldMessages.length) {
+    loadWorldMessages();
+  }
   const msgs = AppState.worldMessages || [];
 
   if (msgs.length === 0) {
@@ -586,48 +567,48 @@ function renderWorldChat() {
   container.innerHTML = html;
   container.scrollTop = container.scrollHeight;
 
-  // Обработчики клика по автору или аватарке
-  container.querySelectorAll('[data-username]').forEach(el => {
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const user = el.dataset.username;
-      openUserQuickPopover(user);
-    });
-  });
+  // Делегирование событий на контейнер мирового чата (добавляется единожды)
+  if (!container._delegatedEventsBound) {
+    container._delegatedEventsBound = true;
+    container.addEventListener('click', (e) => {
+      const replyBtn = e.target.closest('.btn-msg-reply[data-scope="world"]');
+      if (replyBtn) {
+        e.stopPropagation();
+        setReplyTo(replyBtn.dataset.msgId, replyBtn.dataset.author, replyBtn.dataset.text, 'world');
+        return;
+      }
 
-  // Обработчики кнопки ответа (Reply)
-  container.querySelectorAll('.btn-msg-reply[data-scope="world"]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.dataset.msgId;
-      const author = btn.dataset.author;
-      const text = btn.dataset.text;
-      setReplyTo(id, author, text, 'world');
-    });
-  });
+      const delBtn = e.target.closest('.btn-msg-del[data-scope="world"]');
+      if (delBtn) {
+        e.stopPropagation();
+        const msgId = delBtn.dataset.msgId;
+        if (confirm('Удалить это сообщение из мирового чата?')) {
+          deleteWorldMessage(msgId);
+          renderWorldChat();
+          showNotification('Сообщение удалено', 'Сообщение успешно удалено из мирового чата');
+        }
+        return;
+      }
 
-  // Обработчики модерации админа (Удалить / Замьютить)
-  container.querySelectorAll('.btn-msg-del[data-scope="world"]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const msgId = btn.dataset.msgId;
-      if (confirm('Удалить это сообщение из мирового чата?')) {
-        deleteWorldMessage(msgId);
-        renderWorldChat();
-        showNotification('Сообщение удалено', 'Сообщение успешно удалено из мирового чата');
+      const muteBtn = e.target.closest('.btn-msg-mute');
+      if (muteBtn) {
+        e.stopPropagation();
+        const author = muteBtn.dataset.author;
+        if (typeof openMuteModal === 'function') {
+          openMuteModal(author);
+        }
+        return;
+      }
+
+      const userEl = e.target.closest('[data-username]');
+      if (userEl && !e.target.closest('.msg-actions-bar') && !e.target.closest('.msg-reply-quote')) {
+        e.stopPropagation();
+        const user = userEl.dataset.username;
+        if (user) openUserQuickPopover(user);
+        return;
       }
     });
-  });
-
-  container.querySelectorAll('.btn-msg-mute').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const author = btn.dataset.author;
-      if (typeof openMuteModal === 'function') {
-        openMuteModal(author);
-      }
-    });
-  });
+  }
 
   renderWorldTypingIndicator();
   updateChatMuteUI();
@@ -1338,54 +1319,55 @@ function renderChatMessages() {
       </div>
     `;
   }).join('');
+  container.scrollTop = container.scrollHeight;
 
-  container.querySelectorAll('.sender[data-username]').forEach(el => {
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openUserQuickPopover(el.dataset.username);
-    });
-  });
+  // Делегирование событий на контейнер ЛС (добавляется единожды)
+  if (!container._delegatedEventsBound) {
+    container._delegatedEventsBound = true;
+    container.addEventListener('click', (e) => {
+      const replyBtn = e.target.closest('.btn-msg-reply[data-scope="direct"]');
+      if (replyBtn) {
+        e.stopPropagation();
+        setReplyTo(replyBtn.dataset.msgId, replyBtn.dataset.author, replyBtn.dataset.text, 'direct');
+        return;
+      }
 
-  // Обработчики кнопки ответа (Reply в ЛС)
-  container.querySelectorAll('.btn-msg-reply[data-scope="direct"]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.dataset.msgId;
-      const author = btn.dataset.author;
-      const text = btn.dataset.text;
-      setReplyTo(id, author, text, 'direct');
-    });
-  });
-
-  // Обработчики удаления сообщения модератором в ЛС
-  container.querySelectorAll('.btn-msg-del[data-scope="direct"]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const msgId = btn.dataset.msgId;
-      if (confirm('Удалить это сообщение из диалога?')) {
-        if (AppState.chatPartner && AppState.currentUser) {
-          const key = getMessagesKey(AppState.currentUser, AppState.chatPartner);
-          if (AppState.messages[key]) {
-            AppState.messages[key] = AppState.messages[key].filter(m => m.id !== msgId);
-            saveMessages();
-            renderChatMessages();
-            showNotification('Сообщение удалено', 'Сообщение удалено из диалога');
+      const delBtn = e.target.closest('.btn-msg-del[data-scope="direct"]');
+      if (delBtn) {
+        e.stopPropagation();
+        const msgId = delBtn.dataset.msgId;
+        if (confirm('Удалить это сообщение из диалога?')) {
+          if (AppState.chatPartner && AppState.currentUser) {
+            const key = getMessagesKey(AppState.currentUser, AppState.chatPartner);
+            if (AppState.messages[key]) {
+              AppState.messages[key] = AppState.messages[key].filter(m => m.id !== msgId);
+              saveMessages();
+              renderChatMessages();
+              showNotification('Сообщение удалено', 'Сообщение удалено из диалога');
+            }
           }
         }
+        return;
       }
-    });
-  });
 
-  // Обработчики мута из ЛС
-  container.querySelectorAll('.btn-msg-mute').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const author = btn.dataset.author;
-      if (typeof openMuteModal === 'function') {
-        openMuteModal(author);
+      const muteBtn = e.target.closest('.btn-msg-mute');
+      if (muteBtn) {
+        e.stopPropagation();
+        const author = muteBtn.dataset.author;
+        if (typeof openMuteModal === 'function') {
+          openMuteModal(author);
+        }
+        return;
+      }
+
+      const userEl = e.target.closest('.sender[data-username]');
+      if (userEl) {
+        e.stopPropagation();
+        openUserQuickPopover(userEl.dataset.username);
+        return;
       }
     });
-  });
+  }
 
   renderDirectTypingIndicator();
   updateChatMuteUI();

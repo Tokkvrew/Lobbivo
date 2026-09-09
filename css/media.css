@@ -87,6 +87,7 @@
     padding: 0 6px;
     width: 100%;
     box-sizing: border-box;
+    z-index: 10000 !important;
   }
 
   .capsule-header {
@@ -227,6 +228,7 @@
   .capsule-profile-wrapper {
     flex-shrink: 0;
     position: relative;
+    z-index: 10020;
   }
 
   .capsule-profile-btn {
@@ -263,6 +265,12 @@
     max-width: calc(100vw - 20px);
     border-radius: 20px;
     padding: 14px 12px;
+    z-index: 10050 !important;
+    transform: translateY(-8px) scale(0.96) translateZ(0);
+  }
+
+  .profile-dropdown-panel.open {
+    transform: translateY(0) scale(1) translateZ(0);
   }
 
   /* Баннер режима гостя */

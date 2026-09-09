@@ -13,24 +13,38 @@ const firebaseConfig = {
   measurementId: "G-1XKZ9KQ1F8"
 };
 
+function _computeUsersFingerprint(usersObj) {
+  if (!usersObj || typeof usersObj !== 'object') return '';
+  const keys = Object.keys(usersObj).sort();
+  let fp = '';
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
+    const u = usersObj[k];
+    if (!u) continue;
+    fp += `${k}:${u.avatar || ''}:${u.frame || ''}:${u.coins || 0}:${u.game || ''}:${u.nameStyle || ''}:${u.banned ? 1 : 0}:${u.isMuted ? 1 : 0}:${(u.squads || []).length}:${(u.customTags || []).join(',')};`;
+  }
+  return fp;
+}
+
 const FirebaseSync = {
   initialized: false,
   rtdb: null,
+  _lastUsersFingerprint: '',
+  _usersDebounceTimer: null,
 
   init() {
     if (typeof firebase === 'undefined') {
-      console.warn('[Lobbivo Sync] Firebase SDK еще не загружен. Работа в режиме локального кэша.');
       if (!this._retryInitTimer) {
         let attempts = 0;
         const tryConnect = () => {
           attempts++;
           if (typeof firebase !== 'undefined' && !this.initialized) {
             this.init();
-          } else if (attempts < 6) {
-            this._retryInitTimer = setTimeout(tryConnect, 700);
+          } else if (attempts < 60) {
+            this._retryInitTimer = setTimeout(tryConnect, 500);
           }
         };
-        this._retryInitTimer = setTimeout(tryConnect, 700);
+        this._retryInitTimer = setTimeout(tryConnect, 300);
       }
       return;
     }
@@ -77,6 +91,10 @@ const FirebaseSync = {
             }
           }
 
+          const newFp = _computeUsersFingerprint(AppState.users);
+          const hasRealDataChanged = newFp !== this._lastUsersFingerprint;
+          this._lastUsersFingerprint = newFp;
+
           try {
             localStorage.setItem('squad_users', JSON.stringify(AppState.users));
           } catch (e) {}
@@ -88,10 +106,18 @@ const FirebaseSync = {
             }
           }
 
-          if (typeof updateUI === 'function') updateUI();
-          if (typeof updateGameCounts === 'function') updateGameCounts();
-          if (typeof renderProfile === 'function' && AppState.currentUser) renderProfile();
-          if (typeof updateAdminBadges === 'function') updateAdminBadges();
+          // Перерисовываем UI только если данные профилей/анкет реально изменились, чтобы избежать моргания и фризов на мобильных
+          if (hasRealDataChanged) {
+            clearTimeout(this._usersDebounceTimer);
+            this._usersDebounceTimer = setTimeout(() => {
+              if (typeof updateUI === 'function') updateUI();
+              if (typeof updateGameCounts === 'function') updateGameCounts();
+              if (typeof renderProfile === 'function' && AppState.currentUser && document.getElementById('pageProfile')?.classList.contains('active')) {
+                renderProfile();
+              }
+              if (typeof updateAdminBadges === 'function') updateAdminBadges();
+            }, 180);
+          }
         }
       }, (error) => {
         console.warn('Realtime DB users notice (проверьте Rules):', error.message);
@@ -111,12 +137,12 @@ const FirebaseSync = {
             localStorage.setItem('squad_world_messages', JSON.stringify(AppState.worldMessages));
           } catch (e) {}
 
-          if (typeof renderWorldChat === 'function' && AppState.activeChatTab === 'world') {
+          if (typeof renderWorldChat === 'function' && typeof isChatOpen !== 'undefined' && isChatOpen && AppState.activeChatTab === 'world') {
             renderWorldChat();
           }
         } else {
           AppState.worldMessages = [];
-          if (typeof renderWorldChat === 'function' && AppState.activeChatTab === 'world') {
+          if (typeof renderWorldChat === 'function' && typeof isChatOpen !== 'undefined' && isChatOpen && AppState.activeChatTab === 'world') {
             renderWorldChat();
           }
         }
@@ -450,3 +476,11 @@ const FirebaseSync = {
     }
   }
 };
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => {
+    if (typeof FirebaseSync !== 'undefined' && !FirebaseSync.initialized) {
+      FirebaseSync.init();
+    }
+  });
+}

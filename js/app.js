@@ -1897,10 +1897,10 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.8.7', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.8.8', { updateViaCache: 'none' })
         .then((reg) => {
           reg.update().catch(() => {});
-          console.log('[Lobbivo SW] Service Worker v2.8.7 активен:', reg.scope);
+          console.log('[Lobbivo SW] Service Worker v2.8.8 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку
           document.addEventListener('visibilitychange', () => {

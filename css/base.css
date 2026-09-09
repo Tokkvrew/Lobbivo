@@ -224,10 +224,12 @@ body {
   display: flex;
   justify-content: center;
   margin-bottom: 28px;
-  z-index: 200;
+  z-index: 10000 !important;
 }
 
 .capsule-header {
+  position: relative;
+  z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -242,6 +244,7 @@ body {
   border-radius: var(--radius-pill);
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 212, 255, 0.12);
   transition: var(--transition);
+  overflow: visible;
 }
 
 .capsule-header:hover {
@@ -430,6 +433,7 @@ body {
   align-items: center;
   gap: 8px;
   position: relative;
+  z-index: 10010;
 }
 
 .search-toggle-btn {
@@ -628,6 +632,11 @@ body {
   margin-left: 2px;
 }
 
+.capsule-profile-wrapper {
+  position: relative;
+  z-index: 10020;
+}
+
 /* ============================================================
    ВЫПАДАЮЩЕЕ МЕНЮ ПРОФИЛЯ (ФОТО 2 - СТЕКЛЯННЫЙ ДИЗАЙН)
    ============================================================ */
@@ -636,23 +645,24 @@ body {
   top: calc(100% + 14px);
   right: 0;
   width: 260px;
-  background: rgba(8, 16, 34, 0.88);
+  background: rgba(8, 16, 34, 0.94);
   backdrop-filter: blur(36px) saturate(200%);
   -webkit-backdrop-filter: blur(36px) saturate(200%);
-  border: 1px solid rgba(0, 212, 255, 0.32);
+  border: 1px solid rgba(0, 212, 255, 0.45);
   border-radius: 22px;
   padding: 18px 16px 16px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 212, 255, 0.18), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.92), 0 0 35px rgba(0, 212, 255, 0.28), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
   opacity: 0;
-  transform: translateY(-8px) scale(0.96);
+  transform: translateY(-8px) scale(0.96) translateZ(0);
   pointer-events: none;
   transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  z-index: 300;
+  z-index: 10050 !important;
+  isolation: isolate;
 }
 
 .profile-dropdown-panel.open {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0) scale(1) translateZ(0);
   pointer-events: all;
 }
 
@@ -915,28 +925,6 @@ body {
 
 .page-exit {
   animation: pageExit 0.2s ease forwards;
-}
-
-@keyframes pageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes pageExit {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.99);
-  }
 }
 
 /* ЗАГОЛОВКИ ВТОРИЧНЫХ СТРАНИЦ */

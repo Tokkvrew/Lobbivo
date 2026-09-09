@@ -345,10 +345,25 @@ function renderProfileCustomization() {
         btnHtml = `<button type="button" class="btn-custom-action btn-buy-link" onclick="openShopForCustomization('shop')"><svg><use href="#icon-shop"/></svg> <span>В магазине (${theme.cost} LC)</span></button>`;
       }
 
+      let previewChipHtml = '';
+      if (theme.id === 'lobbivo') {
+        previewChipHtml = `<div class="preview-theme-chip"><span class="preview-l-glyph">L</span><span class="preview-theme-tag">GLASS</span></div>`;
+      } else if (theme.id === 'default') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-sparkles"/></svg><span class="preview-theme-tag">CYBER</span></div>`;
+      } else if (theme.id === 'nebula') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-palette-shop"/></svg><span class="preview-theme-tag">NEBULA</span></div>`;
+      } else if (theme.id === 'crimson') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-flame"/></svg><span class="preview-theme-tag">CRIMSON</span></div>`;
+      } else if (theme.id === 'matrix') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-nodes-menu"/></svg><span class="preview-theme-tag">MATRIX</span></div>`;
+      } else {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#${theme.icon}"/></svg><span class="preview-theme-tag">${escapeHtml(theme.name.slice(0,6))}</span></div>`;
+      }
+
       html += `
         <div class="custom-theme-card${activeClass}" data-theme-id="${theme.id}" onclick="if('${isOwned}' === 'true') applyThemeFromProfile('${theme.id}')">
           <div class="theme-palette-preview ${theme.previewClass}">
-            ${theme.id === 'lobbivo' ? '<span class="preview-l-glyph">L</span>' : ''}
+            ${previewChipHtml}
           </div>
           <div class="theme-card-info">
             <div class="theme-name">
@@ -484,14 +499,6 @@ function applyThemeFromProfile(themeId) {
     renderProfile();
     showNotification('Тема изменена', `Активирована тема: ${themeName}`);
   });
-}
-
-function equipFrameFromSettings(frameId) {
-  equipFrameFromProfile(frameId);
-}
-
-function applyThemeFromSettings(themeId) {
-  applyThemeFromProfile(themeId);
 }
 
 async function saveProfile() {
