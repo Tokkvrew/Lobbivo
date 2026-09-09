@@ -585,13 +585,17 @@ function loadUsers() {
     }
     if (!Array.isArray(u.inventory.frames)) u.inventory.frames = [];
     if (!Array.isArray(u.inventory.themes)) u.inventory.themes = [];
+    if (typeof u.nameStyle !== 'string') u.nameStyle = 'default';
+    if (!u.chatDeletedTimestamps || typeof u.chatDeletedTimestamps !== 'object') {
+      u.chatDeletedTimestamps = {};
+    }
   }
 
   saveUsers();
   return AppState.users;
 }
 
-function saveUsers(specificUser = null) {
+function saveUsers(specificUser = null, immediate = false) {
   try {
     localStorage.setItem('squad_users', JSON.stringify(AppState.users));
   } catch (err) {
@@ -600,11 +604,36 @@ function saveUsers(specificUser = null) {
 
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     if (specificUser) {
-      FirebaseSync.saveUser(specificUser);
+      FirebaseSync.saveUser(specificUser, immediate);
     } else {
       FirebaseSync.saveAllUsers();
     }
   }
+}
+
+// Получение CSS-класса для стилизации и раскраски никнейма (GA / Модераторы / Premium)
+function getUserNameClass(username) {
+  if (!username) return '';
+  const user = AppState.users[username];
+  const nameStyle = user?.nameStyle || 'default';
+
+  // 1. Стили Главного Администратора (GA)
+  if (isUserGA(username)) {
+    if (nameStyle === 'ga_inferno') return 'name-style-ga-inferno';
+    if (nameStyle === 'ga_void') return 'name-style-ga-void';
+  }
+
+  // 2. Стили Модераторов
+  if (isUserAdmin(username)) {
+    if (nameStyle === 'mod_emerald') return 'name-style-mod-emerald';
+  }
+
+  // 3. Стиль Premium
+  if (isUserPremium(username)) {
+    return 'premium-author';
+  }
+
+  return '';
 }
 
 // ============================================================
@@ -863,10 +892,23 @@ function getChatPartnerFromKey(key, currentUser) {
 function getChatMessages(user1, user2) {
   if (!user1 || !user2) return [];
   const key1 = getMessagesKey(user1, user2);
-  if (Array.isArray(AppState.messages[key1])) return AppState.messages[key1];
-  const oldKey = [String(user1), String(user2)].sort().join('_');
-  if (Array.isArray(AppState.messages[oldKey])) return AppState.messages[oldKey];
-  return [];
+  let allMsgs = [];
+  if (Array.isArray(AppState.messages[key1])) {
+    allMsgs = AppState.messages[key1];
+  } else {
+    const oldKey = [String(user1), String(user2)].sort().join('_');
+    if (Array.isArray(AppState.messages[oldKey])) {
+      allMsgs = AppState.messages[oldKey];
+    }
+  }
+
+  // Проверка метки удаления переписки «для себя» у пользователя user1
+  const u1 = AppState.users[user1];
+  const deletedUntil = (u1 && u1.chatDeletedTimestamps && u1.chatDeletedTimestamps[user2]) ? Number(u1.chatDeletedTimestamps[user2]) : 0;
+  if (deletedUntil > 0) {
+    return allMsgs.filter(m => (m.time || 0) > deletedUntil);
+  }
+  return allMsgs;
 }
 
 function addMessage(from, to, text, replyTo = null) {
@@ -940,11 +982,55 @@ function getTotalUnreadCount(username) {
   for (const key of Object.keys(AppState.messages)) {
     const partner = getChatPartnerFromKey(key, username);
     if (partner) {
-      const msgs = AppState.messages[key] || [];
+      const msgs = getChatMessages(username, partner);
       total += msgs.filter(m => m.from === partner && !m.read).length;
     }
   }
   return total;
+}
+
+// Удаление личного чата для себя (Telegram style)
+function deleteChatForSelf(currentUser, partner) {
+  if (!currentUser || !partner) return false;
+  const user = AppState.users[currentUser];
+  if (!user) return false;
+  if (!user.chatDeletedTimestamps || typeof user.chatDeletedTimestamps !== 'object') {
+    user.chatDeletedTimestamps = {};
+  }
+  user.chatDeletedTimestamps[partner] = Date.now();
+  saveUsers(currentUser);
+  return true;
+}
+
+// Удаление личного чата для обоих участников (Telegram style)
+function deleteChatForBoth(user1, user2) {
+  if (!user1 || !user2) return false;
+  const key = getMessagesKey(user1, user2);
+  const oldKey = [String(user1), String(user2)].sort().join('_');
+
+  delete AppState.messages[key];
+  if (AppState.messages[oldKey]) {
+    delete AppState.messages[oldKey];
+  }
+  saveMessages();
+
+  // Очищаем метки удаления для себя у обоих участников
+  if (AppState.users[user1]?.chatDeletedTimestamps?.[user2]) {
+    delete AppState.users[user1].chatDeletedTimestamps[user2];
+    saveUsers(user1);
+  }
+  if (AppState.users[user2]?.chatDeletedTimestamps?.[user1]) {
+    delete AppState.users[user2].chatDeletedTimestamps[user1];
+    saveUsers(user2);
+  }
+
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    FirebaseSync.deleteDirectChat(key);
+    if (oldKey !== key) {
+      FirebaseSync.deleteDirectChat(oldKey);
+    }
+  }
+  return true;
 }
 
 // Жалобы

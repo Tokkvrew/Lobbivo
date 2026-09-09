@@ -52,11 +52,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <!-- CSS Стили (с авто-обновлением кэша) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.8.3" />
-  <link rel="stylesheet" href="css/base.css?v=2.8.3" />
-  <link rel="stylesheet" href="css/components.css?v=2.8.3" />
-  <link rel="stylesheet" href="css/animations.css?v=2.8.3" />
-  <link rel="stylesheet" href="css/media.css?v=2.8.3" />
+  <link rel="stylesheet" href="css/variables.css?v=2.8.5" />
+  <link rel="stylesheet" href="css/base.css?v=2.8.5" />
+  <link rel="stylesheet" href="css/components.css?v=2.8.5" />
+  <link rel="stylesheet" href="css/animations.css?v=2.8.5" />
+  <link rel="stylesheet" href="css/media.css?v=2.8.5" />
 </head>
 <body>
 
@@ -899,6 +899,20 @@
               <!-- Рендерится через renderProfileCustomization() -->
             </div>
           </div>
+
+          <!-- 2.3 ЦВЕТ И СТИЛЬ НИКНЕЙМА (ДЛЯ GA И МОДЕРАТОРОВ) -->
+          <div class="custom-wardrobe-block" id="adminNameStyleBlock" style="margin-top: 24px; display: none;">
+            <div class="wardrobe-header">
+              <div class="wardrobe-title">
+                <svg><use href="#icon-palette-shop"/></svg>
+                <span>Фирменный стиль никнейма (Персонал Lobbivo)</span>
+              </div>
+              <div class="wardrobe-sub">Эксклюзивные анимированные градиенты для отображения вашего никнейма в чатах, карточках и профиле</div>
+            </div>
+            <div class="custom-name-styles-grid" id="profileNameStylesGrid">
+              <!-- Рендерится через renderProfileCustomization() -->
+            </div>
+          </div>
         </div>
 
         <!-- 3. СЕКЦИЯ: НАСТРОЙКИ АНКЕТЫ И ПЕРСОНАЛЬНЫЕ ДАННЫЕ -->
@@ -1254,9 +1268,14 @@
             <span id="chatUserStatus" class="chat-header-status" style="display:none;">в сети</span>
           </div>
         </div>
-        <button class="chat-close" id="chatCloseBtn" title="Закрыть чат">
-          <svg><use href="#icon-close"/></svg>
-        </button>
+        <div class="chat-header-actions">
+          <button type="button" class="chat-header-action-btn btn-delete-direct-chat" id="deleteDirectChatHeaderBtn" title="Удалить чат" style="display:none;">
+            <svg><use href="#icon-trash"/></svg>
+          </button>
+          <button class="chat-close" id="chatCloseBtn" title="Закрыть чат">
+            <svg><use href="#icon-close"/></svg>
+          </button>
+        </div>
       </div>
 
       <!-- Вкладки чата: МИР / ЛИЧНЫЕ -->
@@ -1431,6 +1450,51 @@
           <button type="button" class="btn btn-primary" id="firstContactSendBtn">
             <svg><use href="#icon-send"/></svg>
             <span>Отправить заявку</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА УДАЛЕНИЯ ЧАТА (TELEGRAM STYLE) -->
+    <div class="modal-overlay" id="deleteChatModal">
+      <div class="modal delete-chat-modal-glass">
+        <button class="modal-close" id="deleteChatModalClose" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        <div class="delete-chat-modal-header">
+          <div class="delete-chat-icon-wrap">
+            <svg class="delete-chat-trash-icon"><use href="#icon-trash"/></svg>
+          </div>
+          <div class="delete-chat-title-group">
+            <h3>Удалить переписку</h3>
+            <span class="delete-chat-sub" id="deleteChatModalSub">Удаление диалога с игроком</span>
+          </div>
+        </div>
+
+        <div class="delete-chat-body">
+          <p class="delete-chat-warning-text" id="deleteChatWarningText">
+            Вы уверены, что хотите удалить историю сообщений с <strong id="deleteChatPartnerName" class="highlight-partner">Игрок</strong>? Это действие нельзя отменить.
+          </p>
+
+          <label class="delete-both-checkbox-row" for="deleteForBothCheckbox" id="deleteForBothRow">
+            <div class="cyber-checkbox-wrap">
+              <input type="checkbox" id="deleteForBothCheckbox" class="cyber-checkbox-input" />
+              <span class="cyber-checkbox-custom">
+                <svg viewBox="0 0 16 16"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              </span>
+            </div>
+            <div class="delete-checkbox-label-content">
+              <span class="delete-checkbox-title" id="deleteForBothLabelTitle">Также удалить для <span id="deleteForBothPartnerName">Собеседника</span></span>
+              <span class="delete-checkbox-hint" id="deleteForBothLabelHint">Если не выбрано, чат очистится только у вас</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="delete-chat-actions">
+          <button type="button" class="btn btn-outline" id="deleteChatCancelBtn">Отмена</button>
+          <button type="button" class="btn btn-danger-glow" id="deleteChatConfirmBtn">
+            <svg><use href="#icon-trash"/></svg>
+            <span>Удалить</span>
           </button>
         </div>
       </div>
@@ -2652,15 +2716,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (с авто-обновлением кэша) -->
-  <script src="js/data.js?v=2.8.3"></script>
-  <script src="js/security-shield.js?v=2.8.3"></script>
-  <script src="js/firebase-sync.js?v=2.8.3"></script>
-  <script src="js/storage.js?v=2.8.3"></script>
-  <script src="js/auth.js?v=2.8.3"></script>
-  <script src="js/games.js?v=2.8.3"></script>
-  <script src="js/chat.js?v=2.8.3"></script>
-  <script src="js/profile.js?v=2.8.3"></script>
-  <script src="js/admin.js?v=2.8.3"></script>
-  <script src="js/app.js?v=2.8.3"></script>
+  <script src="js/data.js?v=2.8.5"></script>
+  <script src="js/security-shield.js?v=2.8.5"></script>
+  <script src="js/firebase-sync.js?v=2.8.5"></script>
+  <script src="js/storage.js?v=2.8.5"></script>
+  <script src="js/auth.js?v=2.8.5"></script>
+  <script src="js/games.js?v=2.8.5"></script>
+  <script src="js/chat.js?v=2.8.5"></script>
+  <script src="js/profile.js?v=2.8.5"></script>
+  <script src="js/admin.js?v=2.8.5"></script>
+  <script src="js/app.js?v=2.8.5"></script>
 </body>
 </html>

@@ -1545,6 +1545,20 @@ function init() {
     if (e.target === this) closeFirstContactModal();
   });
 
+  // Модалка удаления переписки (Telegram style)
+  document.getElementById('deleteDirectChatHeaderBtn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (AppState.chatPartner) {
+      openDeleteChatModal(AppState.chatPartner);
+    }
+  });
+  document.getElementById('deleteChatModalClose')?.addEventListener('click', closeDeleteChatModal);
+  document.getElementById('deleteChatCancelBtn')?.addEventListener('click', closeDeleteChatModal);
+  document.getElementById('deleteChatConfirmBtn')?.addEventListener('click', confirmDeleteChat);
+  document.getElementById('deleteChatModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteChatModal();
+  });
+
   // Принятие / отклонение заявки в друзья
   document.getElementById('btnAcceptFriendReq')?.addEventListener('click', handleAcceptFriendReq);
   document.getElementById('btnDeclineFriendReq')?.addEventListener('click', handleDeclineFriendReq);

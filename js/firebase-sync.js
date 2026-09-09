@@ -53,9 +53,13 @@ const FirebaseSync = {
           // Мягкое слияние облачных данных с локальным состоянием
           for (const username of Object.keys(data)) {
             if (username && data[username]) {
+              const cloudUser = data[username];
+              if (!Array.isArray(cloudUser.squads)) {
+                cloudUser.squads = [];
+              }
               AppState.users[username] = {
                 ...AppState.users[username],
-                ...data[username]
+                ...cloudUser
               };
             }
           }
@@ -277,25 +281,37 @@ const FirebaseSync = {
     } catch (e) {}
   },
 
-  // Сохранение пользователя в облако с дебаунсом (защита от частых спам-записей)
-  saveUser(username) {
+  // Сохранение пользователя в облако с дебаунсом (или немедленно)
+  saveUser(username, immediate = false) {
     if (!this.initialized || !this.rtdb || !username) return;
     const userData = AppState.users[username];
     if (!userData) return;
 
     if (this._userSaveTimers[username]) {
       clearTimeout(this._userSaveTimers[username]);
+      delete this._userSaveTimers[username];
     }
 
-    this._userSaveTimers[username] = setTimeout(() => {
+    const executeSave = () => {
       try {
-        this.rtdb.ref('users/' + username).set(userData)
+        const payload = JSON.parse(JSON.stringify(userData));
+        if (!Array.isArray(payload.squads) || payload.squads.length === 0) {
+          payload.squads = [];
+          payload.lookingForTeam = false;
+          payload.hasCreatedSquad = false;
+        }
+        this.rtdb.ref('users/' + username).set(payload)
           .catch(err => console.warn('Cloud save user error:', err.message));
       } catch (err) {
         console.warn('Cloud save user exception:', err);
       }
-      delete this._userSaveTimers[username];
-    }, 250);
+    };
+
+    if (immediate) {
+      executeSave();
+    } else {
+      this._userSaveTimers[username] = setTimeout(executeSave, 250);
+    }
   },
 
   // Сохранение всех пользователей в облако
@@ -374,6 +390,17 @@ const FirebaseSync = {
       }).catch(err => console.warn('Cloud save direct chat error:', err.message));
     } catch (err) {
       console.warn('Cloud save direct chat exception:', err);
+    }
+  },
+
+  // Удаление личного чата для обоих участников в облаке
+  deleteDirectChat(key) {
+    if (!this.initialized || !this.rtdb || !key) return;
+    try {
+      this.rtdb.ref('directMessages/' + key).remove()
+        .catch(err => console.warn('Cloud delete direct chat error:', err.message));
+    } catch (err) {
+      console.warn('Cloud delete direct chat exception:', err);
     }
   },
 

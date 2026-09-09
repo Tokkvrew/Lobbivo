@@ -135,22 +135,7 @@ function getUserSquads(username) {
     return u.squads.filter(s => s && s.active !== false);
   }
 
-  // Миграция если анкеты были в виде одиночных полей
-  if (u.lookingForTeam || u.hasCreatedSquad) {
-    u.squads = [{
-      id: 'sq_' + (u.id || Math.random().toString(36).slice(2, 8)),
-      game: u.game || 'csgo',
-      rank: u.rank || '',
-      device: u.device || 'PC',
-      desc: u.desc || '',
-      createdAt: u.created || Date.now(),
-      active: true
-    }];
-    return u.squads;
-  }
-
-  u.squads = [];
-  return u.squads;
+  return [];
 }
 
 function renderMySquads() {
@@ -370,14 +355,17 @@ function deleteSquad(squadId) {
   if (Array.isArray(user.squads)) {
     user.squads = user.squads.filter(s => s.id !== squadId);
     user.lookingForTeam = user.squads.some(s => s.active !== false);
+    user.hasCreatedSquad = user.squads.length > 0;
     if (user.squads.length > 0) {
       user.game = user.squads[0].game || user.game;
     }
   } else {
+    user.squads = [];
     user.lookingForTeam = false;
+    user.hasCreatedSquad = false;
   }
 
-  saveUsers();
+  saveUsers(AppState.currentUser, true);
   renderMySquads();
   renderPlayers(AppState.selectedGameFilter || 'all');
   updateGameCounts();
@@ -482,7 +470,7 @@ function renderPlayers(gameFilter = 'all') {
           <div class="player-avatar">${avatarContent}</div>
           <div class="player-info">
             <div class="player-name">
-              <span class="${isPremium ? 'premium-author' : ''}">${safeName}</span>
+              <span class="${getUserNameClass(username)}">${safeName}</span>
               ${premiumCrownHtml}
               ${adminBadgeHtml}
               ${vipPillHtml}
@@ -632,7 +620,7 @@ function showUserProfileModal(username) {
         </div>
         <div>
           <div class="modal-user-name">
-            <span class="${isUserPremium(username) ? 'premium-author' : ''}">${safeName}</span>
+            <span class="${getUserNameClass(username)}">${safeName}</span>
             ${isUserPremium(username) ? '<span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : ''}
             ${(typeof getUserAdminBadge === 'function' && getUserAdminBadge(username)) ? `<span class="admin-custom-badge badge-style-${getUserAdminBadge(username).style}" style="margin-left:6px;"><svg><use href="#${getUserAdminBadge(username).icon}"/></svg><span>${escapeHtml(getUserAdminBadge(username).text)}</span></span>` : ''}
             ${isTargetBanned ? '<span class="admin-badge badge-ban" style="margin-left:6px;">БАН</span>' : ''}
@@ -644,7 +632,7 @@ function showUserProfileModal(username) {
           </div>
           <div class="modal-user-meta">
             <svg class="device-icon device-icon-sm"><use href="#${escapeHtml(deviceIconSVG)}"/></svg>
-            ${safeDevice} · ID: ${data.id || '---'}
+            ${safeDevice} · ID: ${data.id || '---'}${isUserGA(username) ? ' <span class="profile-ceo-badge"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>' : ''}
           </div>
           <div class="modal-user-status" style="margin-top: 4px; font-size: 0.8rem; font-weight: 600; color: ${isUserOnline(username) ? '#00ff9d' : 'var(--text-muted)'};">
             <span class="online-dot ${isUserOnline(username) ? 'online' : 'offline'}" style="display:inline-block; vertical-align:middle; margin-right:4px;"></span>

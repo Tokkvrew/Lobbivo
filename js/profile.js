@@ -37,7 +37,7 @@ function updateHeaderAvatar() {
   const isAdmin = current && typeof isUserAdmin === 'function' && isUserAdmin(current);
 
   if (dropdownUsername) {
-    dropdownUsername.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(current || 'Гость')}</span>${isPremium ? ' <span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : ''}`;
+    dropdownUsername.innerHTML = `<span class="${getUserNameClass(current)}">${escapeHtml(current || 'Гость')}</span>${isPremium ? ' <span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : ''}`;
   }
   if (dropdownStatusText) {
     dropdownStatusText.textContent = current ? 'В сети' : 'Не авторизован';
@@ -153,8 +153,7 @@ function renderProfile() {
   const nameEl = document.getElementById('profileName');
   if (nameEl) {
     nameEl.textContent = current;
-    if (isPremium) nameEl.classList.add('premium-author');
-    else nameEl.classList.remove('premium-author');
+    nameEl.className = 'profile-name ' + getUserNameClass(current);
   }
 
   const crownEl = document.getElementById('profilePremiumCrown');
@@ -163,7 +162,11 @@ function renderProfile() {
   }
 
   const idEl = document.getElementById('profileId');
-  if (idEl) idEl.textContent = `ID: ${data.id || '---'}`;
+  if (idEl) {
+    const isGA = typeof isUserGA === 'function' && isUserGA(current);
+    const ceoBadge = isGA ? ` <span class="profile-ceo-badge" title="Основатель и Главный Администратор Lobbivo"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>` : '';
+    idEl.innerHTML = `ID: ${data.id || '---'}${ceoBadge}`;
+  }
 
   // 2. Аватар в шапке профиля с рамкой
   const avatarEl = document.getElementById('profileAvatar');
@@ -272,13 +275,19 @@ function renderProfileCustomization() {
     stageFrameName.innerHTML = `<svg class="item-title-icon ${currentFrameDef.id}-icon"><use href="#${currentFrameDef.icon}"/></svg> <span>${currentFrameDef.name}</span>`;
   }
 
+  const isGa = current && typeof isUserGA === 'function' && isUserGA(current);
+  const isMod = current && typeof isUserAdmin === 'function' && isUserAdmin(current);
+
   // 2. Сетка рамок
   const framesGrid = document.getElementById('profileFramesGrid');
   if (framesGrid) {
     let html = '';
     FRAME_DEFINITIONS.forEach(frame => {
       const isEquipped = equippedFrame === frame.id;
-      const isOwned = frame.id === 'none' || inventory.frames.includes(frame.id);
+      let isOwned = frame.id === 'none' || inventory.frames.includes(frame.id);
+      if (frame.gaOnly) {
+        isOwned = isGa || inventory.frames.includes(frame.id);
+      }
       const activeClass = isEquipped ? ' active' : '';
 
       let btnHtml = '';
@@ -286,15 +295,18 @@ function renderProfileCustomization() {
         btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
       } else if (isOwned) {
         btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipFrameFromProfile('${frame.id}')"><span>Надеть</span></button>`;
+      } else if (frame.gaOnly) {
+        btnHtml = `<div class="btn-custom-action btn-locked-ga" title="Только для Главного Администратора"><svg><use href="#icon-admin-shield"/></svg> <span>Эксклюзив GA</span></div>`;
       } else {
         btnHtml = `<button type="button" class="btn-custom-action btn-buy-link" onclick="openShopForCustomization('shop')"><svg><use href="#icon-shop"/></svg> <span>В магазине (${frame.cost} LC)</span></button>`;
       }
 
       const avatarContent = (user && user.avatar) ? `<img src="${user.avatar}" alt="${escapeHtml(current)}">` : `<span>${current ? current.slice(0, 2).toUpperCase() : '?'}</span>`;
       const frameWrapClass = frame.id !== 'none' ? ` frame-${frame.id}` : '';
+      const gaBadgeHtml = frame.gaOnly ? '<span class="frame-ga-pill"><svg><use href="#icon-admin-shield"/></svg>GA EXCLUSIVE</span>' : '';
 
       html += `
-        <div class="custom-frame-card${activeClass}" data-frame-id="${frame.id}">
+        <div class="custom-frame-card${activeClass} ${frame.gaOnly ? 'ga-exclusive-card' : ''}" data-frame-id="${frame.id}">
           <div class="frame-preview-box">
             <div class="avatar-frame-wrap${frameWrapClass}">
               <div class="frame-preview-avatar">${avatarContent}</div>
@@ -304,6 +316,7 @@ function renderProfileCustomization() {
             <div class="frame-name">
               <svg class="item-title-icon ${frame.id}-icon"><use href="#${frame.icon}"/></svg>
               <span>${frame.name}</span>
+              ${gaBadgeHtml}
             </div>
             <div class="frame-desc">${frame.desc}</div>
           </div>
@@ -350,7 +363,80 @@ function renderProfileCustomization() {
     });
     themesGrid.innerHTML = html;
   }
+
+  // 4. Сетка стилей никнейма (для GA и Модераторов)
+  const nameStyleBlock = document.getElementById('adminNameStyleBlock');
+  const nameStylesGrid = document.getElementById('profileNameStylesGrid');
+
+  if (nameStyleBlock && nameStylesGrid) {
+    if (isGa || isMod) {
+      nameStyleBlock.style.display = 'block';
+      const currentNameStyle = user?.nameStyle || 'default';
+
+      let availableStyles = [
+        { id: 'default', name: 'Стандартный стиль', desc: 'Классический цвет никнейма (или золотой при наличии Premium)', previewClass: '' }
+      ];
+
+      if (isGa) {
+        availableStyles.push(
+          { id: 'ga_inferno', name: 'GA Inferno Crimson', desc: 'Анимированный багрово-пламенный градиент с искрами и сиянием', previewClass: 'name-style-ga-inferno' },
+          { id: 'ga_void', name: 'GA Cosmic Singularity', desc: 'Императорский градиент сингулярности: переливы космического ультра-фиолета и золота', previewClass: 'name-style-ga-void' }
+        );
+      } else if (isMod) {
+        availableStyles.push(
+          { id: 'mod_emerald', name: 'Mod Emerald Matrix', desc: 'Сияющий изумрудный кибер-градиент команды модерации Lobbivo', previewClass: 'name-style-mod-emerald' }
+        );
+      }
+
+      let stylesHtml = '';
+      availableStyles.forEach(style => {
+        const isSelected = currentNameStyle === style.id;
+        const activeClass = isSelected ? ' active' : '';
+
+        let btnHtml = '';
+        if (isSelected) {
+          btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
+        } else {
+          btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="applyNameStyleFromProfile('${style.id}')"><span>Применить</span></button>`;
+        }
+
+        stylesHtml += `
+          <div class="custom-name-style-card${activeClass}" data-style-id="${style.id}">
+            <div class="name-style-preview-box">
+              <span class="preview-name-text ${style.previewClass}">${escapeHtml(current || 'Игрок')}</span>
+            </div>
+            <div class="name-style-card-info">
+              <div class="name-style-title">${style.name}</div>
+              <div class="name-style-desc">${style.desc}</div>
+            </div>
+            ${btnHtml}
+          </div>
+        `;
+      });
+      nameStylesGrid.innerHTML = stylesHtml;
+    } else {
+      nameStyleBlock.style.display = 'none';
+    }
+  }
 }
+
+function applyNameStyleFromProfile(styleId) {
+  const current = AppState.currentUser;
+  if (!current || !AppState.users[current]) return;
+
+  const user = AppState.users[current];
+  user.nameStyle = styleId;
+  saveUsers(current);
+
+  renderProfile();
+  renderProfileCustomization();
+  if (typeof renderWorldChat === 'function') renderWorldChat();
+  if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
+  if (typeof updateUI === 'function') updateUI();
+
+  showNotification('Стиль ника обновлён', 'Новый стиль никнейма успешно активирован!');
+}
+window.applyNameStyleFromProfile = applyNameStyleFromProfile;
 
 // Алиас для обратной совместимости
 function renderSettingsCustomization() {

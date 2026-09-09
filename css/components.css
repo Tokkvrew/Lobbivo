@@ -9989,3 +9989,513 @@ select:-webkit-autofill {
   color: #ff4466 !important;
   font-style: italic;
 }
+
+/* ============================================================
+   ЧАТ: УДАЛЕНИЕ ДИАЛОГА (TELEGRAM STYLE DELETE CHAT UI)
+   ============================================================ */
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-header-action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-header-action-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+}
+
+.chat-header-action-btn:hover {
+  background: rgba(255, 68, 102, 0.18);
+  border-color: rgba(255, 68, 102, 0.45);
+  color: #ff4466;
+  box-shadow: 0 0 14px rgba(255, 68, 102, 0.35);
+  transform: translateY(-1px);
+}
+
+.chat-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.chat-item-delete-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 7px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.88);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-item-delete-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+}
+
+.chat-list-item:hover .chat-item-delete-btn,
+.chat-item-delete-btn:focus,
+.chat-item-delete-btn:hover {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.chat-item-delete-btn:hover {
+  background: rgba(255, 68, 102, 0.22);
+  border-color: rgba(255, 68, 102, 0.55);
+  color: #ff4466;
+  box-shadow: 0 0 12px rgba(255, 68, 102, 0.4);
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .chat-item-delete-btn {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   МОДАЛКА УДАЛЕНИЯ ЧАТА (TELEGRAM-STYLE DELETE CHAT MODAL)
+   ============================================================ */
+.delete-chat-modal-glass {
+  max-width: 440px !important;
+  width: 92% !important;
+  background: linear-gradient(160deg, rgba(17, 19, 28, 0.96), rgba(8, 9, 14, 0.98)) !important;
+  border: 1px solid rgba(255, 68, 102, 0.35) !important;
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.85), 0 0 40px rgba(255, 68, 102, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  backdrop-filter: blur(24px) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.delete-chat-modal-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff4466, #b44dff, #00d4ff);
+}
+
+.delete-chat-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.delete-chat-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 68, 102, 0.12);
+  border: 1px solid rgba(255, 68, 102, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4466;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(255, 68, 102, 0.2);
+}
+
+.delete-chat-trash-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.delete-chat-title-group h3 {
+  margin: 0 0 2px 0;
+  font-size: 1.2rem;
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.delete-chat-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.delete-chat-body {
+  margin-bottom: 22px;
+}
+
+.delete-chat-warning-text {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.highlight-partner {
+  color: var(--neon-blue);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.35);
+}
+
+.delete-both-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.delete-both-checkbox-row:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(0, 212, 255, 0.35);
+}
+
+.cyber-checkbox-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.cyber-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  margin: 0;
+  z-index: 2;
+}
+
+.cyber-checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.8px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.cyber-checkbox-custom svg {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cyber-checkbox-input:checked + .cyber-checkbox-custom {
+  background: linear-gradient(135deg, #ff4466, #ff1744);
+  border-color: #ff4466;
+  box-shadow: 0 0 12px rgba(255, 68, 102, 0.5);
+}
+
+.cyber-checkbox-input:checked + .cyber-checkbox-custom svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.delete-checkbox-label-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.delete-checkbox-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.delete-checkbox-hint {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.delete-chat-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-danger-glow {
+  background: linear-gradient(135deg, #ff3366, #ff1744) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 4px 18px rgba(255, 51, 102, 0.4) !important;
+  font-weight: 700 !important;
+  padding: 10px 22px !important;
+  border-radius: 30px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-danger-glow:hover {
+  box-shadow: 0 6px 26px rgba(255, 51, 102, 0.65) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-danger-glow:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.btn-danger-glow svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================================
+   ЭКСКЛЮЗИВНАЯ РАМКА GA (GA SINGULARITY OVERLORD FRAME)
+   ============================================================ */
+.avatar-frame-wrap.frame-ga_overlord {
+  position: relative !important;
+  background: conic-gradient(from 0deg, #ff0055, #ff3b00, #ffd700, #b44dff, #00d4ff, #ff0055) !important;
+  animation: gaSingularityPulse 2.8s ease-in-out infinite alternate !important;
+  box-shadow: 0 0 16px rgba(255, 0, 85, 0.8), 0 0 32px rgba(255, 60, 0, 0.5), 0 0 44px rgba(180, 77, 255, 0.45) !important;
+  border: 1.5px solid rgba(255, 215, 0, 0.7) !important;
+  overflow: visible !important;
+}
+
+.avatar-frame-wrap.frame-ga_overlord::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(from 180deg, #ffd700, #ff0055, #00e5ff, #b44dff, #ffd700);
+  filter: blur(5px);
+  z-index: -1;
+  animation: gaSingularityRotate 3.2s linear infinite;
+  opacity: 0.85;
+}
+
+@keyframes gaSingularityPulse {
+  0% {
+    box-shadow: 0 0 14px rgba(255, 0, 85, 0.8), 0 0 28px rgba(255, 60, 0, 0.5), 0 0 38px rgba(180, 77, 255, 0.4);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 22px rgba(255, 0, 85, 0.95), 0 0 42px rgba(255, 215, 0, 0.7), 0 0 55px rgba(0, 212, 255, 0.5);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes gaSingularityRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.frame-ga-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(255, 0, 85, 0.2), rgba(255, 215, 0, 0.2));
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  color: #ffd700;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+  letter-spacing: 0.4px;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.frame-ga-pill svg {
+  width: 10px;
+  height: 10px;
+}
+
+.custom-frame-card.ga-exclusive-card {
+  border-color: rgba(255, 0, 85, 0.4) !important;
+  background: linear-gradient(145deg, rgba(255, 0, 85, 0.06), rgba(255, 215, 0, 0.04)) !important;
+}
+
+.btn-locked-ga {
+  background: rgba(255, 0, 85, 0.12) !important;
+  border: 1px solid rgba(255, 0, 85, 0.3) !important;
+  color: #ff4466 !important;
+  cursor: not-allowed !important;
+}
+
+/* ============================================================
+   CEO БЕЙДЖ ДЛЯ ID В ПРОФИЛЕ (FOUNDER & CEO ID BADGE)
+   ============================================================ */
+.profile-ceo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(255, 0, 85, 0.24));
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  color: #ffd700;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.8px;
+  vertical-align: middle;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+  animation: ceoGlowPulse 2.5s infinite alternate;
+  margin-left: 6px;
+}
+
+@keyframes ceoGlowPulse {
+  0% {
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+    border-color: rgba(255, 215, 0, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 16px rgba(255, 0, 85, 0.6), 0 0 10px rgba(255, 215, 0, 0.8);
+    border-color: rgba(255, 215, 0, 0.85);
+  }
+}
+
+/* ============================================================
+   ФИРМЕННЫЕ ЦВЕТА И СТИЛИ НИКНЕЙМА (GA & MODERATOR NAME ENGINE)
+   ============================================================ */
+
+/* 1. GA Inferno Crimson (Багрово-пламенный) */
+.name-style-ga-inferno {
+  background: linear-gradient(90deg, #ff0055, #ff3700, #ffbb00, #ff0055) !important;
+  background-size: 250% 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: nameShimmerCycle 3s linear infinite !important;
+  font-weight: 800 !important;
+  filter: drop-shadow(0 0 7px rgba(255, 55, 0, 0.65)) !important;
+}
+
+/* 2. GA Cosmic Singularity (Императорский фиолетово-золотой) */
+.name-style-ga-void {
+  background: linear-gradient(90deg, #b44dff, #ff007f, #ffd700, #00d4ff, #b44dff) !important;
+  background-size: 250% 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: nameShimmerCycle 3.5s linear infinite !important;
+  font-weight: 800 !important;
+  filter: drop-shadow(0 0 7px rgba(180, 77, 255, 0.65)) !important;
+}
+
+/* 3. Mod Emerald Matrix (Изумрудный кибер-код) */
+.name-style-mod-emerald {
+  background: linear-gradient(90deg, #00ff9d, #00e5ff, #10b981, #00ff9d) !important;
+  background-size: 250% 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: nameShimmerCycle 3s linear infinite !important;
+  font-weight: 800 !important;
+  filter: drop-shadow(0 0 7px rgba(0, 255, 157, 0.65)) !important;
+}
+
+@keyframes nameShimmerCycle {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ============================================================
+   КАРТОЧКИ ВЫБОРА СТИЛЯ НИКА В ПЕРСОНАЛИЗАЦИИ
+   ============================================================ */
+.custom-name-styles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.custom-name-style-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-name-style-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(0, 212, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.custom-name-style-card.active {
+  border-color: #00d4ff;
+  background: linear-gradient(145deg, rgba(0, 212, 255, 0.08), rgba(180, 77, 255, 0.05));
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
+}
+
+.name-style-preview-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-name-text {
+  font-size: 1.15rem;
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.name-style-card-info {
+  flex: 1;
+}
+
+.name-style-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.name-style-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}

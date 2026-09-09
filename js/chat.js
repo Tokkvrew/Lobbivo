@@ -222,12 +222,15 @@ function switchChatTab(tab) {
   const chatAvatar = document.getElementById('chatAvatar');
   const chatUserStatus = document.getElementById('chatUserStatus');
 
+  const deleteDirectHeaderBtn = document.getElementById('deleteDirectChatHeaderBtn');
+
   if (tabWorld) tabWorld.classList.toggle('active', tab === 'world');
   if (tabDirect) tabDirect.classList.toggle('active', tab === 'direct');
 
   if (tab === 'world') {
     isInChat = false;
     AppState.chatPartner = null;
+    if (deleteDirectHeaderBtn) deleteDirectHeaderBtn.style.display = 'none';
     if (worldView) {
       worldView.style.display = 'flex';
       worldView.classList.add('active');
@@ -253,6 +256,7 @@ function switchChatTab(tab) {
       directView.classList.add('active');
     }
     if (!isInChat || !AppState.chatPartner) {
+      if (deleteDirectHeaderBtn) deleteDirectHeaderBtn.style.display = 'none';
       showDirectChatList();
     }
   }
@@ -376,7 +380,7 @@ function renderVipSquadPinnedBar() {
         </div>
         <div class="vip-pinned-info">
           <div class="vip-pinned-header">
-            <span class="vip-pinned-name ${isUserPremium(username) ? 'premium-author' : ''}" data-username="${safeName}">
+            <span class="vip-pinned-name ${getUserNameClass(username)}" data-username="${safeName}">
               ${safeName}
             </span>
             ${isUserPremium(username) ? '<span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : ''}
@@ -495,7 +499,7 @@ function renderWorldChat() {
         <span>${escapeHtml(adminBadge.text)}</span>
       </span>
     ` : '';
-    const authorClass = isAuthorPremium ? 'world-msg-author premium-author' : 'world-msg-author';
+    const authorClass = 'world-msg-author ' + getUserNameClass(safeAuthor);
 
     const gameBadgeHtml = gameObj ? `
       <span class="chat-game-badge" title="Игра: ${escapeHtml(gameObj.name)}">
@@ -701,7 +705,7 @@ function openUserQuickPopover(username) {
   const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" title="Администратор Lobbivo"><svg><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
 
   if (nameEl) {
-    nameEl.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(username)}</span>${isPremium ? ' <span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : ''} ${adminBadgeHtml}`;
+    nameEl.innerHTML = `<span class="${getUserNameClass(username)}">${escapeHtml(username)}</span>${isPremium ? ' <span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : ''} ${adminBadgeHtml}`;
   }
 
   let avatarContent;
@@ -810,13 +814,15 @@ function showDirectChatList() {
   const chatUserName = document.getElementById('chatUserName');
   const chatAvatar = document.getElementById('chatAvatar');
   const chatUserStatus = document.getElementById('chatUserStatus');
+  const deleteDirectHeaderBtn = document.getElementById('deleteDirectChatHeaderBtn');
 
+  if (deleteDirectHeaderBtn) deleteDirectHeaderBtn.style.display = 'none';
   if (chatList) chatList.classList.add('open');
   if (directRoom) directRoom.style.display = 'none';
-    if (chatBackBtn) chatBackBtn.style.display = 'flex';
-    if (chatUserName) chatUserName.textContent = 'Личные сообщения';
-    if (chatAvatar) chatAvatar.innerHTML = '<svg class="mini-svg" style="width:20px;height:20px;color:var(--brand-start);"><use href="#icon-chat"/></svg>';
-    if (chatUserStatus) chatUserStatus.style.display = 'none';
+  if (chatBackBtn) chatBackBtn.style.display = 'flex';
+  if (chatUserName) chatUserName.textContent = 'Личные сообщения';
+  if (chatAvatar) chatAvatar.innerHTML = '<svg class="mini-svg" style="width:20px;height:20px;color:var(--brand-start);"><use href="#icon-chat"/></svg>';
+  if (chatUserStatus) chatUserStatus.style.display = 'none';
 
   updateChatList();
   updateChatBadge();
@@ -860,7 +866,10 @@ function updateChatList() {
   loadMessages();
   const currentUser = AppState.currentUser;
   const chatKeys = Object.keys(AppState.messages).filter(key => {
-    return Boolean(getChatPartnerFromKey(key, currentUser));
+    const partner = getChatPartnerFromKey(key, currentUser);
+    if (!partner) return false;
+    const msgs = getChatMessages(currentUser, partner);
+    return msgs.length > 0;
   });
 
   if (chatKeys.length === 0) {
@@ -875,8 +884,10 @@ function updateChatList() {
 
   let html = '';
   const sortedKeys = [...chatKeys].sort((a, b) => {
-    const msgsA = AppState.messages[a] || [];
-    const msgsB = AppState.messages[b] || [];
+    const partnerA = getChatPartnerFromKey(a, currentUser);
+    const partnerB = getChatPartnerFromKey(b, currentUser);
+    const msgsA = getChatMessages(currentUser, partnerA);
+    const msgsB = getChatMessages(currentUser, partnerB);
     const timeA = msgsA.length ? msgsA[msgsA.length - 1].time : 0;
     const timeB = msgsB.length ? msgsB[msgsB.length - 1].time : 0;
     return timeB - timeA;
@@ -885,7 +896,7 @@ function updateChatList() {
   sortedKeys.forEach(key => {
     const partner = getChatPartnerFromKey(key, currentUser);
     if (!partner) return;
-    const msgs = AppState.messages[key] || [];
+    const msgs = getChatMessages(currentUser, partner);
     const last = msgs[msgs.length - 1];
     const userData = AppState.users[partner];
     const safePartner = escapeHtml(partner);
@@ -931,15 +942,30 @@ function updateChatList() {
           </div>
           <div class="last-msg">${lastText}</div>
         </div>
-        ${unreadCount > 0 ? `<span class="unread">${unreadCount}</span>` : ''}
+        <div class="chat-item-actions">
+          ${unreadCount > 0 ? `<span class="unread">${unreadCount}</span>` : ''}
+          <button type="button" class="chat-item-delete-btn" data-delete-partner="${safePartner}" title="Удалить переписку">
+            <svg><use href="#icon-trash"/></svg>
+          </button>
+        </div>
       </div>
     `;
   });
 
   list.innerHTML = html;
   list.querySelectorAll('.chat-list-item').forEach(item => {
-    item.addEventListener('click', function() {
+    item.addEventListener('click', function(e) {
+      // Игнорируем клик, если нажата кнопка удаления
+      if (e.target.closest('.chat-item-delete-btn')) return;
       openChatWith(this.dataset.partner);
+    });
+  });
+
+  list.querySelectorAll('.chat-item-delete-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const partner = this.dataset.deletePartner;
+      openDeleteChatModal(partner);
     });
   });
 }
@@ -1081,10 +1107,12 @@ function openChatWith(username) {
   const chatUserName = document.getElementById('chatUserName');
   const chatAvatar = document.getElementById('chatAvatar');
   const chatUserStatus = document.getElementById('chatUserStatus');
+  const deleteDirectHeaderBtn = document.getElementById('deleteDirectChatHeaderBtn');
 
   if (chatList) chatList.classList.remove('open');
   if (directRoom) directRoom.style.display = 'flex';
   if (chatBackBtn) chatBackBtn.style.display = 'inline-flex';
+  if (deleteDirectHeaderBtn) deleteDirectHeaderBtn.style.display = 'inline-flex';
   const userData = AppState.users[username];
   const isOnline = isUserOnline(username);
   const isPremium = isUserPremium(username);
@@ -1094,7 +1122,7 @@ function openChatWith(username) {
   const frameId = getUserEquippedFrame(username);
 
   if (chatUserName) {
-    chatUserName.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(username)}</span>${crownHtml}${adminBadgeHtml}`;
+    chatUserName.innerHTML = `<span class="${getUserNameClass(username)}">${escapeHtml(username)}</span>${crownHtml}${adminBadgeHtml}`;
   }
 
   if (chatUserStatus) {
@@ -1300,7 +1328,7 @@ function renderChatMessages() {
     return `
       <div class="msg ${isOut ? 'out' : 'in'}" id="${msgId}" data-msg-id="${msgId}">
         ${actionsHtml}
-        ${!isOut ? `<span class="sender" data-username="${safeFrom}" style="cursor:pointer;" title="Нажмите, чтобы посмотреть профиль ${safeFrom}">${safeFrom}</span>` : ''}
+        ${!isOut ? `<span class="sender ${getUserNameClass(safeFrom)}" data-username="${safeFrom}" style="cursor:pointer;" title="Нажмите, чтобы посмотреть профиль ${safeFrom}">${safeFrom}</span>` : ''}
         ${replyQuoteHtml}
         <div class="msg-text">${safeText}</div>
         <div class="msg-meta">
@@ -1762,3 +1790,77 @@ function renderBlacklistSettings() {
     });
   });
 }
+
+// ============================================================
+//  12. УДАЛЕНИЕ ДИАЛОГА (DELETE CHAT MODAL - TELEGRAM STYLE)
+// ============================================================
+
+let pendingDeleteChatPartner = null;
+
+function openDeleteChatModal(partner) {
+  if (!partner) return;
+  pendingDeleteChatPartner = partner;
+  const modal = document.getElementById('deleteChatModal');
+  const partnerNameEl = document.getElementById('deleteChatPartnerName');
+  const forBothPartnerNameEl = document.getElementById('deleteForBothPartnerName');
+  const checkbox = document.getElementById('deleteForBothCheckbox');
+  const subEl = document.getElementById('deleteChatModalSub');
+
+  if (partnerNameEl) partnerNameEl.textContent = partner;
+  if (forBothPartnerNameEl) forBothPartnerNameEl.textContent = partner;
+  if (subEl) subEl.textContent = `Удаление переписки с ${partner}`;
+  if (checkbox) checkbox.checked = false;
+
+  if (modal) {
+    modal.classList.add('show', 'open');
+  }
+}
+
+function closeDeleteChatModal() {
+  const modal = document.getElementById('deleteChatModal');
+  if (modal) {
+    modal.classList.remove('show', 'open');
+  }
+  pendingDeleteChatPartner = null;
+}
+
+function confirmDeleteChat() {
+  if (!pendingDeleteChatPartner || !AppState.currentUser) {
+    closeDeleteChatModal();
+    return;
+  }
+
+  const partner = pendingDeleteChatPartner;
+  const checkbox = document.getElementById('deleteForBothCheckbox');
+  const deleteForBoth = checkbox ? checkbox.checked : false;
+
+  if (deleteForBoth) {
+    deleteChatForBoth(AppState.currentUser, partner);
+  } else {
+    deleteChatForSelf(AppState.currentUser, partner);
+  }
+
+  closeDeleteChatModal();
+
+  // Если был открыт диалог с этим собеседником — возвращаемся в список диалогов
+  if (AppState.chatPartner === partner) {
+    showDirectChatList();
+  } else {
+    updateChatList();
+    updateChatBadge();
+  }
+
+  showNotification('Чат удалён', deleteForBoth 
+    ? `Переписка с ${partner} удалена для обоих участников` 
+    : `Переписка с ${partner} удалена`);
+}
+
+function openDirectChat(username) {
+  openChatWith(username);
+}
+
+// Экспорт в глобальную область видимости
+window.openDeleteChatModal = openDeleteChatModal;
+window.closeDeleteChatModal = closeDeleteChatModal;
+window.confirmDeleteChat = confirmDeleteChat;
+window.openDirectChat = openDirectChat;
