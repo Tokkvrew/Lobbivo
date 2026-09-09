@@ -1378,6 +1378,282 @@
   line-height: 1.45;
 }
 
+/* ============================================================
+   МОИ АНКЕТЫ (MY SQUADS & APPLICATIONS)
+   ============================================================ */
+
+.my-squads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.my-squad-card {
+  background: rgba(10, 18, 38, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 18px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.my-squad-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.6) 0%, rgba(180, 77, 255, 0.4) 100%);
+}
+
+.my-squad-card.vip-active {
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.18);
+}
+
+.my-squad-card.vip-active::before {
+  background: linear-gradient(90deg, #ffd700 0%, #ff8800 100%);
+}
+
+.my-squad-card:hover {
+  border-color: rgba(0, 212, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.my-squad-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.my-squad-game-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: #00f0ff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.my-squad-game-badge svg {
+  width: 18px;
+  height: 18px;
+}
+
+.badge-squad-active {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+}
+
+.badge-squad-vip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+.badge-squad-vip svg {
+  width: 12px;
+  height: 12px;
+}
+
+.my-squad-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.squad-info-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.squad-info-pill .info-label {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.squad-info-pill .info-val {
+  color: #ffffff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.my-squad-desc-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  flex: 1;
+}
+
+.my-squad-desc-box .desc-text {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.my-squad-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.squad-date {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.my-squad-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-squad-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-edit-squad {
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  color: #00f0ff;
+}
+
+.btn-edit-squad:hover {
+  background: linear-gradient(135deg, #00d4ff, #0077ff);
+  color: #ffffff;
+  border-color: #00d4ff;
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-delete-squad {
+  background: rgba(255, 46, 85, 0.1);
+  border: 1px solid rgba(255, 46, 85, 0.3);
+  color: #ff4655;
+}
+
+.btn-delete-squad:hover {
+  background: linear-gradient(135deg, #ff4655, #cc0033);
+  color: #ffffff;
+  border-color: #ff4655;
+  box-shadow: 0 0 14px rgba(255, 46, 85, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-squad-action svg {
+  width: 13px;
+  height: 13px;
+}
+
+.my-squads-empty {
+  text-align: center;
+  padding: 36px 20px;
+  border-radius: 16px;
+  background: rgba(10, 18, 38, 0.4);
+  border: 1.5px dashed rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.my-squads-empty-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neon-cyan);
+  margin-bottom: 4px;
+}
+
+.my-squads-empty-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.my-squads-empty .empty-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.my-squads-empty .empty-sub {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 420px;
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+
+.menu-badge-count {
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--neon-cyan);
+  color: #060913;
+  font-size: 0.7rem;
+  font-weight: 900;
+  font-family: 'Orbitron', monospace;
+}
+
 .custom-wardrobe-block {
   margin-bottom: 28px;
 }
@@ -2654,21 +2930,10 @@
 
 .msg:hover .msg-actions-bar,
 .msg:focus-within .msg-actions-bar,
-.world-msg-item:hover .msg-actions-bar {
+.world-msg-item:hover .msg-actions-bar,
+.world-msg-item:focus-within .msg-actions-bar {
   opacity: 1;
   pointer-events: auto;
-}
-
-.world-msg-header .msg-actions-bar {
-  position: static;
-  opacity: 1;
-  pointer-events: auto;
-  background: none;
-  backdrop-filter: none;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  margin-left: auto;
 }
 
 .btn-msg-reply,
@@ -2868,6 +3133,18 @@
   animation: msgAppear 0.22s ease forwards;
 }
 
+.world-msg-item {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s ease, transform 0.2s ease;
+  animation: msgAppear 0.22s ease forwards;
+}
+
 .world-msg-item:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(0, 212, 255, 0.25);
@@ -2909,16 +3186,23 @@
 .world-msg-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 3px;
+  gap: 5px;
+  margin-bottom: 2px;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .world-msg-author {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--neon-cyan);
   cursor: pointer;
   transition: color 0.18s ease;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .world-msg-author:hover {
@@ -2927,20 +3211,29 @@
 }
 
 .world-msg-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 0.65rem;
   font-weight: 700;
   padding: 1px 6px;
   border-radius: 6px;
-  background: rgba(0, 212, 255, 0.15);
+  background: rgba(0, 212, 255, 0.12);
   color: var(--neon-cyan);
-  border: 1px solid rgba(0, 212, 255, 0.3);
-  text-transform: uppercase;
+  border: 1px solid rgba(0, 212, 255, 0.28);
+  white-space: nowrap;
+  vertical-align: middle;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .world-msg-time {
   font-size: 0.68rem;
   color: var(--text-muted);
   margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding-left: 4px;
 }
 
 .world-msg-text {
@@ -8684,4 +8977,477 @@ select:-webkit-autofill {
   display: inline-block;
   vertical-align: middle;
   margin-left: 3px;
+}
+
+/* ============================================================
+   ОПТИМИЗИРОВАННЫЕ БЕЙДЖИ ИГР В ЧАТЕ И ПОПАПАХ
+   ============================================================ */
+.chat-game-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12) 0%, rgba(0, 119, 255, 0.08) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.28);
+  color: #00e5ff;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  transition: all 0.18s ease;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.chat-game-badge:hover {
+  background: rgba(0, 212, 255, 0.22);
+  border-color: rgba(0, 212, 255, 0.5);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.25);
+}
+
+.chat-game-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.chat-game-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-user-tag-mini {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(180, 77, 255, 0.12);
+  border: 1px solid rgba(180, 77, 255, 0.28);
+  color: #d8b4fe;
+  white-space: nowrap;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.popover-game-pill {
+  max-width: 180px;
+}
+
+/* ============================================================
+   БЕЙДЖИ АДМИНИСТРАТОРА (LOBBIVO ADMIN SYSTEM)
+   ============================================================ */
+.admin-custom-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-transform: uppercase;
+  user-select: none;
+  animation: adminBadgePulse 3s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+.admin-custom-badge svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+/* Стиль 1: Классический Админ (Рубин / Неон) */
+.admin-custom-badge.badge-style-admin {
+  background: linear-gradient(135deg, rgba(255, 42, 75, 0.25) 0%, rgba(255, 0, 102, 0.15) 100%);
+  border: 1px solid rgba(255, 42, 75, 0.55);
+  color: #ff3366;
+  box-shadow: 0 0 10px rgba(255, 42, 75, 0.25);
+}
+
+/* Стиль 2: Lobbivo Team (Золото / Пурпур) */
+.admin-custom-badge.badge-style-team {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(180, 77, 255, 0.2) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.6);
+  color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+}
+
+/* Стиль 3: Developer / Dev (Циан / Неон) */
+.admin-custom-badge.badge-style-dev {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.22) 0%, rgba(0, 102, 255, 0.2) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.55);
+  color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+/* Стиль 4: Модератор (Изумруд) */
+.admin-custom-badge.badge-style-mod {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 204, 102, 0.15) 100%);
+  border: 1px solid rgba(0, 255, 136, 0.55);
+  color: #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.25);
+}
+
+@keyframes adminBadgePulse {
+  0%, 100% {
+    box-shadow: 0 0 6px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 14px currentColor;
+  }
+}
+
+/* ============================================================
+   ПОЛЬЗОВАТЕЛЬСКИЕ ТЕГИ В ПРОФИЛЕ И КАТАЛОГЕ
+   ============================================================ */
+.profile-hero-custom-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.profile-hero-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.22);
+  color: #e2e8f0;
+  transition: all 0.18s ease;
+}
+
+.profile-hero-tag-pill:hover {
+  background: rgba(0, 212, 255, 0.16);
+  border-color: rgba(0, 212, 255, 0.45);
+  color: #00f0ff;
+}
+
+.custom-tags-edit-card {
+  padding: 16px;
+  background: rgba(18, 18, 24, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.custom-tags-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tags-counter-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  color: #00e5ff;
+}
+
+.tags-counter-badge.full {
+  background: rgba(255, 170, 0, 0.18);
+  border-color: rgba(255, 170, 0, 0.45);
+  color: #ffaa00;
+}
+
+.active-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 10px;
+  background: rgba(8, 8, 12, 0.6);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.no-custom-tags-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.active-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.18) 0%, rgba(180, 77, 255, 0.18) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-remove-tag-chip {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-remove-tag-chip:hover {
+  color: #ff3366;
+  background: rgba(255, 51, 102, 0.2);
+}
+
+.custom-tag-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.custom-tag-hash-prefix {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  margin-left: 12px;
+  user-select: none;
+}
+
+.btn-add-custom-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.preset-tags-block {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.preset-tags-title {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.preset-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn-preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-preset-chip:hover {
+  background: rgba(0, 212, 255, 0.12);
+  border-color: rgba(0, 212, 255, 0.35);
+  color: #00e5ff;
+  transform: translateY(-1px);
+}
+
+.btn-preset-chip.active-added {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: rgba(0, 212, 255, 0.6);
+  color: #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.2);
+}
+
+.player-custom-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0;
+}
+
+.player-custom-tag-chip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  color: #cbd5e1;
+}
+
+.player-custom-tag-more {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+.modal-user-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   НАСТРОЙКИ ТЕГА АДМИНИСТРАТОРА В АДМИН-ПАНЕЛИ
+   ============================================================ */
+.admin-badge-settings-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.admin-badge-toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(255, 51, 102, 0.06);
+  border: 1px solid rgba(255, 51, 102, 0.2);
+  border-radius: 12px;
+}
+
+.badge-toggle-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.badge-toggle-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  max-width: 480px;
+}
+
+.admin-badge-styles-card {
+  padding: 16px;
+  background: rgba(18, 18, 24, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.badge-styles-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.admin-badge-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.admin-badge-preset-card {
+  cursor: pointer;
+  display: block;
+}
+
+.admin-badge-preset-card input[type="radio"] {
+  display: none;
+}
+
+.preset-card-inner {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.admin-badge-preset-card input[type="radio"]:checked + .preset-card-inner {
+  background: rgba(0, 212, 255, 0.1);
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.preset-card-inner .preset-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+
+.admin-badge-custom-card {
+  padding: 14px 16px;
+  background: rgba(18, 18, 24, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.admin-badge-preview-card {
+  padding: 16px;
+  background: rgba(8, 8, 12, 0.7);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+}
+
+.preview-card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+
+.admin-live-chat-preview {
+  pointer-events: none;
+}
+
+.admin-badge-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
 }

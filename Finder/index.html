@@ -9,9 +9,14 @@
   <meta name="yandex-verification" content="14bae08dded82c6a" />
   <link rel="canonical" href="https://lobbivo.ru/" />
 
-  <!-- Favicon & PWA Theme -->
+  <!-- Favicon & PWA Manifest for Mobile Push -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300d4ff'/%3E%3Cstop offset='50%25' stop-color='%23b44dff'/%3E%3Cstop offset='100%25' stop-color='%23ff44cc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='sans-serif' font-weight='900' font-size='60' fill='%23ffffff' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#070709" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Lobbivo" />
 
   <!-- Open Graph / Meta (Для красивого превью при отправке ссылки в Telegram, VK, Discord) -->
   <meta property="og:type" content="website" />
@@ -42,11 +47,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <!-- CSS Стили (с авто-обновлением кэша) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.5.0" />
-  <link rel="stylesheet" href="css/base.css?v=2.5.0" />
-  <link rel="stylesheet" href="css/components.css?v=2.5.0" />
-  <link rel="stylesheet" href="css/animations.css?v=2.5.0" />
-  <link rel="stylesheet" href="css/media.css?v=2.5.0" />
+  <link rel="stylesheet" href="css/variables.css?v=2.7.1" />
+  <link rel="stylesheet" href="css/base.css?v=2.7.1" />
+  <link rel="stylesheet" href="css/components.css?v=2.7.1" />
+  <link rel="stylesheet" href="css/animations.css?v=2.7.1" />
+  <link rel="stylesheet" href="css/media.css?v=2.7.1" />
 </head>
 <body>
 
@@ -714,13 +719,17 @@
           </h2>
         </div>
         <div class="filter-bar">
+          <button class="btn btn-outline" id="mySquadsCatalogBtn" type="button" onclick="openMySquadsModal()">
+            <svg><use href="#icon-users"/></svg>
+            <span>Мои анкеты</span>
+          </button>
           <button class="btn" id="createSquadBtn">
             <svg><use href="#icon-plus"/></svg>
-            Создать анкету
+            <span>Создать анкету</span>
           </button>
           <button class="btn btn-outline" id="backToGamesBtn">
             <svg><use href="#icon-back"/></svg>
-            К играм
+            <span>К играм</span>
           </button>
         </div>
       </div>
@@ -796,6 +805,9 @@
                   <span class="member-since" id="profileMemberSince"></span>
                 </div>
               </div>
+
+              <!-- Персональные теги игрока в шапке -->
+              <div class="profile-hero-custom-tags" id="profileHeroTagsList"></div>
             </div>
 
             <!-- Баланс Lobbivo Coin в шапке профиля -->
@@ -859,7 +871,7 @@
               <svg><use href="#icon-settings"/></svg>
               <span>Данные анкеты игрока</span>
             </div>
-            <div class="unified-section-sub">Настройте ваш никнейм, основную игру, платформу и описание стиля игры</div>
+            <div class="unified-section-sub">Настройте ваш никнейм, основную игру, персональные теги и стиль игры</div>
           </div>
 
           <div class="profile-edit-container-clean">
@@ -927,6 +939,41 @@
                     <div class="device-panel-grid" id="editDeviceGrid"></div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- Персональные теги игрока -->
+            <div class="edit-clean-card custom-tags-edit-card">
+              <div class="custom-tags-header">
+                <div class="field-label-group">
+                  <label>
+                    <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;color:var(--neon-cyan);"><use href="#icon-sparkles"/></svg>
+                    Мои теги и стиль игры
+                  </label>
+                  <span class="field-subtitle">Добавьте до 6 тегов, чтобы тиммейты сразу понимали вашу роль</span>
+                </div>
+                <span class="tags-counter-badge" id="profileTagsCounter">0 / 6</span>
+              </div>
+
+              <!-- Список уже добавленных тегов -->
+              <div class="active-tags-container" id="profileActiveTagsList"></div>
+
+              <!-- Добавление своего тега -->
+              <div class="custom-tag-input-row">
+                <div class="input-cyber-wrapper" style="flex:1;">
+                  <span class="custom-tag-hash-prefix">#</span>
+                  <input type="text" id="customTagInput" maxlength="18" placeholder="Свой тег (например: Sniper, OnlyWin, 18+)" autocomplete="off">
+                </div>
+                <button type="button" class="btn btn-outline btn-add-custom-tag" id="addCustomTagBtn">
+                  <svg style="width:14px;height:14px;"><use href="#icon-plus"/></svg>
+                  <span>Добавить</span>
+                </button>
+              </div>
+
+              <!-- Быстрые популярные пресеты -->
+              <div class="preset-tags-block">
+                <div class="preset-tags-title">Популярные теги (кликните, чтобы добавить):</div>
+                <div class="preset-tags-grid" id="profilePresetTagsGrid"></div>
               </div>
             </div>
 
@@ -1457,14 +1504,18 @@
       </div>
     </div>
 
-    <!-- МОДАЛКА: СОЗДАНИЕ АНКЕТЫ -->
+    <!-- МОДАЛКА: СОЗДАНИЕ И РЕДАКТИРОВАНИЕ АНКЕТЫ -->
     <div class="modal-overlay" id="createSquadModal">
       <div class="modal">
         <button class="modal-close" id="createSquadModalClose">
           <svg><use href="#icon-close"/></svg>
         </button>
-        <h2><svg><use href="#icon-users"/></svg> Создать анкету</h2>
-        <div class="sub">Найдите тиммейтов в выбранной игре</div>
+        <h2 id="createSquadModalTitle"><svg><use href="#icon-users"/></svg> <span>Создать анкету</span></h2>
+        <div class="sub" id="createSquadModalSub">Найдите тиммейтов в выбранной онлайн-игре</div>
+        
+        <!-- Скрытый ID для режима редактирования -->
+        <input type="hidden" id="squadEditId" value="" />
+
         <div class="field" id="squadGameField">
           <label>Игра</label>
           <div class="custom-game-picker" id="squadGamePicker" data-input-id="squadGame">
@@ -1491,7 +1542,7 @@
         </div>
         <div class="field">
           <label>Ранг / Уровень / Звание</label>
-          <input type="text" id="squadRank" placeholder="Например: Premier 15k, Immortal, Gold Nova...">
+          <input type="text" id="squadRank" placeholder="Например: Premier 15k, Immortal, Gold Nova, Diamond...">
         </div>
         <div class="field">
           <label>Устройство</label>
@@ -1526,8 +1577,33 @@
         </div>
         <button class="btn" id="submitSquadBtn">
           <svg><use href="#icon-send"/></svg>
-          Опубликовать анкету
+          <span id="submitSquadBtnText">Опубликовать анкету</span>
         </button>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: МОИ АНКЕТЫ (MY SQUADS MODAL) -->
+    <div class="modal-overlay" id="mySquadsModal">
+      <div class="modal" style="max-width: 680px;">
+        <button class="modal-close" id="mySquadsModalClose" onclick="closeMySquadsModal()">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        <h2><svg><use href="#icon-users"/></svg> <span>Мои анкеты</span></h2>
+        <div class="sub">Ваши активные анкеты поиска тиммейтов в каталоге игроков</div>
+
+        <div class="my-squads-modal-body" id="mySquadsModalList" style="margin-top: 18px; max-height: 440px; overflow-y: auto;">
+          <!-- Рендерится через renderMySquads() -->
+        </div>
+
+        <div class="modal-actions-bar" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <button type="button" class="btn btn-outline" onclick="closeMySquadsModal()">
+            <span>Закрыть</span>
+          </button>
+          <button type="button" class="btn btn-primary-glow" onclick="closeMySquadsModal(); openCreateSquadModal();">
+            <svg><use href="#icon-plus"/></svg>
+            <span>+ Создать анкету</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -2152,6 +2228,10 @@
             <svg style="width:14px;height:14px;"><use href="#icon-lock"/></svg>
             <span>Активные наказания</span>
           </button>
+          <button type="button" class="admin-tab-btn" data-tab="badge">
+            <svg style="width:14px;height:14px;"><use href="#icon-admin-shield"/></svg>
+            <span>Тег администратора</span>
+          </button>
         </div>
 
         <!-- Контент 1: Жалобы -->
@@ -2193,6 +2273,119 @@
         <!-- Контент 3: Наказания -->
         <div class="admin-tab-content" id="adminPunishmentsView" style="display:none;">
           <div class="admin-punishments-scroll" id="adminPunishmentsList"></div>
+        </div>
+
+        <!-- Контент 4: Настройки тега/бейджа администратора -->
+        <div class="admin-tab-content" id="adminBadgeView" style="display:none;">
+          <div class="admin-badge-settings-wrap">
+            
+            <!-- Карточка переключателя -->
+            <div class="admin-badge-toggle-card">
+              <div class="badge-toggle-info">
+                <div class="badge-toggle-title">
+                  <svg style="width:16px;height:16px;color:var(--neon-pink);display:inline-block;vertical-align:-2px;"><use href="#icon-admin-shield"/></svg>
+                  <span>Отображение тега администратора</span>
+                </div>
+                <div class="badge-toggle-desc">
+                  Включите, чтобы ваш статус отображался рядом с никнеймом в чате и анкетах. Отключите для режима Инкогнито (выглядит как обычный игрок).
+                </div>
+              </div>
+              <label class="cyber-switch" title="Включить / Выключить тег администратора">
+                <input type="checkbox" id="adminBadgeToggle" checked>
+                <span class="cyber-switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Выбор стиля и иконки тега -->
+            <div class="admin-badge-styles-card">
+              <div class="badge-styles-title">Выберите стиль и тип тега:</div>
+              <div class="admin-badge-presets-grid">
+                
+                <label class="admin-badge-preset-card">
+                  <input type="radio" name="adminBadgePreset" value="admin" checked>
+                  <div class="preset-card-inner">
+                    <span class="admin-custom-badge badge-style-admin">
+                      <svg><use href="#icon-admin-shield"/></svg>
+                      <span>АДМИНИСТРАТОР</span>
+                    </span>
+                    <span class="preset-desc">Классический рубиново-неоновый щит</span>
+                  </div>
+                </label>
+
+                <label class="admin-badge-preset-card">
+                  <input type="radio" name="adminBadgePreset" value="team">
+                  <div class="preset-card-inner">
+                    <span class="admin-custom-badge badge-style-team">
+                      <svg><use href="#icon-crown"/></svg>
+                      <span>LOBBIVO TEAM</span>
+                    </span>
+                    <span class="preset-desc">Королевский фиолетово-золотой градиент</span>
+                  </div>
+                </label>
+
+                <label class="admin-badge-preset-card">
+                  <input type="radio" name="adminBadgePreset" value="dev">
+                  <div class="preset-card-inner">
+                    <span class="admin-custom-badge badge-style-dev">
+                      <svg><use href="#icon-sparkles"/></svg>
+                      <span>DEVELOPER</span>
+                    </span>
+                    <span class="preset-desc">Киберпанк неон с искрами</span>
+                  </div>
+                </label>
+
+                <label class="admin-badge-preset-card">
+                  <input type="radio" name="adminBadgePreset" value="moderator">
+                  <div class="preset-card-inner">
+                    <span class="admin-custom-badge badge-style-mod">
+                      <svg><use href="#icon-admin-shield"/></svg>
+                      <span>МОДЕРАТОР</span>
+                    </span>
+                    <span class="preset-desc">Изумрудный щит защиты</span>
+                  </div>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- Кастомизация надписи на теге -->
+            <div class="admin-badge-custom-card">
+              <div class="field">
+                <label for="adminBadgeCustomText">Текст на теге (опционально, до 18 символов):</label>
+                <div class="input-cyber-wrapper">
+                  <svg class="input-cyber-icon"><use href="#icon-sparkles"/></svg>
+                  <input type="text" id="adminBadgeCustomText" maxlength="18" placeholder="Оставьте пустым для стандартного названия">
+                </div>
+              </div>
+            </div>
+
+            <!-- Живой предпросмотр -->
+            <div class="admin-badge-preview-card">
+              <div class="preview-card-title">Предпросмотр сообщения в Мировом чате:</div>
+              <div class="admin-live-chat-preview" id="adminBadgeLivePreview">
+                <div class="world-msg-item from-me">
+                  <div class="world-msg-avatar" id="previewAdminAvatar"><span>A</span></div>
+                  <div class="world-msg-body">
+                    <div class="world-msg-header">
+                      <span class="world-msg-author" id="previewAdminName">Admin</span>
+                      <span id="previewAdminBadgeContainer"></span>
+                      <span class="chat-game-badge"><svg class="chat-game-icon"><use href="#icon-csgo"/></svg><span class="chat-game-title">CS 2</span></span>
+                      <span class="world-msg-time">12:00</span>
+                    </div>
+                    <div class="world-msg-text">Привет! Добро пожаловать на платформу Lobbivo 🎮</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-badge-actions">
+              <button type="button" class="btn btn-save-clean" id="saveAdminBadgeBtn">
+                <svg><use href="#icon-check"/></svg>
+                <span>Применить настройки бейджа</span>
+              </button>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
@@ -2344,15 +2537,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (с авто-обновлением кэша) -->
-  <script src="js/data.js?v=2.5.0"></script>
-  <script src="js/security-shield.js?v=2.5.0"></script>
-  <script src="js/firebase-sync.js?v=2.5.0"></script>
-  <script src="js/storage.js?v=2.5.0"></script>
-  <script src="js/auth.js?v=2.5.0"></script>
-  <script src="js/games.js?v=2.5.0"></script>
-  <script src="js/chat.js?v=2.5.0"></script>
-  <script src="js/profile.js?v=2.5.0"></script>
-  <script src="js/admin.js?v=2.5.0"></script>
-  <script src="js/app.js?v=2.5.0"></script>
+  <script src="js/data.js?v=2.7.1"></script>
+  <script src="js/security-shield.js?v=2.7.1"></script>
+  <script src="js/firebase-sync.js?v=2.7.1"></script>
+  <script src="js/storage.js?v=2.7.1"></script>
+  <script src="js/auth.js?v=2.7.1"></script>
+  <script src="js/games.js?v=2.7.1"></script>
+  <script src="js/chat.js?v=2.7.1"></script>
+  <script src="js/profile.js?v=2.7.1"></script>
+  <script src="js/admin.js?v=2.7.1"></script>
+  <script src="js/app.js?v=2.7.1"></script>
 </body>
 </html>
