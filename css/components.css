@@ -434,6 +434,79 @@
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 25px var(--game-glow);
 }
 
+.player-card.my-squad-card {
+  border-color: rgba(0, 212, 255, 0.55) !important;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.16) !important;
+  background: linear-gradient(145deg, rgba(8, 24, 48, 0.95) 0%, rgba(6, 14, 30, 0.98) 100%) !important;
+}
+
+.my-squad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 212, 255, 0.16);
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  color: #00f0ff;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.my-squad-badge svg {
+  width: 10px;
+  height: 10px;
+}
+
+.squad-game-locked-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 14px;
+  margin-top: 4px;
+}
+
+.squad-game-locked-badge .locked-game-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(0, 212, 255, 0.15);
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  color: var(--neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.squad-game-locked-badge .locked-game-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.squad-game-locked-badge .locked-game-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.squad-game-locked-badge .locked-game-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+.squad-game-locked-badge .locked-game-sub {
+  font-size: 0.72rem;
+  color: var(--neon-cyan);
+}
+
 .player-top {
   display: flex;
   align-items: center;
@@ -610,6 +683,34 @@
   background: var(--neon-red);
   color: #fff;
   border-color: var(--neon-red);
+}
+
+.card-actions .edit-my-squad-btn {
+  flex: 1.2;
+  border-color: rgba(0, 212, 255, 0.4);
+  color: var(--neon-cyan);
+  background: rgba(0, 212, 255, 0.08);
+}
+
+.card-actions .edit-my-squad-btn:hover {
+  background: var(--neon-cyan);
+  color: #030a16;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.4);
+}
+
+.card-actions .del-my-squad-btn {
+  flex: 0.8;
+  border-color: rgba(255, 68, 102, 0.4);
+  color: var(--neon-red);
+  background: rgba(255, 68, 102, 0.06);
+}
+
+.card-actions .del-my-squad-btn:hover {
+  background: var(--neon-red);
+  color: #fff;
+  border-color: var(--neon-red);
+  box-shadow: 0 0 14px rgba(255, 68, 102, 0.4);
 }
 
 /* 4. ПУСТОЕ СОСТОЯНИЕ (EMPTY STATE) */

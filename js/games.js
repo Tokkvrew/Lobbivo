@@ -101,7 +101,17 @@ function getRussianPlural(n, forms) {
 
 function updateGameCounts() {
   GAMES.forEach(game => {
-    const count = Object.values(AppState.users).filter(u => u.game === game.id && u.lookingForTeam).length;
+    let count = 0;
+    for (const [uname, user] of Object.entries(AppState.users)) {
+      if (!user) continue;
+      if (Array.isArray(user.squads) && user.squads.length > 0) {
+        if (user.squads.some(s => s && s.active !== false && s.game === game.id)) {
+          count++;
+        }
+      } else if (user.game === game.id && user.lookingForTeam) {
+        count++;
+      }
+    }
     const el = document.getElementById(`gameCount_${game.id}`);
     if (el) {
       el.textContent = `${count} ${getRussianPlural(count, ['игрок', 'игрока', 'игроков'])}`;
@@ -323,28 +333,9 @@ function openEditSquadModal(squadId) {
 
   // Закрываем модалку со списком если была открыта
   closeMySquadsModal();
-
-  const modal = document.getElementById('createSquadModal');
-  const modalTitle = document.getElementById('createSquadModalTitle');
-  const modalSub = document.getElementById('createSquadModalSub');
-  const submitBtnText = document.getElementById('submitSquadBtnText');
-  const editIdInput = document.getElementById('squadEditId');
-  const squadRank = document.getElementById('squadRank');
-  const squadDesc = document.getElementById('squadDescription');
-  const gameField = document.getElementById('squadGameField');
-
-  if (editIdInput) editIdInput.value = sq.id;
-  if (modalTitle) modalTitle.innerHTML = '<svg><use href="#icon-users"/></svg> <span>Редактировать анкету</span>';
-  if (modalSub) modalSub.textContent = 'Обновите параметры и описание вашей анкеты';
-  if (submitBtnText) submitBtnText.textContent = 'Сохранить изменения';
-
-  if (gameField) gameField.style.display = 'block';
-  if (typeof setGamePickerValue === 'function') setGamePickerValue('squadGamePicker', sq.game || 'csgo');
-  if (typeof setDevicePickerValue === 'function') setDevicePickerValue('squadDevicePicker', sq.device || 'PC');
-  if (squadRank) squadRank.value = sq.rank || '';
-  if (squadDesc) squadDesc.value = sq.desc || '';
-
-  if (modal) modal.classList.add('show');
+  if (typeof openCreateSquadModal === 'function') {
+    openCreateSquadModal(sq.game, sq.id);
+  }
 }
 
 function deleteSquad(squadId) {
@@ -370,9 +361,10 @@ function deleteSquad(squadId) {
   }
 
   saveUsers(AppState.currentUser, true);
-  renderMySquads();
+  if (typeof renderMySquads === 'function') renderMySquads();
   renderPlayers(AppState.selectedGameFilter || 'all');
   updateGameCounts();
+  if (typeof updateUI === 'function') updateUI();
   showNotification('Анкета удалена', 'Ваша анкета успешно удалена из каталога игроков');
 }
 
@@ -385,7 +377,7 @@ function renderPlayers(gameFilter = 'all') {
   const squadCards = [];
 
   for (const [username, user] of Object.entries(AppState.users)) {
-    if (username === current) continue;
+    const isMe = (username === current);
     const squads = getUserSquads(username);
 
     if (squads.length > 0) {
@@ -396,7 +388,8 @@ function renderPlayers(gameFilter = 'all') {
         squadCards.push({
           username,
           userData: user,
-          squad: sq
+          squad: sq,
+          isMe
         });
       });
     } else if (user.lookingForTeam) {
@@ -411,16 +404,21 @@ function renderPlayers(gameFilter = 'all') {
           device: user.device || 'PC',
           desc: user.desc || '',
           createdAt: user.created || Date.now()
-        }
+        },
+        isMe
       });
     }
   }
 
-  // Сортировка: VIP буст -> Premium -> Онлайн
+  // Сортировка: VIP буст -> Моя анкета -> Premium -> Онлайн -> Новые
   squadCards.sort((a, b) => {
     const boostA = isSquadVipBoosted(a.username) ? 1 : 0;
     const boostB = isSquadVipBoosted(b.username) ? 1 : 0;
     if (boostA !== boostB) return boostB - boostA;
+
+    const meA = a.isMe ? 1 : 0;
+    const meB = b.isMe ? 1 : 0;
+    if (meA !== meB) return meB - meA;
 
     const premA = isUserPremium(a.username) ? 1 : 0;
     const premB = isUserPremium(b.username) ? 1 : 0;
@@ -428,7 +426,9 @@ function renderPlayers(gameFilter = 'all') {
 
     const onlA = isUserOnline(a.username) ? 1 : 0;
     const onlB = isUserOnline(b.username) ? 1 : 0;
-    return onlB - onlA;
+    if (onlA !== onlB) return onlB - onlA;
+
+    return (b.squad.createdAt || 0) - (a.squad.createdAt || 0);
   });
 
   if (squadCards.length === 0) {
@@ -439,7 +439,7 @@ function renderPlayers(gameFilter = 'all') {
   empty.style.display = 'none';
 
   grid.innerHTML = squadCards.map(item => {
-    const { username, userData, squad } = item;
+    const { username, userData, squad, isMe } = item;
     const game = GAMES.find(g => g.id === squad.game) || GAMES[0];
     const safeName = escapeHtml(username);
     const safeRank = escapeHtml(squad.rank || '');
@@ -464,17 +464,44 @@ function renderPlayers(gameFilter = 'all') {
 
     const premiumCrownHtml = isPremium ? '<span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : '';
     const vipPillHtml = isBoosted ? '<span class="vip-squad-badge"><svg><use href="#icon-badge-vip"/></svg> VIP СБОР</span>' : '';
+    const mySquadBadgeHtml = isMe ? '<span class="my-squad-badge"><svg><use href="#icon-sparkles"/></svg> Ваша анкета</span>' : '';
     const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
     const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" style="font-size:0.62rem;padding:2px 6px;"><svg style="width:11px;height:11px;"><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
     const userTags = typeof getUserCustomTags === 'function' ? getUserCustomTags(username) : [];
 
+    let actionsHtml = '';
+    if (isMe) {
+      actionsHtml = `
+        <button class="btn btn-outline btn-sm edit-my-squad-btn" data-squad-id="${escapeHtml(squad.id || '')}" data-game="${escapeHtml(squad.game || '')}">
+          <svg><use href="#icon-sparkles"/></svg>
+          Редактировать
+        </button>
+        <button class="btn btn-outline btn-sm del-my-squad-btn" data-squad-id="${escapeHtml(squad.id || '')}">
+          <svg><use href="#icon-ban"/></svg>
+          Удалить
+        </button>
+      `;
+    } else {
+      actionsHtml = `
+        <button class="btn btn-outline btn-sm chat-btn" data-username="${safeName}">
+          <svg><use href="#icon-chat"/></svg>
+          Чат
+        </button>
+        <button class="btn btn-outline btn-sm report-btn" data-username="${safeName}">
+          <svg><use href="#icon-flag"/></svg>
+          Жалоба
+        </button>
+      `;
+    }
+
     return `
-      <div class="player-card ${isBoosted ? 'vip-boosted-card' : ''} ${isPremium ? 'premium-user-card' : ''}" data-username="${safeName}" data-game="${escapeHtml(squad.game || 'csgo')}" data-squad-id="${escapeHtml(squad.id || '')}">
+      <div class="player-card ${isMe ? 'my-squad-card' : ''} ${isBoosted ? 'vip-boosted-card' : ''} ${isPremium ? 'premium-user-card' : ''}" data-username="${safeName}" data-game="${escapeHtml(squad.game || 'csgo')}" data-squad-id="${escapeHtml(squad.id || '')}">
         <div class="player-top">
           <div class="player-avatar">${avatarContent}</div>
           <div class="player-info">
             <div class="player-name">
               <span class="${getUserNameClass(username)}">${safeName}</span>
+              ${mySquadBadgeHtml}
               ${premiumCrownHtml}
               ${adminBadgeHtml}
               ${vipPillHtml}
@@ -497,20 +524,13 @@ function renderPlayers(gameFilter = 'all') {
           <svg class="device-icon device-icon-sm"><use href="#${escapeHtml(deviceIconSVG)}"/></svg>
           <span>${safeDevice}</span>
         </div>
-        <span class="looking-for-team"><svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#icon-search"/></svg>Ищет команду</span>
+        <span class="looking-for-team"><svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#icon-search"/></svg>${isMe ? 'Вы ищете команду' : 'Ищет команду'}</span>
         <div class="player-status-line">
           <span class="online-dot ${isUserOnline(username) ? 'online' : 'offline'}"></span> 
-          <span class="status-text">${formatLastSeen(userData.lastSeen, username)}</span>
+          <span class="status-text">${isMe ? 'В сети (Вы)' : formatLastSeen(userData.lastSeen, username)}</span>
         </div>
         <div class="card-actions">
-          <button class="btn btn-outline btn-sm chat-btn" data-username="${safeName}">
-            <svg><use href="#icon-chat"/></svg>
-            Чат
-          </button>
-          <button class="btn btn-outline btn-sm report-btn" data-username="${safeName}">
-            <svg><use href="#icon-flag"/></svg>
-            Жалоба
-          </button>
+          ${actionsHtml}
         </div>
       </div>
     `;
@@ -538,10 +558,30 @@ function renderPlayers(gameFilter = 'all') {
     });
   });
 
+  grid.querySelectorAll('.edit-my-squad-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const squadId = this.dataset.squadId;
+      openEditSquadModal(squadId);
+    });
+  });
+
+  grid.querySelectorAll('.del-my-squad-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const squadId = this.dataset.squadId;
+      deleteSquad(squadId);
+    });
+  });
+
   grid.querySelectorAll('.player-card').forEach(card => {
     card.addEventListener('click', function() {
       const username = this.dataset.username;
-      showUserProfileModal(username);
+      if (username === AppState.currentUser) {
+        switchPage('pageProfile');
+      } else {
+        showUserProfileModal(username);
+      }
     });
   });
 }

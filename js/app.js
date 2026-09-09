@@ -166,7 +166,7 @@ function sendComplaint() {
 //  СОЗДАНИЕ И РЕДАКТИРОВАНИЕ АНКЕТЫ (CREATE & EDIT SQUAD)
 // ============================================================
 
-function openCreateSquadModal(defaultGame = null) {
+function openCreateSquadModal(defaultGame = null, editSquadId = null) {
   if (!AppState.currentUser) {
     showNotification('Требуется вход', 'Войдите в аккаунт, чтобы создать анкету');
     showAuthModal('login');
@@ -181,25 +181,81 @@ function openCreateSquadModal(defaultGame = null) {
   const squadRank = document.getElementById('squadRank');
   const squadDesc = document.getElementById('squadDescription');
   const gameField = document.getElementById('squadGameField');
-  const currentFilter = defaultGame || AppState.selectedGameFilter || 'all';
+  const squadGamePicker = document.getElementById('squadGamePicker');
+  const hiddenGameInput = document.getElementById('squadGame');
 
-  if (editIdInput) editIdInput.value = '';
-  if (modalTitle) modalTitle.innerHTML = '<svg><use href="#icon-users"/></svg> <span>Создать анкету</span>';
-  if (modalSub) modalSub.textContent = 'Найдите тиммейтов в выбранной онлайн-игре';
-  if (submitBtnText) submitBtnText.textContent = 'Опубликовать анкету';
+  const currentUserData = AppState.users[AppState.currentUser];
+  const userSquads = Array.isArray(currentUserData?.squads) ? currentUserData.squads : [];
 
-  if (squadRank) squadRank.value = '';
-  if (squadDesc) squadDesc.value = '';
-  if (typeof setDevicePickerValue === 'function') {
-    setDevicePickerValue('squadDevicePicker', AppState.users[AppState.currentUser]?.device || 'PC');
+  // Safely resolve defaultGame parameter (ignore MouseEvent or non-string arguments)
+  let initialGame = (typeof defaultGame === 'string' && defaultGame) ? defaultGame : (AppState.selectedGameFilter || 'all');
+  let squadToEdit = null;
+
+  if (editSquadId && typeof editSquadId === 'string') {
+    squadToEdit = userSquads.find(s => s && s.id === editSquadId);
   }
 
-  if (gameField) gameField.style.display = 'block';
-  if (currentFilter !== 'all') {
-    if (typeof setGamePickerValue === 'function') setGamePickerValue('squadGamePicker', currentFilter);
+  if (squadToEdit) {
+    if (editIdInput) editIdInput.value = squadToEdit.id;
+    if (modalTitle) modalTitle.innerHTML = '<svg><use href="#icon-users"/></svg> <span>Редактировать анкету</span>';
+    if (modalSub) modalSub.textContent = 'Обновите параметры и описание вашей анкеты';
+    if (submitBtnText) submitBtnText.textContent = 'Сохранить изменения';
+
+    if (squadRank) squadRank.value = squadToEdit.rank || '';
+    if (squadDesc) squadDesc.value = squadToEdit.desc || '';
+    if (typeof setDevicePickerValue === 'function') {
+      setDevicePickerValue('squadDevicePicker', squadToEdit.device || currentUserData?.device || 'PC');
+    }
+    initialGame = squadToEdit.game || initialGame;
   } else {
-    const userGame = AppState.users[AppState.currentUser]?.game || 'csgo';
-    if (typeof setGamePickerValue === 'function') setGamePickerValue('squadGamePicker', userGame);
+    if (editIdInput) editIdInput.value = '';
+    if (squadRank) squadRank.value = '';
+    if (squadDesc) squadDesc.value = '';
+    if (typeof setDevicePickerValue === 'function') {
+      setDevicePickerValue('squadDevicePicker', currentUserData?.device || 'PC');
+    }
+    if (submitBtnText) submitBtnText.textContent = 'Опубликовать анкету';
+  }
+
+  // Remove existing locked badge if any
+  const oldLockedBadge = document.getElementById('squadGameLockedBadge');
+  if (oldLockedBadge) oldLockedBadge.remove();
+
+  if (initialGame && initialGame !== 'all') {
+    const gameObj = GAMES.find(g => g.id === initialGame) || GAMES[0];
+    if (!squadToEdit) {
+      if (modalTitle) modalTitle.innerHTML = `<svg><use href="#icon-users"/></svg> <span>Анкета: ${escapeHtml(gameObj.name)}</span>`;
+      if (modalSub) modalSub.textContent = `Поиск тиммейтов и напарников в ${escapeHtml(gameObj.name)}`;
+    }
+
+    if (typeof setGamePickerValue === 'function') setGamePickerValue('squadGamePicker', initialGame);
+    if (hiddenGameInput) hiddenGameInput.value = initialGame;
+
+    if (squadGamePicker) squadGamePicker.style.display = 'none';
+    if (gameField) {
+      gameField.style.display = 'block';
+      const lockedHtml = `
+        <div class="squad-game-locked-badge" id="squadGameLockedBadge">
+          <div class="locked-game-icon"><svg><use href="#${escapeHtml(gameObj.icon)}"/></svg></div>
+          <div class="locked-game-info">
+            <span class="locked-game-title">${escapeHtml(gameObj.name)}</span>
+            <span class="locked-game-sub">Игра выбрана в каталоге</span>
+          </div>
+        </div>
+      `;
+      gameField.insertAdjacentHTML('beforeend', lockedHtml);
+    }
+  } else {
+    if (!squadToEdit) {
+      if (modalTitle) modalTitle.innerHTML = '<svg><use href="#icon-users"/></svg> <span>Создать анкету</span>';
+      if (modalSub) modalSub.textContent = 'Найдите тиммейтов в любой выбранной онлайн-игре';
+    }
+
+    const fallbackGame = currentUserData?.game || 'csgo';
+    if (typeof setGamePickerValue === 'function') setGamePickerValue('squadGamePicker', fallbackGame);
+    if (hiddenGameInput) hiddenGameInput.value = fallbackGame;
+    if (squadGamePicker) squadGamePicker.style.display = 'block';
+    if (gameField) gameField.style.display = 'block';
   }
 
   if (modal) modal.classList.add('show');
@@ -281,7 +337,7 @@ function submitSquad() {
   userData.lookingForTeam = true;
   userData.hasCreatedSquad = true;
 
-  saveUsers();
+  saveUsers(AppState.currentUser, true);
   closeCreateSquadModal();
 
   if (typeof renderMySquads === 'function') renderMySquads();
