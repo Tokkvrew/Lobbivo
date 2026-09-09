@@ -27,9 +27,6 @@ function showSystemLoader(message = 'Загрузка...', duration = 650, callb
 }
 
 function switchPage(pageId) {
-  if (pageId === 'pageSettings') {
-    pageId = 'pageProfile';
-  }
   const pages = document.querySelectorAll('.page');
   const targetPage = document.getElementById(pageId);
   if (!targetPage) return;
@@ -64,10 +61,11 @@ function switchPage(pageId) {
 
   if (pageId === 'pageProfile') {
     if (typeof renderProfile === 'function') renderProfile();
-    if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
-    if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
     if (typeof renderProfileCustomization === 'function') renderProfileCustomization();
     if (typeof renderMySquads === 'function') renderMySquads();
+  } else if (pageId === 'pageSettings') {
+    if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
+    if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
   }
 
   // Скролл вверх при смене страницы
@@ -1338,13 +1336,11 @@ function init() {
       } else if (action === 'profile' || action === 'customization') {
         showProfile();
       } else if (action === 'settings') {
-        showProfile();
-        setTimeout(() => {
-          const settingsSec = document.getElementById('profileSettingsSection');
-          if (settingsSec) {
-            settingsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 150);
+        if (typeof showSettings === 'function') {
+          showSettings();
+        } else {
+          switchPage('pageSettings');
+        }
       } else if (action === 'my-squads') {
         if (typeof openMySquadsModal === 'function') openMySquadsModal();
       } else if (action === 'login') {
@@ -1870,11 +1866,11 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.8.0', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.8.1', { updateViaCache: 'none' })
         .then((reg) => {
           // Проверяем обновления файлов немедленно при загрузке страницы
           reg.update();
-          console.log('⚡ Lobbivo Service Worker v2.8.0 активен:', reg.scope);
+          console.log('⚡ Lobbivo Service Worker v2.8.1 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку (на телефоне и ПК)
           document.addEventListener('visibilitychange', () => {

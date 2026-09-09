@@ -52,11 +52,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <!-- CSS Стили (с авто-обновлением кэша) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.8.0" />
-  <link rel="stylesheet" href="css/base.css?v=2.8.0" />
-  <link rel="stylesheet" href="css/components.css?v=2.8.0" />
-  <link rel="stylesheet" href="css/animations.css?v=2.8.0" />
-  <link rel="stylesheet" href="css/media.css?v=2.8.0" />
+  <link rel="stylesheet" href="css/variables.css?v=2.8.1" />
+  <link rel="stylesheet" href="css/base.css?v=2.8.1" />
+  <link rel="stylesheet" href="css/components.css?v=2.8.1" />
+  <link rel="stylesheet" href="css/animations.css?v=2.8.1" />
+  <link rel="stylesheet" href="css/media.css?v=2.8.1" />
 </head>
 <body>
 
@@ -992,12 +992,47 @@
           </div>
         </div>
 
-        <!-- 4. СЕКЦИЯ: НАСТРОЙКИ (КАТЕГОРИИ ЧАТЫ И ПРИВАТНОСТЬ) -->
-        <div class="profile-unified-section" id="profileSettingsSection" style="margin-top: 24px;">
+        <!-- 4. КНОПКИ ДЕЙСТВИЙ (FOOTER) -->
+        <div class="edit-clean-footer-actions" style="margin-top: 24px;">
+          <button type="button" class="btn btn-save-clean" id="saveProfileBtn">
+            <svg><use href="#icon-check"/></svg>
+            <span>Сохранить изменения</span>
+          </button>
+          <button type="button" class="btn btn-danger-glass" id="deleteAccountBtn">
+            <svg><use href="#icon-flag"/></svg>
+            <span>Удалить аккаунт</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- СТРАНИЦА 4: НАСТРОЙКИ ПЛАТФОРМЫ (ЧАТЫ И ПРИВАТНОСТЬ) -->
+    <section class="page" id="pageSettings" style="display:none;">
+      <div class="profile-container">
+        
+        <!-- Заголовок страницы настроек с кнопкой возврата -->
+        <div class="page-header profile-page-header">
+          <div class="page-title-wrapper">
+            <h2>
+              <svg><use href="#icon-settings"/></svg>
+              <span>Настройки платформы</span>
+            </h2>
+          </div>
+          <div class="filter-bar">
+            <button type="button" class="btn btn-outline" id="backFromSettingsBtn">
+              <svg><use href="#icon-back"/></svg>
+              К играм
+            </button>
+          </div>
+        </div>
+
+        <!-- СЕКЦИЯ НАСТРОЕК (КАТЕГОРИИ ЧАТЫ И ПРИВАТНОСТЬ) -->
+        <div class="profile-unified-section" id="profileSettingsSection" style="margin-top: 0;">
           <div class="unified-section-header">
             <div class="unified-section-title">
               <svg><use href="#icon-settings"/></svg>
-              <span>Настройки платформы</span>
+              <span>Параметры и безопасность</span>
             </div>
             <div class="unified-section-sub">Управляйте фильтрами чата, приватностью личных сообщений и уведомлениями</div>
           </div>
@@ -1110,18 +1145,6 @@
               <div class="blacklist-items-grid" id="blacklistItemsGrid"></div>
             </div>
           </div>
-        </div>
-
-        <!-- 5. КНОПКИ ДЕЙСТВИЙ (FOOTER) -->
-        <div class="edit-clean-footer-actions" style="margin-top: 24px;">
-          <button type="button" class="btn btn-save-clean" id="saveProfileBtn">
-            <svg><use href="#icon-check"/></svg>
-            <span>Сохранить изменения</span>
-          </button>
-          <button type="button" class="btn btn-danger-glass" id="deleteAccountBtn">
-            <svg><use href="#icon-flag"/></svg>
-            <span>Удалить аккаунт</span>
-          </button>
         </div>
 
       </div>
@@ -2593,15 +2616,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (с авто-обновлением кэша) -->
-  <script src="js/data.js?v=2.8.0"></script>
-  <script src="js/security-shield.js?v=2.8.0"></script>
-  <script src="js/firebase-sync.js?v=2.8.0"></script>
-  <script src="js/storage.js?v=2.8.0"></script>
-  <script src="js/auth.js?v=2.8.0"></script>
-  <script src="js/games.js?v=2.8.0"></script>
-  <script src="js/chat.js?v=2.8.0"></script>
-  <script src="js/profile.js?v=2.8.0"></script>
-  <script src="js/admin.js?v=2.8.0"></script>
-  <script src="js/app.js?v=2.8.0"></script>
+  <script src="js/data.js?v=2.8.1"></script>
+  <script src="js/security-shield.js?v=2.8.1"></script>
+  <script src="js/firebase-sync.js?v=2.8.1"></script>
+  <script src="js/storage.js?v=2.8.1"></script>
+  <script src="js/auth.js?v=2.8.1"></script>
+  <script src="js/games.js?v=2.8.1"></script>
+  <script src="js/chat.js?v=2.8.1"></script>
+  <script src="js/profile.js?v=2.8.1"></script>
+  <script src="js/admin.js?v=2.8.1"></script>
+  <script src="js/app.js?v=2.8.1"></script>
 </body>
 </html>

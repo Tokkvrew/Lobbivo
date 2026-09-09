@@ -133,6 +133,12 @@ function showProfile() {
   renderProfile();
 }
 
+function showSettings() {
+  switchPage('pageSettings');
+  if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
+  if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
+}
+
 function switchProfileTab(tabName = 'overview') {
   // Для обратной совместимости: всё находится на единой странице профиля
   renderProfile();
