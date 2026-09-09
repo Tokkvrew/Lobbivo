@@ -1343,6 +1343,8 @@ function init() {
         showAuthModal('register');
       } else if (action === 'about') {
         switchPage('pageAbout');
+      } else if (action === 'reload-cache') {
+        forceClearCacheAndReload();
       } else if (action === 'logout') {
         logout();
       }
@@ -1768,9 +1770,10 @@ function init() {
   // Регистрация PWA Service Worker для фоновых Push-уведомлений на телефоне и ПК
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
+      navigator.serviceWorker.register('./sw.js?v=2.7.2')
         .then((reg) => {
-          console.log('⚡ Lobbivo Service Worker успешно активен:', reg.scope);
+          reg.update();
+          console.log('⚡ Lobbivo Service Worker v2.7.2 активен:', reg.scope);
         })
         .catch((err) => {
           console.warn('Service Worker registration issue:', err);
@@ -1797,5 +1800,32 @@ function init() {
 
   updateUI();
 }
+
+/**
+ * Принудительный сброс локального кэша, PWA Service Worker и жесткая перезагрузка
+ */
+window.forceClearCacheAndReload = async function() {
+  if (typeof showNotification === 'function') {
+    showNotification('🔄 Сброс кэша и обновление файлов...', 'info');
+  }
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const reg of registrations) {
+        await reg.unregister();
+      }
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      for (const key of keys) {
+        await caches.delete(key);
+      }
+    }
+  } catch (err) {
+    console.warn('Cache clearing error:', err);
+  }
+  const cleanUrl = window.location.origin + window.location.pathname + '?nocache=' + Date.now();
+  window.location.replace(cleanUrl);
+};
 
 document.addEventListener('DOMContentLoaded', init);

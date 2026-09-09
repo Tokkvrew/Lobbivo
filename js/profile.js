@@ -95,6 +95,10 @@ function updateHeaderAvatar() {
           <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-about"/></svg>
           <span>О платформе</span>
         </button>
+        <button class="profile-menu-item" data-action="reload-cache" style="color:var(--neon-cyan); opacity:0.9;">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <span>Обновить сайт (сброс кэша)</span>
+        </button>
         <div class="menu-divider-line"></div>
         <button class="profile-menu-item logout-item" data-action="logout">
           <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-logout"/></svg>
@@ -110,6 +114,10 @@ function updateHeaderAvatar() {
         <button class="profile-menu-item" data-action="about">
           <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-about"/></svg>
           <span>О платформе</span>
+        </button>
+        <button class="profile-menu-item" data-action="reload-cache" style="color:var(--neon-cyan); opacity:0.9;">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <span>Обновить сайт (сброс кэша)</span>
         </button>
       `;
     }
