@@ -27,18 +27,24 @@ function debounce(func, wait = 150) {
   };
 }
 
-// Оптимизация и сжатие аватара через Canvas (макс. 256x256, JPEG 0.85)
+// Оптимизация и сжатие аватара через Canvas (макс. 256x256, JPEG 0.85) с полной поддержкой мобильных устройств
 function compressImage(file, maxSize = 256, quality = 0.85) {
   return new Promise((resolve, reject) => {
-    if (!file || (!file.type.startsWith('image/') && !file.name?.toLowerCase().endsWith('.gif'))) {
-      return reject(new Error('Выбранный файл не является изображением'));
+    if (!file) {
+      return reject(new Error('Файл не выбран'));
     }
 
-    const isGif = file.type === 'image/gif' || (file.name && file.name.toLowerCase().endsWith('.gif'));
+    const fileName = (file.name || '').toLowerCase();
+    const isImage = file.type?.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|heic|heif|svg)$/i.test(fileName) || !file.type;
+    
+    if (!isImage) {
+      return reject(new Error('Выбранный файл не является поддерживаемым изображением'));
+    }
+
+    const isGif = file.type === 'image/gif' || fileName.endsWith('.gif');
     if (isGif) {
-      // GIF аватарка: сохраняем кадры анимации напрямую без сжатия через Canvas
-      if (file.size > 3.5 * 1024 * 1024) {
-        return reject(new Error('Размер GIF-аватарки не должен превышать 3.5 МБ'));
+      if (file.size > 4 * 1024 * 1024) {
+        return reject(new Error('Размер GIF-аватарки не должен превышать 4 МБ'));
       }
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Не удалось прочитать GIF файл'));
@@ -47,35 +53,78 @@ function compressImage(file, maxSize = 256, quality = 0.85) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
-    reader.onload = function(e) {
+    const processImageSource = (srcUrl, isBlobUrl = false) => {
       const img = new Image();
-      img.onerror = () => reject(new Error('Не удалось загрузить изображение'));
-      img.onload = function() {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        if (width > height) {
-          if (width > maxSize) {
-            height = Math.round((height * maxSize) / width);
+      img.crossOrigin = 'anonymous';
+      
+      img.onerror = () => {
+        if (isBlobUrl) URL.revokeObjectURL(srcUrl);
+        // Резервная попытка через FileReader
+        const fallbackReader = new FileReader();
+        fallbackReader.onload = (fe) => {
+          const fallbackImg = new Image();
+          fallbackImg.onload = () => renderToCanvas(fallbackImg);
+          fallbackImg.onerror = () => reject(new Error('Не удалось открыть изображение с камеры/галереи'));
+          fallbackImg.src = fe.target.result;
+        };
+        fallbackReader.onerror = () => reject(new Error('Ошибка чтения файла'));
+        fallbackReader.readAsDataURL(file);
+      };
+
+      const renderToCanvas = (loadedImg) => {
+        try {
+          const canvas = document.createElement('canvas');
+          let { width, height } = loadedImg;
+          
+          if (!width || !height) {
             width = maxSize;
-          }
-        } else {
-          if (height > maxSize) {
-            width = Math.round((width * maxSize) / height);
             height = maxSize;
           }
+
+          // Квадратное центрированное кадрирование для идеального аватара
+          const minSide = Math.min(width, height);
+          const startX = (width - minSide) / 2;
+          const startY = (height - minSide) / 2;
+          
+          canvas.width = Math.min(maxSize, minSide);
+          canvas.height = Math.min(maxSize, minSide);
+          
+          const ctx = canvas.getContext('2d', { alpha: false });
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(loadedImg, startX, startY, minSide, minSide, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(dataUrl);
+          } else {
+            resolve(loadedImg.src);
+          }
+        } catch (err) {
+          reject(err);
         }
-        canvas.width = Math.max(1, width);
-        canvas.height = Math.max(1, height);
-        const ctx = canvas.getContext('2d');
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
       };
-      img.src = e.target.result;
+
+      img.onload = () => {
+        if (isBlobUrl) URL.revokeObjectURL(srcUrl);
+        renderToCanvas(img);
+      };
+
+      img.src = srcUrl;
     };
+
+    if (window.URL && typeof window.URL.createObjectURL === 'function') {
+      try {
+        const blobUrl = URL.createObjectURL(file);
+        processImageSource(blobUrl, true);
+        return;
+      } catch (e) {
+        // Fallback to FileReader below
+      }
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
+    reader.onload = (e) => processImageSource(e.target.result, false);
     reader.readAsDataURL(file);
   });
 }

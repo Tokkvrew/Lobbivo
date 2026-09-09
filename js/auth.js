@@ -141,13 +141,13 @@ function registerUser(username, password, game, device) {
     return false;
   }
 
-  if (typeof SecurityShield !== 'undefined' && !SecurityShield.isValidUsername(trimmedUser)) {
-    setErrorMessage(regErr, 'Имя может содержать только буквы, цифры, дефис (2-20 символов)');
+  if (trimmedUser.length < 2 || trimmedUser.length > 20) {
+    setErrorMessage(regErr, 'Имя пользователя должно быть от 2 до 20 символов');
     return false;
   }
 
-  if (trimmedUser.length < 2 || trimmedUser.length > 20) {
-    setErrorMessage(regErr, 'Имя пользователя должно быть от 2 до 20 символов');
+  if (typeof SecurityShield !== 'undefined' && !SecurityShield.isValidUsername(trimmedUser)) {
+    setErrorMessage(regErr, 'Имя может содержать только буквы, цифры, дефис (2-20 символов)');
     return false;
   }
 

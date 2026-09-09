@@ -9,10 +9,17 @@ let isInChat = false;
 //  1. ФОРМАТИРОВАНИЕ СООБЩЕНИЙ И ПАСХАЛКИ
 // ============================================================
 
-// Форматирование текста сообщений и радужная пасхалка для слова "гей" / "gay"
+// Форматирование текста сообщений, модерация мата и пасхалки
 function formatChatMessage(rawText) {
   if (!rawText) return '';
   let safe = escapeHtml(String(rawText).trim());
+
+  // Автоматическая цензура / блюр мата (по умолчанию включена)
+  const isCensorshipActive = typeof AppState === 'undefined' || AppState.chatCensorship !== false;
+  if (typeof SecurityShield !== 'undefined' && typeof SecurityShield.censorProfanity === 'function') {
+    safe = SecurityShield.censorProfanity(safe, isCensorshipActive);
+  }
+
   const gayRegex = /(^|[^\p{L}\p{N}_])(гей|геи|геем|геев|гейский|гейская|гейское|гейские|гейству|геями|геях|gay|gays)(?=[^\p{L}\p{N}_]|$)/giu;
   safe = safe.replace(gayRegex, (match, prefix) => {
     return `${prefix}<span class="rainbow-gay-tag" title="✨ Pride Rainbow">Gay</span>`;
@@ -285,41 +292,52 @@ function renderVipSquadPinnedBar() {
   const current = AppState.currentUser;
   const now = Date.now();
   
-  // Ищем пользователей с активным VIP-бустом анкеты
-  let vipCandidate = null;
-  let highestBoostTime = 0;
+  // Ищем анкеты, которые пользователь ЯВНО закрепил через тумблер в «Мои анкеты»
+  let pinnedCandidate = null;
 
-  for (const [name, data] of Object.entries(AppState.users)) {
-    if (!data.lookingForTeam) continue;
-    if (data.vipBoostUntil && Number(data.vipBoostUntil) > now) {
-      if (Number(data.vipBoostUntil) > highestBoostTime) {
-        highestBoostTime = Number(data.vipBoostUntil);
-        vipCandidate = { username: name, data: data, isBoosted: true };
-      }
+  // 1. Сначала проверяем закреп текущего пользователя (чтобы он сразу видел свой закреп)
+  if (current && AppState.users[current]) {
+    const meSquads = Array.isArray(AppState.users[current].squads) ? AppState.users[current].squads : [];
+    const myPinned = meSquads.find(s => s && s.pinnedInChat === true && s.active !== false);
+    if (myPinned) {
+      pinnedCandidate = {
+        username: current,
+        data: AppState.users[current],
+        squad: myPinned,
+        isBoosted: isSquadVipBoosted(current)
+      };
     }
   }
 
-  // Если нет бустнутых, берем премиум-игрока с активной анкетой
-  if (!vipCandidate) {
+  // 2. Если у текущего пользователя нет закрепа, ищем закрепленные анкеты других пользователей
+  if (!pinnedCandidate) {
     for (const [name, data] of Object.entries(AppState.users)) {
-      if (!data.lookingForTeam) continue;
-      if (isUserPremium(name)) {
-        vipCandidate = { username: name, data: data, isBoosted: false };
+      if (name === current) continue;
+      if (!Array.isArray(data.squads)) continue;
+      const pinnedSq = data.squads.find(s => s && s.pinnedInChat === true && s.active !== false);
+      if (pinnedSq) {
+        pinnedCandidate = {
+          username: name,
+          data: data,
+          squad: pinnedSq,
+          isBoosted: isSquadVipBoosted(name)
+        };
         break;
       }
     }
   }
 
-  if (!vipCandidate) {
+  // Если ни у кого не включен тумблер закрепления — по умолчанию ничего не закрепляется
+  if (!pinnedCandidate) {
     bar.style.display = 'none';
     bar.innerHTML = '';
     return;
   }
 
-  const { username, data, isBoosted } = vipCandidate;
+  const { username, data, squad, isBoosted } = pinnedCandidate;
 
   // Проверка скрытия объявления пользователем в localStorage
-  const dismissKey = `lobbivo_dismissed_vip_${username}`;
+  const dismissKey = `lobbivo_dismissed_vip_${username}_${squad.id || 'sq'}`;
   if (localStorage.getItem(dismissKey) === 'true') {
     bar.style.display = 'none';
     bar.innerHTML = '';
@@ -327,9 +345,11 @@ function renderVipSquadPinnedBar() {
   }
 
   const safeName = escapeHtml(username);
-  const gameObj = GAMES.find(g => g.id === data.game) || GAMES[0];
+  const targetGameId = squad.game || data.game || 'csgo';
+  const gameObj = GAMES.find(g => g.id === targetGameId) || GAMES[0];
   const frameId = getUserEquippedFrame(username);
-  const safeDesc = escapeHtml(data.desc || 'Ищу тиммейтов для совместной игры и побед!');
+  const safeDesc = escapeHtml(squad.desc || data.desc || 'Ищу тиммейтов для совместной игры и побед!');
+  const safeRank = escapeHtml(squad.rank || data.rank || '');
   const isMe = current === username;
 
   let avatarHtml;
@@ -364,7 +384,7 @@ function renderVipSquadPinnedBar() {
               <svg><use href="#${escapeHtml(gameObj.icon)}"/></svg>
               <span>${escapeHtml(gameObj.name)}</span>
             </span>
-            ${data.rank ? `<span class="vip-pinned-rank">${escapeHtml(data.rank)}</span>` : ''}
+            ${safeRank ? `<span class="vip-pinned-rank">${safeRank}</span>` : ''}
           </div>
           <div class="vip-pinned-desc">${safeDesc}</div>
         </div>
@@ -1507,9 +1527,13 @@ function renderPrivacySettings() {
   const access = user.privacy?.dmAccess || 'all';
   const radioAll = document.getElementById('privacyDmAll');
   const radioFriends = document.getElementById('privacyDmFriends');
+  if (radioAll) radioAll.checked = access === 'all';
+  if (radioFriends) radioFriends.checked = access === 'friends';
 
-  if (radioAll) radioAll.checked = (access === 'all');
-  if (radioFriends) radioFriends.checked = (access === 'friends');
+  const censorshipToggle = document.getElementById('chatCensorshipToggle');
+  if (censorshipToggle) {
+    censorshipToggle.checked = AppState.chatCensorship !== false;
+  }
 
   updatePushSettingsUI();
 }

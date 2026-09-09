@@ -280,10 +280,6 @@ function submitSquad() {
     }
   }
 
-  userData.game = game;
-  userData.rank = rank || userData.rank || 'Не указан';
-  userData.device = device;
-  userData.desc = description;
   userData.lookingForTeam = true;
   userData.hasCreatedSquad = true;
 
@@ -305,6 +301,12 @@ function createParticles(theme) {
   const container = document.getElementById('particlesContainer');
   if (!container) return;
   container.innerHTML = '';
+
+  // Оптимизация производительности: на мобильных устройствах отключаем тяжелые DOM-частицы во избежание нагрева телефона и расхода батареи
+  const isMobile = window.innerWidth <= 768 || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1);
+  if (isMobile) {
+    return;
+  }
 
   const frag = document.createDocumentFragment();
 
@@ -1333,8 +1335,16 @@ function init() {
         if (typeof openAdminPanel === 'function') openAdminPanel('complaints');
       } else if (action === 'coins') {
         openCoinModal('earn');
-      } else if (action === 'profile' || action === 'customization' || action === 'settings') {
+      } else if (action === 'profile' || action === 'customization') {
         showProfile();
+      } else if (action === 'settings') {
+        showProfile();
+        setTimeout(() => {
+          const settingsSec = document.getElementById('profileSettingsSection');
+          if (settingsSec) {
+            settingsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 150);
       } else if (action === 'my-squads') {
         if (typeof openMySquadsModal === 'function') openMySquadsModal();
       } else if (action === 'login') {
@@ -1343,8 +1353,6 @@ function init() {
         showAuthModal('register');
       } else if (action === 'about') {
         switchPage('pageAbout');
-      } else if (action === 'reload-cache') {
-        forceClearCacheAndReload();
       } else if (action === 'logout') {
         logout();
       }
@@ -1617,32 +1625,56 @@ function init() {
   document.getElementById('deleteAccountBtn')?.addEventListener('click', deleteAccount);
 
   // Делегирование клика по аватару профиля для смены фото
-  document.getElementById('profileAvatar')?.addEventListener('click', (e) => {
-    if (e.target.closest('#avatarEditBtn') || e.target.closest('.profile-avatar')) {
-      if (!AppState.currentUser) return;
-      document.getElementById('editAvatarFile')?.click();
+  const triggerAvatarUpload = () => {
+    if (!AppState.currentUser) {
+      showAuthModal('login');
+      return;
     }
+    const fileInput = document.getElementById('editAvatarFile');
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  document.getElementById('profileAvatar')?.addEventListener('click', triggerAvatarUpload);
+  document.getElementById('avatarEditBtn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    triggerAvatarUpload();
   });
 
-  // Загрузка и оптимизация аватара
+  // Загрузка и мгновенная оптимизация аватара
   document.getElementById('editAvatarFile')?.addEventListener('change', async function() {
     if (this.files && this.files[0]) {
       const file = this.files[0];
-      if (file.size > 5 * 1024 * 1024) {
-        showNotification('Ошибка', 'Размер изображения не должен превышать 5 МБ');
+      if (file.size > 8 * 1024 * 1024) {
+        showNotification('Ошибка', 'Размер изображения не должен превышать 8 МБ');
         this.value = '';
         return;
       }
+      
+      const isGif = file.type === 'image/gif' || (file.name && file.name.toLowerCase().endsWith('.gif'));
+      if (isGif && !isUserPremium(AppState.currentUser)) {
+        showNotification('Lobbivo Premium', 'Для установки анимированных GIF-аватарок требуется статус Premium');
+        if (typeof openCoinModal === 'function') openCoinModal('shop');
+        this.value = '';
+        return;
+      }
+
+      showNotification('Обработка фото...', 'Оптимизирую изображение для профиля');
       try {
         const compressedBase64 = await compressImage(file, 256, 0.85);
         if (AppState.currentUser && AppState.users[AppState.currentUser]) {
           AppState.users[AppState.currentUser].avatar = compressedBase64;
           saveUsers();
+          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+            FirebaseSync.saveUser(AppState.currentUser, AppState.users[AppState.currentUser]);
+          }
           renderProfile();
+          if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
           showNotification('Фото обновлено', 'Новый аватар успешно сохранен!');
         }
       } catch (err) {
-        showNotification('Ошибка', err.message || 'Не удалось обработать изображение');
+        showNotification('Ошибка загрузки', err.message || 'Не удалось обработать изображение');
       }
       this.value = '';
     }
@@ -1767,13 +1799,92 @@ function init() {
     switchPage('pageWelcome');
   }
 
-  // Регистрация PWA Service Worker для фоновых Push-уведомлений на телефоне и ПК
+  // Настройки платформы: Цензура чата (по умолчанию включена)
+  const savedCensorship = localStorage.getItem('lobbivo_chat_censorship');
+  AppState.chatCensorship = savedCensorship !== 'false';
+
+  const censorshipToggle = document.getElementById('chatCensorshipToggle');
+  if (censorshipToggle) {
+    censorshipToggle.checked = AppState.chatCensorship !== false;
+    censorshipToggle.addEventListener('change', function() {
+      AppState.chatCensorship = this.checked;
+      localStorage.setItem('lobbivo_chat_censorship', this.checked ? 'true' : 'false');
+      if (AppState.currentUser && AppState.users[AppState.currentUser]) {
+        if (!AppState.users[AppState.currentUser].settings) {
+          AppState.users[AppState.currentUser].settings = {};
+        }
+        AppState.users[AppState.currentUser].settings.chatCensorship = this.checked;
+        saveUsers();
+      }
+      if (typeof renderWorldChat === 'function') renderWorldChat();
+      if (typeof renderChatMessages === 'function') renderChatMessages();
+      if (typeof updateChatList === 'function') updateChatList();
+      if (typeof showNotification === 'function') {
+        showNotification(
+          this.checked ? '🛡️ Цензура чата включена' : '⚠️ Цензура чата отключена',
+          this.checked ? 'Нецензурные выражения в чате теперь блюрятся' : 'Фильтр отключен, сообщения отображаются без цензуры'
+        );
+      }
+    });
+  }
+
+  // Переключение категорий в Настройках платформы (Чаты / Приватность)
+  const settingsCatTabs = document.querySelectorAll('.settings-category-tab');
+  const settingsCatPanels = document.querySelectorAll('.settings-category-panel');
+
+  settingsCatTabs.forEach(tabBtn => {
+    tabBtn.addEventListener('click', function() {
+      const targetTab = this.dataset.settingsTab;
+      settingsCatTabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+
+      settingsCatPanels.forEach(panel => {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+      });
+
+      if (targetTab === 'chats') {
+        const chatsPanel = document.getElementById('settingsPanelChats');
+        if (chatsPanel) {
+          chatsPanel.classList.add('active');
+          chatsPanel.style.display = 'block';
+        }
+      } else if (targetTab === 'privacy') {
+        const privacyPanel = document.getElementById('settingsPanelPrivacy');
+        if (privacyPanel) {
+          privacyPanel.classList.add('active');
+          privacyPanel.style.display = 'block';
+        }
+      }
+    });
+  });
+
+  // Регистрация PWA Service Worker с авто-обновлением кэша (Network-First) и Push-уведомлениями
   if ('serviceWorker' in navigator) {
+    let swRefreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!swRefreshing) {
+        swRefreshing = true;
+        window.location.reload();
+      }
+    });
+
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.7.2')
+      navigator.serviceWorker.register('./sw.js?v=2.8.0', { updateViaCache: 'none' })
         .then((reg) => {
+          // Проверяем обновления файлов немедленно при загрузке страницы
           reg.update();
-          console.log('⚡ Lobbivo Service Worker v2.7.2 активен:', reg.scope);
+          console.log('⚡ Lobbivo Service Worker v2.8.0 активен:', reg.scope);
+
+          // Проверяем обновления при возврате пользователя на вкладку (на телефоне и ПК)
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              reg.update();
+            }
+          });
+          window.addEventListener('focus', () => {
+            reg.update();
+          });
         })
         .catch((err) => {
           console.warn('Service Worker registration issue:', err);

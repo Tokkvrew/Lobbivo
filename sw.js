@@ -2,7 +2,7 @@
 //  LOBBIVO SERVICE WORKER (BACKGROUND WEB PUSH & NOTIFICATIONS)
 // ============================================================
 
-const CACHE_NAME = 'lobbivo-cache-v2.7.2';
+const CACHE_NAME = 'lobbivo-cache-v2.8.0';
 const OFFLINE_URL = './index.html';
 
 self.addEventListener('install', (event) => {
@@ -20,6 +20,48 @@ self.addEventListener('activate', (event) => {
         })
       );
     }).then(() => self.clients.claim())
+  );
+});
+
+// Автоматическое обновление: Network-First для всех локальных файлов (HTML, JS, CSS, Media)
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+
+  // Игнорируем внешние запросы к Firebase и Google APIs
+  if (
+    url.origin.includes('firebaseio.com') ||
+    url.origin.includes('googleapis.com') ||
+    url.origin.includes('firestore') ||
+    url.origin.includes('gstatic.com')
+  ) {
+    return;
+  }
+
+  // Network-First: запрашиваем сеть для получения свежих файлов с GitHub Pages, при успехе обновляем кэш, при отсутствии сети — отдаем из кэша
+  event.respondWith(
+    fetch(request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseToCache);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          if (request.mode === 'navigate') {
+            return caches.match(OFFLINE_URL);
+          }
+        });
+      })
   );
 });
 

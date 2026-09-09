@@ -239,6 +239,18 @@ function renderMySquads() {
               <div class="desc-text">${safeDesc}</div>
             </div>
 
+            <!-- ТУМБЛЕР ЗАКРЕПЛЕНИЯ АНКЕТЫ В ЧАТЕ -->
+            <div class="my-squad-pin-row">
+              <div class="pin-toggle-info">
+                <svg style="width:14px;height:14px;color:var(--neon-cyan);display:inline-block;vertical-align:middle;margin-right:6px;"><use href="#icon-badge-vip"/></svg>
+                <span style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">Закрепить вашу анкету в чате</span>
+              </div>
+              <label class="cyber-switch cyber-switch-sm" title="Закрепить или открепить эту анкету в шапке мирового чата">
+                <input type="checkbox" onchange="toggleSquadPinInChat('${sq.id}', this.checked)" ${sq.pinnedInChat ? 'checked' : ''}>
+                <span class="cyber-switch-slider"></span>
+              </label>
+            </div>
+
             <div class="my-squad-card-footer">
               <span class="squad-date">Создана: ${dateStr}</span>
               <div class="my-squad-actions">
@@ -260,6 +272,39 @@ function renderMySquads() {
 
   if (listContainer) listContainer.innerHTML = squadsHtml;
   if (modalListContainer) modalListContainer.innerHTML = squadsHtml;
+}
+
+/**
+ * Переключение закрепления анкеты в шапке мирового чата (по умолчанию выключено)
+ */
+function toggleSquadPinInChat(squadId, isPinned) {
+  if (!AppState.currentUser) return;
+  const user = AppState.users[AppState.currentUser];
+  if (!user || !Array.isArray(user.squads)) return;
+
+  user.squads.forEach(s => {
+    if (s.id === squadId) {
+      s.pinnedInChat = Boolean(isPinned);
+    } else if (isPinned) {
+      // Только одна анкета пользователя может быть одновременно закреплена
+      s.pinnedInChat = false;
+    }
+  });
+
+  saveUsers();
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    FirebaseSync.saveUser(AppState.currentUser, user);
+  }
+
+  renderMySquads();
+  if (typeof renderVipSquadPinnedBar === 'function') {
+    renderVipSquadPinnedBar();
+  }
+
+  showNotification(
+    isPinned ? '📌 Закреплено в чате' : '📌 Закрепление снято',
+    isPinned ? 'Ваша анкета теперь закреплена в шапке мирового чата!' : 'Анкета откреплена из шапки чата'
+  );
 }
 
 function openMySquadsModal() {
