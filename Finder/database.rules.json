@@ -1,0 +1,40 @@
+{
+  "rules": {
+    ".read": true,
+    
+    "users": {
+      "$uid": {
+        ".write": "true",
+        ".validate": "!newData.exists() || (newData.hasChildren(['username', 'game', 'device']) && newData.child('username').isString() && newData.child('username').val().length <= 30)"
+      }
+    },
+
+    "worldMessages": {
+      ".indexOn": ["time"],
+      "$msgId": {
+        // Разрешаем создание нового сообщения и удаление старых при автоочистке/модерации
+        ".write": "true",
+        ".validate": "!newData.exists() || (newData.hasChildren(['id', 'text', 'from', 'time']) && newData.child('text').isString() && newData.child('text').val().length <= 500 && newData.child('from').val().length <= 30)"
+      }
+    },
+
+    "directMessages": {
+      "$chatKey": {
+        ".write": "true",
+        ".validate": "!newData.exists() || newData.hasChild('messages')"
+      }
+    },
+
+    "complaints": {
+      "$complaintId": {
+        // Разрешаем создание жалобы и удаление/закрытие модератором
+        ".write": "true",
+        ".validate": "!newData.exists() || (newData.hasChildren(['id', 'target', 'reason']) && newData.child('reason').val().length <= 500)"
+      }
+    },
+
+    "typing": {
+      ".write": "true"
+    }
+  }
+}

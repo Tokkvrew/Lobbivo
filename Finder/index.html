@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+  <title>LOBBIVO — Поиск тиммейтов и создание пати для 25+ онлайн-игр</title>
+  <meta name="description" content="LOBBIVO — современная гейминг-платформа для быстрого поиска тиммейтов, напарников и сквадов в CS 2, Dota 2, Valorant, GTA V, Rust и др. Общайся во встроенном чате и побеждай." />
+  <meta name="keywords" content="lobbivo, лоббиво, поиск тиммейтов, найти пати, поиск напарников кс 2, дота 2 тимейты, найти сквад valorant, тиммейты для игр, гейминг платформа" />
+  <meta name="yandex-verification" content="14bae08dded82c6a" />
+  <link rel="canonical" href="https://lobbivo.ru/" />
+
+  <!-- Favicon & PWA Theme -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300d4ff'/%3E%3Cstop offset='50%25' stop-color='%23b44dff'/%3E%3Cstop offset='100%25' stop-color='%23ff44cc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='sans-serif' font-weight='900' font-size='60' fill='%23ffffff' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+  <meta name="theme-color" content="#070709" />
+
+  <!-- Open Graph / Meta (Для красивого превью при отправке ссылки в Telegram, VK, Discord) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lobbivo.ru/" />
+  <meta property="og:title" content="LOBBIVO — Найди свою команду для онлайн-игр" />
+  <meta property="og:description" content="Платформа для быстрого поиска тиммейтов и создания сквадов в 25+ популярных играх: CS 2, Dota 2, Valorant, GTA V, Rust и др." />
+  <meta property="og:site_name" content="Lobbivo" />
+
+  <!-- Schema.org JSON-LD Structured Data for Google & Yandex -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Lobbivo",
+    "url": "https://lobbivo.ru/",
+    "description": "Платформа для поиска тиммейтов и создания сквадов в 25+ онлайн-играх",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://lobbivo.ru/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- CSS Стили -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/media.css" />
+</head>
+<body>
+
+  <!-- SVG СПРАЙТ ИКОНОК -->
+  <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00d4ff"/>
+        <stop offset="50%" stop-color="#b44dff"/>
+        <stop offset="100%" stop-color="#ff44cc"/>
+      </linearGradient>
+    </defs>
+
+    <!-- ИКОНКИ МОДЕРАЦИИ И АДМИНИСТРИРОВАНИЯ -->
+    <symbol id="icon-admin-shield" viewBox="0 0 24 24">
+      <path d="M12 2L4 5v6.5c0 5.25 3.4 10.15 8 11.5 4.6-1.35 8-6.25 8-11.5V5l-8-3z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+      <path d="M12 7.5l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4L12 7.5z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24">
+      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-mute" viewBox="0 0 24 24">
+      <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-gavel" viewBox="0 0 24 24">
+      <path d="M14 13l-7.5 7.5a2.12 2.12 0 0 1-3-3L11 10M16 8l4-4 2 2-4 4M9 15l2 2M15 9l2 2M19 5l-4 4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- ИКОНКИ УСТРОЙСТВ (СТИЛИЗОВАННЫЙ КИБЕРПАНК МИНИМАЛИЗМ) -->
+    <!-- 1. PC -->
+    <symbol id="icon-device-pc" viewBox="0 0 24 24">
+      <rect x="2" y="3" width="20" height="13" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <rect x="4" y="5" width="16" height="9" rx="1" fill="currentColor" fill-opacity="0.12"/>
+      <line x1="12" y1="16" x2="12" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M7 20h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="12" cy="9.5" r="2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.2"/>
+    </symbol>
+
+    <!-- 2. PlayStation -->
+    <symbol id="icon-device-playstation" viewBox="0 0 24 24">
+      <path d="M4 14.5c-1 3 0 5 2 5 2.5 0 3.5-3 6-3s3.5 3 6 3c2 0 3-2 2-5L19 7a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3l-1 7.5z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+      <path d="M7 9v3M5.5 10.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="16.5" cy="9" r="0.9" fill="currentColor"/>
+      <circle cx="15" cy="10.5" r="0.9" fill="currentColor"/>
+      <circle cx="18" cy="10.5" r="0.9" fill="currentColor"/>
+      <circle cx="16.5" cy="12" r="0.9" fill="currentColor"/>
+      <rect x="10" y="7" width="4" height="2.5" rx="0.8" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+    </symbol>
+
+    <!-- 3. Xbox -->
+    <symbol id="icon-device-xbox" viewBox="0 0 24 24">
+      <path d="M4 14.5c-1.2 3.2 0 5.5 2.2 5.5 2.2 0 3.8-3.2 5.8-3.2s3.6 3.2 5.8 3.2c2.2 0 3.4-2.3 2.2-5.5L19 7a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3l-1 7.5z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+      <circle cx="12" cy="7.2" r="2.2" stroke="currentColor" stroke-width="1.3" fill="none"/>
+      <path d="M10.8 6.2l2.4 2M13.2 6.2l-2.4 2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      <circle cx="7.5" cy="10" r="1.6" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="14" cy="13.2" r="1.6" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M9.5 13.5h2M10.5 12.5v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 4. Nintendo Switch -->
+    <symbol id="icon-device-nintendo" viewBox="0 0 24 24">
+      <rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <rect x="7" y="6.5" width="10" height="11" rx="0.5" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="4.8" cy="9.5" r="1.2" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.1"/>
+      <circle cx="4.8" cy="14" r="0.7" fill="currentColor"/>
+      <circle cx="19.2" cy="13.5" r="1.2" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="1.1"/>
+      <circle cx="19.2" cy="9" r="0.7" fill="currentColor"/>
+      <line x1="4.8" y1="6.8" x2="4.8" y2="7.8" stroke="currentColor" stroke-width="1.2"/>
+      <line x1="18.7" y1="7.3" x2="19.7" y2="7.3" stroke="currentColor" stroke-width="1.2"/>
+    </symbol>
+
+    <!-- 5. Mobile -->
+    <symbol id="icon-device-mobile" viewBox="0 0 24 24">
+      <rect x="5.5" y="2" width="13" height="20" rx="2.8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <rect x="7.5" y="4.5" width="9" height="15" rx="1.2" fill="currentColor" fill-opacity="0.12"/>
+      <circle cx="12" cy="3.5" r="0.75" fill="currentColor"/>
+      <circle cx="12" cy="11" r="2.2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 1.5" fill="none"/>
+      <circle cx="12" cy="11" r="0.75" fill="currentColor"/>
+      <line x1="10" y1="18" x2="14" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 6. Other / VR / Gear -->
+    <symbol id="icon-device-other" viewBox="0 0 24 24">
+      <path d="M3 9a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V9z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <circle cx="8.5" cy="11" r="2.2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.3"/>
+      <circle cx="15.5" cy="11" r="2.2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M3 11C1.8 11 1 12 1 13.5S2 16 3 16M21 11c1.2 0 2 1 2 2.5s-1 2.5-2 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="10" y1="7.8" x2="14" y2="7.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+    </symbol>
+
+    <!-- ГЛАВНАЯ ИКОНКА -->
+    <symbol id="icon-main" viewBox="0 0 100 100">
+      <rect x="5" y="5" width="90" height="90" rx="20" fill="url(#brandGrad)" stroke="none"/>
+      <rect x="18" y="18" width="64" height="64" rx="14" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.5"/>
+      <circle cx="35" cy="42" r="7" fill="rgba(255,255,255,0.3)" stroke="none"/>
+      <circle cx="65" cy="42" r="7" fill="rgba(255,255,255,0.3)" stroke="none"/>
+      <circle cx="35" cy="42" r="3.5" fill="rgba(255,255,255,0.7)" stroke="none"/>
+      <circle cx="65" cy="42" r="3.5" fill="rgba(255,255,255,0.7)" stroke="none"/>
+      <path d="M 32 60 Q 50 75 68 60" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="25" cy="25" r="3" fill="rgba(255,255,255,0.15)"/>
+      <circle cx="75" cy="25" r="3" fill="rgba(255,255,255,0.15)"/>
+      <circle cx="25" cy="75" r="3" fill="rgba(255,255,255,0.15)"/>
+      <circle cx="75" cy="75" r="3" fill="rgba(255,255,255,0.15)"/>
+    </symbol>
+
+    <!-- ИКОНКИ ДЛЯ 25 ИГР (МИНИМАЛИСТИЧНЫЕ УЗНАВАЕМЫЕ ЛОГОТИПЫ) -->
+    <!-- 1. CS 2 -->
+    <symbol id="icon-csgo" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M8 8h3v8H8zm5 0h3v8h-3z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </symbol>
+
+    <!-- 2. Dota 2 -->
+    <symbol id="icon-dota2" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="3.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M6 6h4.5v4.5H6z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M13.5 13.5H18V18h-4.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M18.5 5.5L5.5 18.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 3. Valorant -->
+    <symbol id="icon-valorant" viewBox="0 0 24 24">
+      <path d="M3.5 4h5.5l7 14h-5.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M16 4h4.5l-4 7.5h-4.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 4. GTA V Online -->
+    <symbol id="icon-gta5" viewBox="0 0 24 24">
+      <path d="M4 3h5l3 11 3-11h5l-6 18h-4L4 3z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M8.5 8.5h7M10 13h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 5. Rust -->
+    <symbol id="icon-rust" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M12 3v6M4.2 16.5l5.2-3M19.8 16.5l-5.2-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M9.5 5.5a7 7 0 0 1 5 0M4.5 14.5a7 7 0 0 1 2.5-4.5M19.5 14.5a7 7 0 0 0-2.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 6. Apex Legends -->
+    <symbol id="icon-apex" viewBox="0 0 24 24">
+      <path d="M12 2L3 19h4.5l4.5-9 4.5 9H21L12 2z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M8.5 15.5h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 7. Fortnite -->
+    <symbol id="icon-fortnite" viewBox="0 0 24 24">
+      <path d="M6 3h12v4.5h-7v3.5h6v4h-6V21H6V3z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <circle cx="15.5" cy="17" r="1.5" fill="currentColor"/>
+    </symbol>
+
+    <!-- 8. Minecraft -->
+    <symbol id="icon-minecraft" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <rect x="6.5" y="7" width="3.5" height="3.5" fill="currentColor"/>
+      <rect x="14" y="7" width="3.5" height="3.5" fill="currentColor"/>
+      <path d="M10 10.5h4v3h2v4.5h-2.5v-2h-3v2H8V13.5h2v-3z" fill="currentColor"/>
+    </symbol>
+
+    <!-- 9. Warzone -->
+    <symbol id="icon-warzone" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" stroke-dasharray="4 2" fill="none"/>
+      <path d="M7.5 11c0-3 2-5 4.5-5s4.5 2 4.5 5c0 2-.8 3.2-1.5 4v2.5h-6V15c-.7-.8-1.5-2-1.5-4z" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="10" cy="11.5" r="1" fill="currentColor"/>
+      <circle cx="14" cy="11.5" r="1" fill="currentColor"/>
+      <path d="M10 17.5v2M12 17.5v2M14 17.5v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 10. PUBG -->
+    <symbol id="icon-pubg" viewBox="0 0 24 24">
+      <path d="M4 13C4 7.5 7.5 4 12 4s8 3.5 8 9v4c0 1.5-1 2-2 2H6c-1 0-2-.5-2-2v-4z" fill="currentColor" fill-opacity="0.25" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M5 11h14v4H5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="7" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M8 17h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 11. Rocket League -->
+    <symbol id="icon-rocket" viewBox="0 0 24 24">
+      <path d="M12 2l8 4v7c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-4z" stroke="currentColor" stroke-width="1.6" fill="none"/>
+      <path d="M9 13.5l3-6 3 6-1 2h-4l-1-2z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M10.5 15.5l-1.5 2M13.5 15.5l1.5 2M12 15.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 12. Rainbow Six Siege -->
+    <symbol id="icon-rainbow" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M14 6h-3.5a4.5 4.5 0 0 0-4.5 4.5V13a4.5 4.5 0 1 0 9 0v-1h-4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="12" cy="14" r="1.5" fill="currentColor"/>
+    </symbol>
+
+    <!-- 13. Overwatch 2 -->
+    <symbol id="icon-overwatch" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M7 6l5 4 5-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M6 14.5l3.5-3 2.5 2 2.5-2 3.5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M9.5 11.5v6M14.5 11.5v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 14. League of Legends -->
+    <symbol id="icon-league" viewBox="0 0 24 24">
+      <path d="M4 3h4v13h10v4H4V3z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M11 6l5 4-5 4M14 3l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 15. Escape from Tarkov -->
+    <symbol id="icon-tarkov" viewBox="0 0 24 24">
+      <polygon points="12,2 22,7 22,17 12,22 2,17 2,7" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+      <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/>
+    </symbol>
+
+    <!-- 16. Destiny 2 -->
+    <symbol id="icon-destiny" viewBox="0 0 24 24">
+      <path d="M12 3l3.5 6.5h-7L12 3z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M4 14l6.5-1.5-3.5 6L4 14z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M20 14l-6.5-1.5 3.5 6L20 14z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="12" cy="12" r="2" fill="currentColor"/>
+    </symbol>
+
+    <!-- 17. World of Warcraft -->
+    <symbol id="icon-wow" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" fill="none"/>
+      <path d="M5 7l3 10 4-7 4 7 3-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M9 13.5h6" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="12" cy="6.5" r="1.5" fill="currentColor"/>
+    </symbol>
+
+    <!-- 18. Deadlock -->
+    <symbol id="icon-deadlock" viewBox="0 0 24 24">
+      <polygon points="12,2 21,12 12,22 3,12" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <circle cx="12" cy="10" r="3" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M10.5 12.5L9.5 17h5l-1-4.5" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="12" cy="10" r="1" fill="currentColor"/>
+    </symbol>
+
+    <!-- 19. Marvel Rivals -->
+    <symbol id="icon-marvel" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M6 16V8l3.5 5L13 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M15.5 16v-8h2.5a2 2 0 0 1 0 4h-2.5l2.5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- 20. XDefiant -->
+    <symbol id="icon-xdefiant" viewBox="0 0 24 24">
+      <path d="M4 4l6 8-6 8h4.5l3.5-5 3.5 5H20l-6-8 6-8h-4.5L12 9 8.5 4H4z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </symbol>
+
+    <!-- 21. The Finals -->
+    <symbol id="icon-thefinals" viewBox="0 0 24 24">
+      <polygon points="12,3 21,19 3,19" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <polygon points="12,8 17,17 7,17" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="12" cy="14.5" r="1" fill="currentColor"/>
+    </symbol>
+
+    <!-- 22. Ready or Not -->
+    <symbol id="icon-readyornot" viewBox="0 0 24 24">
+      <polygon points="12,2 21,6 21,14 12,22 3,14 3,6" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M12 6l1.8 3.8 4.2.6-3 3 .7 4.2-3.7-2-3.7 2 .7-4.2-3-3 4.2-.6z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.4"/>
+    </symbol>
+
+    <!-- 23. Helldivers 2 -->
+    <symbol id="icon-helldivers2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M8 8l4-3 4 3v4c0 3-1.5 5-4 6-2.5-1-4-3-4-6V8z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M10 10.5h.01M14 10.5h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M10.5 14h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M4 12h3M17 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- 24. Palworld -->
+    <symbol id="icon-palworld" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M12 4c2 3 4 5.5 4 8.5a4 4 0 1 1-8 0c0-3 2-5.5 4-8.5z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="12" cy="13.5" r="1.5" fill="currentColor"/>
+    </symbol>
+
+    <!-- 25. Baldur's Gate 3 -->
+    <symbol id="icon-bg3" viewBox="0 0 24 24">
+      <polygon points="12,2 21,7 21,17 12,22 3,17 3,7" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M9 8a3 3 0 0 1 6 0c0 2-1 3-1 4.5v3.5l-2-1.5-2 1.5v-3.5C10 11 9 10 9 8z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M7 11c0 2 1 3.5 2 4M17 11c0 2-1 3.5-2 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="12" cy="8.5" r="1" fill="currentColor"/>
+    </symbol>
+
+    <symbol id="icon-default" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="2" fill="none"/>
+      <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.3"/>
+    </symbol>
+
+    <!-- ИКОНКИ МЕНЮ ПРОФИЛЯ (ФОТО 2) -->
+    <symbol id="icon-user-round" viewBox="0 0 24 24">
+      <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M4 21v-2a6 6 0 0 1 12 0v2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-palette-menu" viewBox="0 0 24 24">
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.9-.5-1.6 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C23 6.1 18 2 12 2z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <circle cx="7.5" cy="11.5" r="1.3" fill="currentColor"/>
+      <circle cx="10.5" cy="7.5" r="1.3" fill="currentColor"/>
+      <circle cx="14.5" cy="7.5" r="1.3" fill="currentColor"/>
+      <circle cx="17.5" cy="11.5" r="1.3" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-nodes-menu" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <circle cx="5" cy="6" r="2" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity="0.3"/>
+      <circle cx="19" cy="6" r="2" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity="0.3"/>
+      <circle cx="5" cy="18" r="2" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity="0.3"/>
+      <circle cx="19" cy="18" r="2" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity="0.3"/>
+      <line x1="6.5" y1="7.5" x2="9.8" y2="10.2" stroke="currentColor" stroke-width="1.6"/>
+      <line x1="17.5" y1="7.5" x2="14.2" y2="10.2" stroke="currentColor" stroke-width="1.6"/>
+      <line x1="6.5" y1="16.5" x2="9.8" y2="13.8" stroke="currentColor" stroke-width="1.6"/>
+      <line x1="17.5" y1="16.5" x2="14.2" y2="13.8" stroke="currentColor" stroke-width="1.6"/>
+    </symbol>
+    <symbol id="icon-logout-door" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="9" height="16" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M14 8l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="8" y1="12" x2="18" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- ИКОНКИ ИНТЕРФЕЙСА -->
+    <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24"><path d="M2 21L23 12 2 3v7l15 2-15 2z" fill="currentColor"/></symbol>
+    <symbol id="icon-profile" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="icon-about" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="16" r="1" fill="currentColor"/><path d="M12 8v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="icon-back" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="icon-game" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><line x1="6" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="2"/><line x1="8" y1="10" x2="8" y2="14" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="10" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="icon-flag" viewBox="0 0 24 24"><path d="M4 21V4h16l-4 6 4 6H4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <!-- КОСМИЧЕСКИЙ ФОН СО ЗВЕЗДАМИ -->
+  <div class="space-background">
+    <div class="star-field"></div>
+    <div class="space-nebula"></div>
+  </div>
+  <div class="particles-container" id="particlesContainer"></div>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <div class="app-wrapper" id="appWrapper">
+    <!-- ПАРЯЩАЯ ШАПКА-КАПСУЛА (ФОТО 1) -->
+    <div class="capsule-header-container" id="capsuleHeaderContainer" style="display:none;">
+      <header class="capsule-header">
+        <div class="capsule-brand" id="logoHome" title="Lobbivo">
+          <div class="l-logo-badge" id="lobbivoLogoBadge">
+            <div class="l-badge-glow"></div>
+            <div class="l-badge-glass">
+              <span class="header-logo-l">L</span>
+            </div>
+          </div>
+          <div class="brand-title">Lobbivo</div>
+          <span class="beta-badge">BETA</span>
+        </div>
+
+        <div class="capsule-center">
+          <div class="capsule-search-box">
+            <svg><use href="#icon-search"/></svg>
+            <input type="text" id="gameSearchInput" placeholder="Поиск игры..." autocomplete="off">
+          </div>
+        </div>
+
+        <div class="capsule-right">
+          <button class="search-toggle-btn" id="searchToggleBtn" title="Быстрый поиск" aria-label="Поиск">
+            <svg><use href="#icon-search"/></svg>
+          </button>
+
+          <!-- ЖЕЛТАЯ МОНЕТКА LOBBIVO COIN (БАЛАНС & МОНЕТИЗАЦИЯ) -->
+          <button class="capsule-coin-btn" id="capsuleCoinBtn" type="button" title="Lobbivo Coins · Баланс, награды и пополнение" aria-label="Lobbivo Coins">
+            <div class="capsule-coin-icon">
+              <span class="coin-l-letter">L</span>
+              <div class="coin-glow-effect"></div>
+            </div>
+            <span class="capsule-coin-amount" id="headerCoinBalance">0</span>
+            <span class="capsule-coin-currency">LC</span>
+          </button>
+
+          <!-- КНОПКА АДМИН ПАНЕЛИ (ПОЯВЛЯЕТСЯ ЕСЛИ isAdmin === true В БАЗЕ) -->
+          <button class="capsule-admin-btn" id="capsuleAdminBtn" type="button" title="Панель администратора Lobbivo" aria-label="Админ Панель" style="display:none;">
+            <div class="capsule-admin-icon">
+              <svg><use href="#icon-admin-shield"/></svg>
+            </div>
+            <span class="capsule-admin-label">Админ Панель</span>
+            <span class="admin-complaints-badge" id="adminComplaintsBadge" style="display:none;">0</span>
+          </button>
+          
+          <div class="capsule-profile-wrapper" id="avatarWrapper">
+            <button class="capsule-profile-btn" id="capsuleProfileBtn" type="button" aria-label="Профиль">
+              <div class="profile-avatar-thumb" id="headerAvatar">
+                <span id="headerAvatarText">?</span>
+              </div>
+              <span id="capsuleProfileLabel">Профиль</span>
+              <span class="notif-dot" id="headerNotifDot"></span>
+            </button>
+
+            <!-- ВЫПАДАЮЩЕЕ МЕНЮ ПРОФИЛЯ (ФОТО 2 - СТЕКЛЯННЫЙ ДИЗАЙН) -->
+            <div class="profile-dropdown-panel" id="avatarDropdown">
+              <div class="dropdown-user-header">
+                <div class="dropdown-avatar-ring" id="dropdownAvatar">?</div>
+                <div class="dropdown-user-info">
+                  <div class="dropdown-user-name" id="dropdownUsername">Гость</div>
+                  <div class="dropdown-user-status">
+                    <span class="online-glow-dot guest" id="dropdownStatusDot"></span>
+                    <span id="dropdownStatusText">Не авторизован</span>
+                  </div>
+                  <div class="dropdown-coin-pill" id="dropdownCoinBalance" style="display:none;">0 LC</div>
+                </div>
+              </div>
+
+              <div class="profile-menu-list" id="profileMenuList">
+                <!-- Заполняется динамически в зависимости от авторизации -->
+              </div>
+            </div>
+          </div>
+          
+          <button class="btn btn-outline" id="authBtn" style="display:none; padding:5px 14px; font-size:0.82rem;">Войти</button>
+        </div>
+      </header>
+    </div>
+
+    <!-- ПРИВЕТСТВЕННАЯ СТРАНИЦА (WELCOME LANDING GATEWAY) -->
+    <section class="page" id="pageWelcome">
+      <div class="welcome-hero-container">
+        <!-- БАННЕР БЛОКИРОВКИ АККАУНТА (ЕСЛИ ИГРОК ЗАБАНЕН) -->
+        <div class="welcome-ban-notice-card" id="welcomeBanNoticeCard" style="display:none;"></div>
+
+        <!-- Анимированные световые шары и свечение фона -->
+        <div class="welcome-glow-orb welcome-glow-1"></div>
+        <div class="welcome-glow-orb welcome-glow-2"></div>
+        <div class="welcome-glow-orb welcome-glow-3"></div>
+
+        <div class="welcome-hero-card">
+          <!-- 3D Анимированная эмблема Lobbivo с орбитальными неоновыми кольцами -->
+          <div class="welcome-brand-emblem-wrap">
+            <div class="welcome-orbit-ring ring-outer"></div>
+            <div class="welcome-orbit-ring ring-inner"></div>
+            <div class="welcome-brand-badge">
+              <div class="welcome-badge-glow"></div>
+              <div class="welcome-badge-glass">
+                <span class="welcome-badge-l">L</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Бейдж статуса платформы -->
+          <div class="welcome-pill-badge">
+            <span class="welcome-pill-dot"></span>
+            <span class="welcome-pill-text">LOBBIVO PLATFORM 2.0 · NEXT-GEN SQUAD MATCHER</span>
+          </div>
+
+          <!-- Главный заголовок и слоган -->
+          <h1 class="welcome-main-title">
+            <span class="welcome-title-wrap">
+              <span class="welcome-title-gradient">LOBBIVO</span>
+              <span class="welcome-beta-badge">BETA</span>
+            </span>
+            <span class="welcome-title-sub">Твоя идеальная команда — в один клик</span>
+          </h1>
+
+          <p class="welcome-hero-desc">
+            Инновационная гейминг-платформа для быстрого поиска тиммейтов в 25+ топовых онлайн-играх. Собирай сквады по рангам и устройствам, общайся во встроенном чате и побеждай без задержек.
+          </p>
+
+          <!-- Информационные фичи-плашки -->
+          <div class="welcome-features-strip">
+            <div class="welcome-feature-card">
+              <div class="feature-card-icon">
+                <svg><use href="#icon-game"/></svg>
+              </div>
+              <div class="feature-card-text">
+                <div class="feature-card-title">25+ Онлайн игр</div>
+                <div class="feature-card-sub">CS 2, Dota 2, Valorant, Helldivers 2, GTA V...</div>
+              </div>
+            </div>
+
+            <div class="welcome-feature-card">
+              <div class="feature-card-icon">
+                <svg><use href="#icon-users"/></svg>
+              </div>
+              <div class="feature-card-text">
+                <div class="feature-card-title">Умный поиск пати</div>
+                <div class="feature-card-sub">Фильтры по рангам, праймтайму и платформам</div>
+              </div>
+            </div>
+
+            <div class="welcome-feature-card">
+              <div class="feature-card-icon">
+                <svg><use href="#icon-chat"/></svg>
+              </div>
+              <div class="feature-card-text">
+                <div class="feature-card-title">Встроенный чат</div>
+                <div class="feature-card-sub">Мгновенные сообщения и координация игры</div>
+              </div>
+            </div>
+
+            <div class="welcome-feature-card">
+              <div class="feature-card-icon">
+                <svg><use href="#icon-shield"/></svg>
+              </div>
+              <div class="feature-card-text">
+                <div class="feature-card-title">Анонимность</div>
+                <div class="feature-card-sub">Без реальных имён и данных — только игровой ник</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Интерактивный хаб действий (Кнопки) -->
+          <div class="welcome-actions-hub">
+            <button class="welcome-btn welcome-btn-primary" id="welcomeLoginBtn" type="button">
+              <svg><use href="#icon-profile"/></svg>
+              <span>Войти в аккаунт</span>
+            </button>
+            <button class="welcome-btn welcome-btn-accent" id="welcomeRegisterBtn" type="button">
+              <svg><use href="#icon-sparkles"/></svg>
+              <span>Создать аккаунт</span>
+            </button>
+            <button class="welcome-btn welcome-btn-glass" id="welcomeExploreBtn" type="button">
+              <svg><use href="#icon-game"/></svg>
+              <span>Каталог игр</span>
+            </button>
+            <button class="welcome-btn welcome-btn-outline" id="welcomeAboutBtn" type="button">
+              <svg><use href="#icon-about"/></svg>
+              <span>О платформе</span>
+            </button>
+          </div>
+
+          <!-- Нижняя полоса статистики -->
+          <div class="welcome-stats-row">
+            <div class="welcome-stat-item">
+              <div class="stat-value">25+</div>
+              <div class="stat-label">Поддерживаемых игр</div>
+            </div>
+            <div class="welcome-stat-divider"></div>
+            <div class="welcome-stat-item">
+              <div class="stat-value">100%</div>
+              <div class="stat-label">Бесплатно и без рекламы</div>
+            </div>
+            <div class="welcome-stat-divider"></div>
+            <div class="welcome-stat-item">
+              <div class="stat-value">&lt; 1 сек</div>
+              <div class="stat-label">Мгновенный подбор</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- СТРАНИЦА 1: КАТАЛОГ ИГР (ФОТО 1) -->
+    <section class="page" id="pageGames">
+      <div class="games-guest-banner" id="gamesGuestBanner" style="display:none;">
+        <div class="guest-banner-left">
+          <button class="btn btn-outline btn-sm" id="backToWelcomeFromGamesBtn" type="button">
+            <svg><use href="#icon-back"/></svg>
+            <span>На главную</span>
+          </button>
+          <div class="guest-banner-text">
+            <span class="guest-banner-dot"></span>
+            <span>Режим обзора каталога · Войдите в аккаунт для поиска пати и создания анкет</span>
+          </div>
+        </div>
+        <button class="btn btn-sm" id="guestBannerLoginBtn" type="button">
+          <svg><use href="#icon-profile"/></svg>
+          <span>Войти</span>
+        </button>
+      </div>
+      <div class="games-grid" id="gamesGrid"></div>
+    </section>
+
+    <!-- СТРАНИЦА 2: ТИММЕЙТЫ (ИГРОКИ) -->
+    <section class="page" id="pagePlayers">
+      <div class="page-header">
+        <div class="page-title-wrapper">
+          <h2>
+            <svg><use href="#icon-users"/></svg>
+            <span id="playersPageTitle">Все тимейты</span>
+          </h2>
+        </div>
+        <div class="filter-bar">
+          <button class="btn" id="createSquadBtn">
+            <svg><use href="#icon-plus"/></svg>
+            Создать анкету
+          </button>
+          <button class="btn btn-outline" id="backToGamesBtn">
+            <svg><use href="#icon-back"/></svg>
+            К играм
+          </button>
+        </div>
+      </div>
+      <div class="players-grid" id="playersGrid"></div>
+      <div class="empty-state" id="emptyPlayers" style="display:none;">
+        <svg><use href="#icon-users"/></svg>
+        <h3>Игроки не найдены</h3>
+        <p>В этой игре пока нет активных анкет. Будьте первым — создайте анкету!</p>
+      </div>
+    </section>
+
+    <!-- СТРАНИЦА 3: ПРОФИЛЬ И НАСТРОЙКИ (GAMER ID & SETTINGS) -->
+    <section class="page" id="pageProfile">
+      <div class="profile-container">
+        
+        <!-- Заголовок страницы с кнопкой возврата -->
+        <div class="page-header profile-page-header">
+          <div class="page-title-wrapper">
+            <h2>
+              <svg><use href="#icon-profile"/></svg>
+              <span>Профиль игрока</span>
+            </h2>
+          </div>
+          <div class="filter-bar">
+            <button class="btn btn-outline" id="backFromProfileBtn">
+              <svg><use href="#icon-back"/></svg>
+              К играм
+            </button>
+          </div>
+        </div>
+
+        <!-- ГЛАВНАЯ КАРТОЧКА ПРОФИЛЯ (GAMER HERO CARD) -->
+        <div class="profile-card profile-hero-card">
+          <div class="profile-card-glow-bg"></div>
+
+          <div class="profile-header">
+            <div class="profile-avatar-wrapper">
+              <div class="profile-avatar" id="profileAvatar">
+                <span id="profileAvatarText">?</span>
+                <span class="online-dot"></span>
+                <div class="avatar-edit-btn" id="avatarEditBtn">
+                  <svg style="width:13px;height:13px;stroke:currentColor;fill:none;display:inline-block;vertical-align:middle;margin-right:2px;"><use href="#icon-sparkles"/></svg>
+                  Фото
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-header-info">
+              <div class="profile-name-row">
+                <div class="profile-name" id="profileName">Гость</div>
+                <div class="profile-id-badge" id="profileId">ID: ---</div>
+              </div>
+
+              <div class="profile-tags-row">
+                <div class="profile-tag-pill game-tag" id="profileGame">
+                  <svg><use href="#icon-default"/></svg>
+                  <span>Не выбрана</span>
+                </div>
+                <div class="profile-tag-pill status-tag">
+                  <span class="online-pulse-dot"></span>
+                  <span id="profileStatusText">В сети</span>
+                  <span class="member-since" id="profileMemberSince"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- СЕТКА ИНФОРМАЦИИ ПРОФИЛЯ -->
+          <div class="profile-info-grid">
+            <div class="profile-info-block">
+              <div class="block-label">
+                <svg><use href="#icon-game"/></svg>
+                <span>Игровая платформа</span>
+              </div>
+              <div class="block-value" id="profileDevice">
+                <span class="empty">Не указано</span>
+              </div>
+            </div>
+
+            <div class="profile-info-block full-width">
+              <div class="block-label">
+                <svg><use href="#icon-about"/></svg>
+                <span>О себе и стиле игры</span>
+              </div>
+              <div class="block-value desc-value" id="profileDesc">
+                <span class="empty">Информация о себе не заполнена</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- КНОПКА ОТКРЫТИЯ РЕДАКТОРА -->
+          <div class="profile-actions">
+            <button type="button" class="btn btn-edit-profile-toggle" id="editProfileBtn">
+              <svg><use href="#icon-settings"/></svg>
+              <span>Редактировать профиль</span>
+            </button>
+          </div>
+
+          <!-- ФОРМА РЕДАКТИРОВАНИЯ И НАСТРОЕК (SETTINGS FORM) -->
+          <div class="profile-edit-form" id="profileEditForm">
+            <div class="edit-form-header">
+              <div class="edit-form-title">
+                <svg><use href="#icon-settings"/></svg>
+                <span>Настройки профиля</span>
+              </div>
+              <div class="edit-form-sub">Измените персональные данные, игру, платформу или аватар</div>
+            </div>
+
+            <div class="field">
+              <label for="editUsername">Имя пользователя (Никнейм)</label>
+              <div class="input-cyber-wrapper">
+                <svg class="input-cyber-icon"><use href="#icon-profile"/></svg>
+                <input type="text" id="editUsername" maxlength="20" placeholder="Ваш никнейм">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Основная игра</label>
+              <div class="custom-game-picker" id="editGamePicker" data-input-id="editGame">
+                <input type="hidden" id="editGame" value="csgo" />
+                <button type="button" class="game-picker-trigger" id="editGameTrigger" aria-label="Выбрать основную игру">
+                  <div class="game-picker-current">
+                    <div class="game-picker-badge" id="editGameBadge">
+                      <svg><use href="#icon-csgo"/></svg>
+                    </div>
+                    <span class="game-picker-name" id="editGameName">CS 2</span>
+                  </div>
+                  <div class="game-picker-chevron">
+                    <svg><use href="#icon-chevron-down"/></svg>
+                  </div>
+                </button>
+                <div class="game-picker-panel" id="editGamePanel">
+                  <div class="game-picker-search-box">
+                    <svg><use href="#icon-search"/></svg>
+                    <input type="text" class="game-picker-search-input" id="editGameSearch" placeholder="Поиск по 25+ играм..." autocomplete="off" />
+                  </div>
+                  <div class="game-picker-grid" id="editGameGrid"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Устройство / Платформа</label>
+              <div class="custom-device-picker" id="editDevicePicker" data-input-id="editDevice">
+                <input type="hidden" id="editDevice" value="PC" />
+                <button type="button" class="device-picker-trigger" id="editDeviceTrigger" aria-label="Выбрать устройство">
+                  <div class="device-picker-current">
+                    <div class="device-picker-badge" id="editDeviceBadge">
+                      <svg class="device-icon"><use href="#icon-device-pc"/></svg>
+                    </div>
+                    <div class="device-picker-info">
+                      <span class="device-picker-name" id="editDeviceName">PC (Компьютер)</span>
+                      <span class="device-picker-desc" id="editDeviceDesc">Windows / Steam / Epic</span>
+                    </div>
+                  </div>
+                  <div class="device-picker-chevron">
+                    <svg><use href="#icon-chevron-down"/></svg>
+                  </div>
+                </button>
+                <div class="device-select-panel" id="editDevicePanel">
+                  <div class="device-panel-title">
+                    <svg><use href="#icon-game"/></svg>
+                    <span>Выберите вашу игровую платформу</span>
+                  </div>
+                  <div class="device-panel-grid" id="editDeviceGrid"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="editDesc">О себе и стиле игры</label>
+              <textarea id="editDesc" rows="3" placeholder="Расскажите о себе, прайм-тайме, ранге и любимых ролях..."></textarea>
+            </div>
+
+            <!-- Скрытый input для загрузки аватара по клику на фото профиля -->
+            <input type="file" id="editAvatarFile" accept="image/*" style="display:none;" />
+
+            <div class="profile-buttons">
+              <button type="button" class="btn btn-save-profile" id="saveProfileBtn">
+                <svg><use href="#icon-check"/></svg>
+                <span>Сохранить</span>
+              </button>
+              <button type="button" class="btn btn-outline" id="cancelEditBtn">
+                <span>Отмена</span>
+              </button>
+              <button type="button" class="btn btn-danger-glass" id="deleteAccountBtn">
+                <svg><use href="#icon-flag"/></svg>
+                <span>Удалить аккаунт</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- СТРАНИЦА 4: НАСТРОЙКИ (ТЕМЫ) -->
+    <section class="page" id="pageSettings">
+      <div class="page-header">
+        <div class="page-title-wrapper">
+          <h2>
+            <svg><use href="#icon-settings"/></svg>
+            Темы оформления
+          </h2>
+        </div>
+        <button class="btn btn-outline" id="backFromSettingsBtn">
+          <svg><use href="#icon-back"/></svg>
+          Назад
+        </button>
+      </div>
+      <div class="settings-grid">
+        <div class="theme-card active" data-theme="default">
+          <div class="theme-preview theme-preview-default"></div>
+          <div class="theme-info">
+            <div class="theme-name">Neon Cyber (Дефолтная)</div>
+            <div class="theme-desc">Классический тёмный неоновый киберпанк</div>
+          </div>
+          <div class="theme-badge-active">Активна</div>
+        </div>
+        <div class="theme-card" data-theme="lobbivo">
+          <div class="theme-preview theme-preview-lobbivo">
+            <span class="preview-l-glyph">L</span>
+          </div>
+          <div class="theme-info">
+            <div class="theme-name">Liquid Glass <span class="theme-glow-tag">СТЕКЛО</span></div>
+            <div class="theme-desc">Ультрареалистичное жидкое стекло, кристальный блюр & летающие буквы L</div>
+          </div>
+          <div class="theme-badge-active">Активна</div>
+        </div>
+      </div>
+
+      <!-- НАСТРОЙКИ ПРИВАТНОСТИ И ЧЁРНЫЙ СПИСОК -->
+      <div class="settings-sub-section">
+        <div class="settings-section-title">
+          <svg><use href="#icon-lock"/></svg>
+          <span>Приватность и сообщения</span>
+        </div>
+        <div class="privacy-settings-card">
+          <div class="privacy-option-title">Кто может писать мне в ЛС:</div>
+          <div class="privacy-options-group">
+            <label class="privacy-radio-item">
+              <input type="radio" name="dmPrivacy" value="all" id="privacyDmAll" checked>
+              <span class="privacy-radio-custom"></span>
+              <div class="privacy-radio-info">
+                <strong>Все пользователи</strong>
+                <span>Любой игрок может написать в ЛС без предварительной заявки</span>
+              </div>
+            </label>
+            <label class="privacy-radio-item">
+              <input type="radio" name="dmPrivacy" value="friends" id="privacyDmFriends">
+              <span class="privacy-radio-custom"></span>
+              <div class="privacy-radio-info">
+                <strong>Только друзья</strong>
+                <span>Новые игроки могут отправить 1 сообщение вместе с заявкой в друзья</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- PUSH-УВЕДОМЛЕНИЯ О НОВЫХ СООБЩЕНИЯХ -->
+        <div class="settings-section-title" style="margin-top: 24px;">
+          <svg><use href="#icon-bell"/></svg>
+          <span>Push-уведомления (Телефон и ПК)</span>
+        </div>
+        <div class="privacy-settings-card push-settings-card">
+          <div class="push-toggle-row">
+            <div class="push-toggle-info">
+              <div class="push-toggle-title">Уведомления о сообщениях в ЛС</div>
+              <div class="push-toggle-sub">Получать мгновенные Push-уведомления и звук, когда вам пишут тиммейты в личные сообщения</div>
+            </div>
+            <label class="cyber-switch" title="Включить / Выключить Push-уведомления">
+              <input type="checkbox" id="pushNotifToggle">
+              <span class="cyber-switch-slider"></span>
+            </label>
+          </div>
+          <div class="push-status-note" id="pushStatusNote">
+            <span class="push-status-dot default" id="pushStatusDot"></span>
+            <span id="pushStatusText">Статус разрешений браузера: Не запрошено</span>
+          </div>
+          <div class="push-actions-row" style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <button type="button" class="btn btn-sm btn-outline" id="testPushBtn">
+              <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-bell"/></svg>
+              <span>🔔 Проверить Push-уведомление</span>
+            </button>
+            <span class="push-ios-hint" id="pushIosHint">💡 На iPhone для фоновых уведомлений: нажмите «Поделиться» ➡️ «На экран Домой»</span>
+          </div>
+        </div>
+
+        <div class="settings-section-title" style="margin-top: 24px;">
+          <svg><use href="#icon-flag"/></svg>
+          <span>Чёрный список (Заблокированные пользователи)</span>
+        </div>
+        <div class="blacklist-card" id="blacklistContainer">
+          <div class="blacklist-empty" id="blacklistEmpty">
+            В чёрном списке пока никого нет
+          </div>
+          <div class="blacklist-items-grid" id="blacklistItemsGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- СТРАНИЦА 5: О САЙТЕ -->
+    <section class="page" id="pageAbout">
+      <div class="page-header">
+        <div class="page-title-wrapper">
+          <h2>
+            <svg><use href="#icon-about"/></svg>
+            О платформе Lobbivo
+          </h2>
+        </div>
+        <button class="btn btn-outline" id="backFromAboutBtn">
+          <svg><use href="#icon-back"/></svg>
+          Назад
+        </button>
+      </div>
+      <div class="about-content">
+        <p>
+          <span class="highlight">LOBBIVO</span> — это удобная и быстрая платформа для поиска тимейтов в любые онлайн-игры.
+          Мы создаем пространство, где каждый геймер может найти единомышленников для совместных побед.
+        </p>
+        <p>
+          Проект разработан игроками для игроков: без рекламы, без лишней бюрократии — выберите игру, найдите подходящего игрока и начинайте играть вместе!
+        </p>
+        <div class="features-grid">
+          <div class="feature-item">
+            <svg><use href="#icon-game"/></svg>
+            <span>25+ популярных игр</span>
+          </div>
+          <div class="feature-item">
+            <svg><use href="#icon-users"/></svg>
+            <span>Быстрый поиск пати</span>
+          </div>
+          <div class="feature-item">
+            <svg><use href="#icon-chat"/></svg>
+            <span>Встроенный чат</span>
+          </div>
+          <div class="feature-item">
+            <svg><use href="#icon-shield"/></svg>
+            <span>Анонимность профиля</span>
+          </div>
+          <div class="feature-item">
+            <svg><use href="#icon-settings"/></svg>
+            <span>2 уникальные темы</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; opacity:0.5; text-align:center; margin-top:20px;">
+          Lobbivo Platform · Beta v9.0 · 2026
+        </p>
+      </div>
+    </section>
+
+    <!-- ПЛАВАЮЩАЯ КНОПКА ЧАТА -->
+    <button class="chat-fab" id="chatFab" title="Открыть сообщения">
+      <svg><use href="#icon-chat"/></svg>
+      <span class="badge" id="chatBadge" style="display:none;">0</span>
+    </button>
+
+    <!-- ОКНО ЧАТА LOBBIVO 2.0 -->
+    <div class="chat-container" id="chatContainer">
+      <div class="chat-header">
+        <div class="chat-user" id="chatUserHeader">
+          <span id="chatBackBtn" class="chat-back-btn" style="display:none;">
+            <svg><use href="#icon-back"/></svg>
+            Назад
+          </span>
+          <div class="avatar" id="chatAvatar">💬</div>
+          <div class="chat-header-meta">
+            <span id="chatUserName">Мировой чат</span>
+            <span id="chatUserStatus" class="chat-header-status" style="display:none;">в сети</span>
+          </div>
+        </div>
+        <button class="chat-close" id="chatCloseBtn" title="Закрыть чат">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+      </div>
+
+      <!-- Вкладки чата: МИР / ЛИЧНЫЕ -->
+      <div class="chat-tab-bar" id="chatTabBar">
+        <button type="button" class="chat-tab-pill active" id="chatTabWorld" data-chat-tab="world">
+          <svg class="chat-tab-icon"><use href="#icon-sparkles"/></svg>
+          <span>Мир</span>
+        </button>
+        <button type="button" class="chat-tab-pill" id="chatTabDirect" data-chat-tab="direct">
+          <svg class="chat-tab-icon"><use href="#icon-chat"/></svg>
+          <span>Личные</span>
+          <span class="chat-tab-badge" id="directTabBadge" style="display:none;">0</span>
+        </button>
+      </div>
+
+      <!-- 1. РАЗДЕЛ: МИРОВОЙ ЧАТ СЕРВЕРА -->
+      <div class="chat-section-view active" id="worldChatView">
+        <div class="world-chat-messages" id="worldChatMessages"></div>
+
+        <!-- Индикатор печати в Мировом чате -->
+        <div class="chat-typing-bar" id="worldChatTyping" style="display:none;">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-text" id="worldChatTypingText">Игрок печатает...</span>
+        </div>
+
+        <!-- Превью ответа в Мировом чате (Telegram Style) -->
+        <div class="chat-reply-preview" id="worldReplyPreview" style="display:none;">
+          <div class="reply-preview-line"></div>
+          <div class="reply-preview-content">
+            <div class="reply-preview-header">
+              <svg><use href="#icon-chat"/></svg>
+              <span class="reply-preview-author" id="worldReplyAuthor">Ответ для</span>
+            </div>
+            <div class="reply-preview-text" id="worldReplyText">Текст сообщения...</div>
+          </div>
+          <button type="button" class="reply-preview-close" id="worldReplyCancelBtn" title="Отменить ответ">
+            <svg><use href="#icon-close"/></svg>
+          </button>
+        </div>
+
+        <div class="chat-input world-chat-input" id="worldChatInputArea">
+          <input type="text" id="worldChatInput" placeholder="Сообщение в мировой чат..." maxlength="350" autocomplete="off">
+          <button class="send-btn" id="worldChatSendBtn" title="Отправить в мир">
+            <svg><use href="#icon-send"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. РАЗДЕЛ: ЛИЧНЫЕ СООБЩЕНИЯ (ДИАЛОГИ) -->
+      <div class="chat-section-view" id="directChatView" style="display:none;">
+        <div class="chat-list open" id="chatList"></div>
+        <div class="direct-chat-room" id="directChatRoom" style="display:none;">
+          <!-- Баннер входящей заявки в друзья -->
+          <div class="chat-friend-banner" id="chatFriendRequestBanner" style="display:none;">
+            <div class="friend-banner-info">
+              <div class="friend-banner-icon">👋</div>
+              <div class="friend-banner-text">
+                <span class="friend-banner-title" id="friendBannerTitle">Заявка в друзья</span>
+                <span class="friend-banner-sub" id="friendBannerSub">Пользователь хочет затимиться</span>
+              </div>
+            </div>
+            <div class="friend-banner-actions" id="friendBannerActions">
+              <button type="button" class="btn-friend-accept" id="btnAcceptFriendReq">Принять</button>
+              <button type="button" class="btn-friend-decline" id="btnDeclineFriendReq">Отклонить</button>
+            </div>
+          </div>
+          
+          <div class="chat-messages" id="chatMessages"></div>
+
+          <!-- Индикатор печати в ЛС -->
+          <div class="chat-typing-bar" id="directChatTyping" style="display:none;">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-text" id="directChatTypingText">Собеседник печатает...</span>
+          </div>
+          
+          <div class="chat-locked-notice" id="chatLockedNotice" style="display:none;">
+            <svg style="width:14px;height:14px;fill:none;stroke:currentColor;vertical-align:middle;margin-right:4px;"><use href="#icon-lock"/></svg>
+            <span id="chatLockedNoticeText">Заявка отправлена. Ожидание подтверждения...</span>
+          </div>
+
+          <!-- Превью ответа в ЛС (Telegram Style) -->
+          <div class="chat-reply-preview" id="directReplyPreview" style="display:none;">
+            <div class="reply-preview-line"></div>
+            <div class="reply-preview-content">
+              <div class="reply-preview-header">
+                <svg><use href="#icon-chat"/></svg>
+                <span class="reply-preview-author" id="directReplyAuthor">Ответ для</span>
+              </div>
+              <div class="reply-preview-text" id="directReplyText">Текст сообщения...</div>
+            </div>
+            <button type="button" class="reply-preview-close" id="directReplyCancelBtn" title="Отменить ответ">
+              <svg><use href="#icon-close"/></svg>
+            </button>
+          </div>
+
+          <div class="chat-input" id="chatInputArea">
+            <input type="text" id="chatInput" placeholder="Напишите сообщение..." maxlength="500" autocomplete="off">
+            <button class="send-btn" id="chatSendBtn" title="Отправить">
+              <svg><use href="#icon-send"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- БЫСТРАЯ КАРТОЧКА ПРОФИЛЯ ПО КЛИКУ В МИРОВОМ ЧАТЕ -->
+      <div class="user-quick-popover" id="userQuickPopover" style="display:none;">
+        <div class="popover-backdrop" id="popoverBackdrop"></div>
+        <div class="popover-card">
+          <button type="button" class="popover-close-btn" id="popoverCloseBtn" title="Закрыть">
+            <svg><use href="#icon-close"/></svg>
+          </button>
+          <div class="popover-user-header">
+            <div class="popover-avatar" id="popoverAvatar">?</div>
+            <div class="popover-user-meta">
+              <div class="popover-username" id="popoverUsername">User</div>
+              <div class="popover-game-tag" id="popoverGameTag">CS 2</div>
+            </div>
+          </div>
+          <div class="popover-bio" id="popoverBio">Описание профиля</div>
+          <div class="popover-tags" id="popoverTags"></div>
+          <div class="popover-actions">
+            <button type="button" class="btn-popover-action btn-popover-profile" id="popoverProfileBtn">
+              <svg><use href="#icon-profile"/></svg>
+              <span>Полная анкета</span>
+            </button>
+            <button type="button" class="btn-popover-action btn-popover-msg" id="popoverMsgBtn">
+              <svg><use href="#icon-chat"/></svg>
+              <span>Написать в ЛС</span>
+            </button>
+            <button type="button" class="btn-popover-action btn-popover-block" id="popoverBlockBtn">
+              <svg><use href="#icon-flag"/></svg>
+              <span id="popoverBlockText">В чёрный список</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА ПЕРВОГО СООБЩЕНИЯ И ЗАЯВКИ В ДРУЗЬЯ -->
+    <div class="modal-overlay" id="firstContactModal">
+      <div class="modal first-contact-modal-glass">
+        <button class="modal-close" id="firstContactModalClose" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        <div class="first-contact-header">
+          <div class="first-contact-icon">🤝</div>
+          <div class="first-contact-title">
+            <h3>Предложить сыграть вместе</h3>
+            <span class="first-contact-sub" id="firstContactSub">Отправка сообщения и заявки в друзья игроку</span>
+          </div>
+        </div>
+        <div class="field" style="margin-top: 16px;">
+          <label for="firstContactMessageInput">Ваше первое сообщение:</label>
+          <div class="cyber-textarea-wrapper">
+            <textarea id="firstContactMessageInput" rows="3" maxlength="250" placeholder="Привет! Увидел твою анкету, давай затимимся 🎮"></textarea>
+          </div>
+          <span class="field-hint">Сообщение придёт игроку в ЛС вместе с возможностью принять вас в друзья</span>
+        </div>
+        <div class="first-contact-actions">
+          <button type="button" class="btn btn-outline" id="firstContactCancelBtn">Отмена</button>
+          <button type="button" class="btn btn-primary" id="firstContactSendBtn">
+            <svg><use href="#icon-send"/></svg>
+            <span>Отправить заявку</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ -->
+    <div class="modal-overlay" id="authModal">
+      <div class="modal auth-modal-glass">
+        <button class="modal-close" id="authModalClose" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        
+        <!-- Шапка авторизации со стеклянным логотипом -->
+        <div class="auth-modal-header">
+          <div class="auth-brand-emblem">
+            <div class="l-logo-badge">
+              <div class="l-badge-glow"></div>
+              <div class="l-badge-glass">
+                <span class="header-logo-l">L</span>
+              </div>
+            </div>
+          </div>
+          <div class="auth-header-text">
+            <h2 id="authModalTitle">Вход в аккаунт</h2>
+            <div class="sub" id="authModalSub">Единый профиль игровой платформы Lobbivo</div>
+          </div>
+        </div>
+
+        <!-- Стеклянные переключатели вкладок Вход / Регистрация -->
+        <div class="auth-segmented-tabs">
+          <button type="button" class="auth-tab-pill active" id="tabLoginBtn" data-tab="login">
+            <svg><use href="#icon-profile"/></svg>
+            <span>Вход</span>
+          </button>
+          <button type="button" class="auth-tab-pill" id="tabRegisterBtn" data-tab="register">
+            <svg><use href="#icon-sparkles"/></svg>
+            <span>Регистрация</span>
+          </button>
+        </div>
+
+        <!-- Форма входа -->
+        <div id="authForm" class="auth-form-content">
+          <div class="field">
+            <label for="loginUsername">Имя пользователя (Никнейм)</label>
+            <div class="input-cyber-wrapper">
+              <svg class="input-cyber-icon"><use href="#icon-profile"/></svg>
+              <input type="text" id="loginUsername" placeholder="Ваш никнейм" autocomplete="username">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="loginPassword">Пароль</label>
+            <div class="input-cyber-wrapper">
+              <svg class="input-cyber-icon"><use href="#icon-lock"/></svg>
+              <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+              <button type="button" class="password-toggle-btn" id="toggleLoginPassword" aria-label="Показать пароль" title="Показать пароль">
+                <svg><use href="#icon-eye"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="error-msg" id="loginError">
+            <svg><use href="#icon-flag"/></svg>
+            <span>Неверный логин или пароль</span>
+          </div>
+
+          <button type="button" class="btn btn-auth-submit" id="loginBtn">
+            <span>Войти в аккаунт</span>
+          </button>
+
+          <div class="switch">
+            Нет аккаунта? <a id="switchToRegister">Зарегистрироваться</a>
+          </div>
+        </div>
+
+        <!-- Форма регистрации -->
+        <div id="registerForm" class="auth-form-content" style="display:none;">
+          <div class="field">
+            <label for="regUsername">Придумайте никнейм</label>
+            <div class="input-cyber-wrapper">
+              <svg class="input-cyber-icon"><use href="#icon-profile"/></svg>
+              <input type="text" id="regUsername" placeholder="От 2 до 20 символов" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="regPassword">Пароль</label>
+            <div class="input-cyber-wrapper">
+              <svg class="input-cyber-icon"><use href="#icon-lock"/></svg>
+              <input type="password" id="regPassword" placeholder="Минимум 3 символа" autocomplete="new-password">
+              <button type="button" class="password-toggle-btn" id="toggleRegPassword" aria-label="Показать пароль" title="Показать пароль">
+                <svg><use href="#icon-eye"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Основная игра</label>
+            <div class="custom-game-picker" id="regGamePicker" data-input-id="regGame">
+              <input type="hidden" id="regGame" value="csgo" />
+              <button type="button" class="game-picker-trigger" id="regGameTrigger" aria-label="Выбрать основную игру">
+                <div class="game-picker-current">
+                  <div class="game-picker-badge" id="regGameBadge">
+                    <svg><use href="#icon-csgo"/></svg>
+                  </div>
+                  <span class="game-picker-name" id="regGameName">CS 2</span>
+                </div>
+                <div class="game-picker-chevron">
+                  <svg><use href="#icon-chevron-down"/></svg>
+                </div>
+              </button>
+              <div class="game-picker-panel" id="regGamePanel">
+                <div class="game-picker-search-box">
+                  <svg><use href="#icon-search"/></svg>
+                  <input type="text" class="game-picker-search-input" id="regGameSearch" placeholder="Поиск по 25+ играм..." autocomplete="off" />
+                </div>
+                <div class="game-picker-grid" id="regGameGrid"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Устройство / Платформа</label>
+            <div class="custom-device-picker" id="regDevicePicker" data-input-id="regDevice">
+              <input type="hidden" id="regDevice" value="PC" />
+              <button type="button" class="device-picker-trigger" id="regDeviceTrigger" aria-label="Выбрать устройство">
+                <div class="device-picker-current">
+                  <div class="device-picker-badge" id="regDeviceBadge">
+                    <svg class="device-icon"><use href="#icon-device-pc"/></svg>
+                  </div>
+                  <div class="device-picker-info">
+                    <span class="device-picker-name" id="regDeviceName">PC (Компьютер)</span>
+                    <span class="device-picker-desc" id="regDeviceDesc">Windows / Steam / Epic</span>
+                  </div>
+                </div>
+                <div class="device-picker-chevron">
+                  <svg><use href="#icon-chevron-down"/></svg>
+                </div>
+              </button>
+              <div class="device-select-panel" id="regDevicePanel">
+                <div class="device-panel-title">
+                  <svg><use href="#icon-game"/></svg>
+                  <span>Выберите вашу игровую платформу</span>
+                </div>
+                <div class="device-panel-grid" id="regDeviceGrid"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cyber-checkbox-field">
+            <label class="cyber-checkbox-label">
+              <input type="checkbox" id="rulesCheckbox">
+              <span class="cyber-checkbox-custom">
+                <svg><use href="#icon-check"/></svg>
+              </span>
+              <span class="checkbox-text">Я согласен с <span class="rules-link" id="showRulesLink">правилами сервиса</span></span>
+            </label>
+          </div>
+
+          <div class="rules-text" id="rulesText">
+            <h4><svg><use href="#icon-shield"/></svg> Правила сервиса LOBBIVO</h4>
+            <ul>
+              <li>Будьте вежливы и уважайте других участников сообщества.</li>
+              <li>Запрещены оскорбления, травля и нецензурная лексика.</li>
+              <li>Не публикуйте конфиденциальные личные данные в публичном профиле.</li>
+              <li>Запрещен спам, реклама и создание фейковых профилей.</li>
+            </ul>
+            <div class="small">⚠️ Нарушение правил ведет к блокировке аккаунта.</div>
+          </div>
+
+          <div class="error-msg" id="regError">
+            <svg><use href="#icon-flag"/></svg>
+            <span>Заполните все поля и подтвердите согласие с правилами</span>
+          </div>
+
+          <button type="button" class="btn btn-auth-submit" id="registerBtn" disabled>
+            <span>Создать аккаунт</span>
+          </button>
+
+          <div class="switch">
+            Уже есть аккаунт? <a id="switchToLogin">Войти</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: СОЗДАНИЕ АНКЕТЫ -->
+    <div class="modal-overlay" id="createSquadModal">
+      <div class="modal">
+        <button class="modal-close" id="createSquadModalClose">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        <h2><svg><use href="#icon-users"/></svg> Создать анкету</h2>
+        <div class="sub">Найдите тиммейтов в выбранной игре</div>
+        <div class="field" id="squadGameField">
+          <label>Игра</label>
+          <div class="custom-game-picker" id="squadGamePicker" data-input-id="squadGame">
+            <input type="hidden" id="squadGame" value="csgo" />
+            <button type="button" class="game-picker-trigger" id="squadGameTrigger" aria-label="Выбрать игру анкеты">
+              <div class="game-picker-current">
+                <div class="game-picker-badge" id="squadGameBadge">
+                  <svg><use href="#icon-csgo"/></svg>
+                </div>
+                <span class="game-picker-name" id="squadGameName">CS 2</span>
+              </div>
+              <div class="game-picker-chevron">
+                <svg><use href="#icon-chevron-down"/></svg>
+              </div>
+            </button>
+            <div class="game-picker-panel" id="squadGamePanel">
+              <div class="game-picker-search-box">
+                <svg><use href="#icon-search"/></svg>
+                <input type="text" class="game-picker-search-input" id="squadGameSearch" placeholder="Поиск по 25+ играм..." autocomplete="off" />
+              </div>
+              <div class="game-picker-grid" id="squadGameGrid"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Ранг / Уровень / Звание</label>
+          <input type="text" id="squadRank" placeholder="Например: Premier 15k, Immortal, Gold Nova...">
+        </div>
+        <div class="field">
+          <label>Устройство</label>
+          <div class="custom-device-picker" id="squadDevicePicker" data-input-id="squadDevice">
+            <input type="hidden" id="squadDevice" value="PC" />
+            <button type="button" class="device-picker-trigger" id="squadDeviceTrigger" aria-label="Выбрать устройство">
+              <div class="device-picker-current">
+                <div class="device-picker-badge" id="squadDeviceBadge">
+                  <svg class="device-icon"><use href="#icon-device-pc"/></svg>
+                </div>
+                <div class="device-picker-info">
+                  <span class="device-picker-name" id="squadDeviceName">PC (Компьютер)</span>
+                  <span class="device-picker-desc" id="squadDeviceDesc">Windows / Steam / Epic</span>
+                </div>
+              </div>
+              <div class="device-picker-chevron">
+                <svg><use href="#icon-chevron-down"/></svg>
+              </div>
+            </button>
+            <div class="device-select-panel" id="squadDevicePanel">
+              <div class="device-panel-title">
+                <svg><use href="#icon-game"/></svg>
+                <span>Выберите вашу игровую платформу</span>
+              </div>
+              <div class="device-panel-grid" id="squadDeviceGrid"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Описание анкеты</label>
+          <textarea id="squadDescription" placeholder="Кого вы ищете? Какой стиль игры, праймтайм и голосовая связь?" rows="3"></textarea>
+        </div>
+        <button class="btn" id="submitSquadBtn">
+          <svg><use href="#icon-send"/></svg>
+          Опубликовать анкету
+        </button>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: ЖАЛОБА -->
+    <div class="modal-overlay" id="complaintModal">
+      <div class="modal">
+        <button class="modal-close" id="complaintModalClose">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        <h2><svg><use href="#icon-flag"/></svg> Пожаловаться</h2>
+        <div class="sub">Опишите причину нарушения правил игроком</div>
+        <div class="field">
+          <label>Причина жалобы</label>
+          <textarea id="complaintReason" placeholder="Опишите ситуацию подробно..." rows="4"></textarea>
+        </div>
+        <button class="btn" id="sendComplaintBtn">
+          <svg><use href="#icon-send"/></svg>
+          Отправить жалобу модераторам
+        </button>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: LOBBIVO COIN HUB (МОНЕТИЗАЦИЯ, ЗАДАНИЯ, ПОПОЛНЕНИЕ) -->
+    <div class="modal-overlay" id="coinModal">
+      <div class="modal coin-modal-glass">
+        <button class="modal-close" id="coinModalClose" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+
+        <!-- Шапка Lobbivo Coin с 3D вращающейся монетой и балансом -->
+        <div class="coin-modal-hero">
+          <div class="coin-3d-visual">
+            <div class="coin-3d-glow"></div>
+            <div class="coin-3d-orbit"></div>
+            <div class="coin-3d-gold">
+              <span class="coin-3d-l">L</span>
+              <div class="coin-3d-shine"></div>
+            </div>
+          </div>
+          <div class="coin-hero-details">
+            <div class="coin-brand-tag">
+              <span class="coin-tag-dot"></span>
+              <span>LOBBIVO REWARDS &amp; ECONOMY</span>
+            </div>
+            <h2 class="coin-modal-title">Lobbivo Coin</h2>
+            <div class="coin-balance-badge">
+              <span class="coin-balance-label">Ваш баланс:</span>
+              <div class="coin-balance-number-wrap">
+                <span class="coin-balance-number" id="modalCoinBalance">0</span>
+                <span class="coin-balance-suffix">LC</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Описание платформенной валюты -->
+        <div class="coin-about-banner">
+          <div class="coin-about-icon">
+            <svg><use href="#icon-sparkles"/></svg>
+          </div>
+          <div class="coin-about-text">
+            <strong>Lobbivo Coin (LC)</strong> — это внутриигровая валюта сайта, которая начисляется как при вашей поддержке платформы, так и за выполнение заданий. На монеты вы сможете приобрести больше эксклюзивных визуальных улучшений, кастомные темы оформления, рамки профиля и анимации!
+          </div>
+        </div>
+
+        <!-- Переключатели вкладок: Заработать / Купить -->
+        <div class="coin-modal-tabs">
+          <button type="button" class="coin-tab-btn active" id="tabCoinEarnBtn" data-tab="earn">
+            <svg><use href="#icon-sparkles"/></svg>
+            <span>Заработать</span>
+            <span class="coin-tab-badge" id="coinTasksBadge">4 задания</span>
+          </button>
+          <button type="button" class="coin-tab-btn" id="tabCoinBuyBtn" data-tab="buy">
+            <svg><use href="#icon-plus"/></svg>
+            <span>Купить монеты</span>
+          </button>
+        </div>
+
+        <!-- ВКЛАДКА 1: ЗАРАБОТАТЬ (ИНТЕРАКТИВНЫЕ ЗАДАНИЯ) -->
+        <div class="coin-tab-content active" id="coinEarnContent">
+          <div class="coin-tasks-header">
+            <div class="coin-tasks-title">Задания платформы Lobbivo</div>
+            <div class="coin-tasks-sub">Выполняйте задания профиля и моментально получайте монеты</div>
+          </div>
+
+          <div class="coin-tasks-list" id="coinTasksList">
+            <!-- Задание 1: Аватарка (50 LC) -->
+            <div class="coin-task-card" id="taskCardAvatar">
+              <div class="task-card-left">
+                <div class="task-icon-wrap">
+                  <svg><use href="#icon-profile"/></svg>
+                </div>
+                <div class="task-info">
+                  <div class="task-title">1. Поставь аватарку для своего профиля</div>
+                  <div class="task-desc">Загрузите своё уникальное фото или аватар в профиль</div>
+                </div>
+              </div>
+              <div class="task-card-right">
+                <div class="task-reward-pill">
+                  <span class="task-coin-l">L</span>
+                  <span class="task-reward-amount">+50 LC</span>
+                </div>
+                <button type="button" class="task-action-btn" id="taskBtnAvatar" data-task="avatar">
+                  <span>Выполнить</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Задание 2: О себе (50 LC) -->
+            <div class="coin-task-card" id="taskCardBio">
+              <div class="task-card-left">
+                <div class="task-icon-wrap">
+                  <svg><use href="#icon-about"/></svg>
+                </div>
+                <div class="task-info">
+                  <div class="task-title">2. Заполни информацию о себе</div>
+                  <div class="task-desc">Расскажите в профиле о стиле игры, любимых ролях или праймтайме</div>
+                </div>
+              </div>
+              <div class="task-card-right">
+                <div class="task-reward-pill">
+                  <span class="task-coin-l">L</span>
+                  <span class="task-reward-amount">+50 LC</span>
+                </div>
+                <button type="button" class="task-action-btn" id="taskBtnBio" data-task="bio">
+                  <span>Выполнить</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Задание 3: 1 анкета (50 LC) -->
+            <div class="coin-task-card" id="taskCardSquad">
+              <div class="task-card-left">
+                <div class="task-icon-wrap">
+                  <svg><use href="#icon-plus"/></svg>
+                </div>
+                <div class="task-info">
+                  <div class="task-title">3. Создай 1 анкету в любой игре</div>
+                  <div class="task-desc">Опубликуйте анкету поиска тимейтов в каталоге игроков</div>
+                </div>
+              </div>
+              <div class="task-card-right">
+                <div class="task-reward-pill">
+                  <span class="task-coin-l">L</span>
+                  <span class="task-reward-amount">+50 LC</span>
+                </div>
+                <button type="button" class="task-action-btn" id="taskBtnSquad" data-task="squad">
+                  <span>Выполнить</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Задание 4: 5 тимейтов (200 LC) -->
+            <div class="coin-task-card task-card-featured" id="taskCardTeammates">
+              <div class="task-card-left">
+                <div class="task-icon-wrap featured-icon">
+                  <svg><use href="#icon-users"/></svg>
+                </div>
+                <div class="task-info">
+                  <div class="task-title">4. Найди 5 тимейтов</div>
+                  <div class="task-desc">Начните общение или напишите 5 разным игрокам на платформе</div>
+                  <div class="task-progress-wrap">
+                    <div class="task-progress-track">
+                      <div class="task-progress-fill" id="taskTeammatesProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="task-progress-label" id="taskTeammatesProgressText">Прогресс: 0 / 5 тиммейтов</div>
+                  </div>
+                </div>
+              </div>
+              <div class="task-card-right">
+                <div class="task-reward-pill gold-highlight">
+                  <span class="task-coin-l">L</span>
+                  <span class="task-reward-amount">+200 LC</span>
+                </div>
+                <button type="button" class="task-action-btn featured-action" id="taskBtnTeammates" data-task="teammates">
+                  <span>Найти игроков</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ВКЛАДКА 2: КУПИТЬ (ПОПОЛНЕНИЕ & ПАКЕТЫ & КОНВЕРТАЦИЯ) -->
+        <div class="coin-tab-content" id="coinBuyContent" style="display:none;">
+          <div class="coin-buy-header">
+            <div class="coin-buy-title">Пакеты пополнения Lobbivo Coin</div>
+            <div class="coin-buy-sub">Поддержите проект и открывайте визуальные возможности без ограничений</div>
+          </div>
+
+          <!-- Сетка готовых пакетов -->
+          <div class="coin-packs-grid">
+            <div class="coin-pack-card" data-coins="100" data-price="99">
+              <div class="pack-coin-badge">
+                <span class="pack-l-letter">L</span>
+              </div>
+              <div class="pack-amount">100 LC</div>
+              <div class="pack-sub">Стартовый набор</div>
+              <div class="pack-price">99 ₽</div>
+              <button type="button" class="btn-pack-buy" data-pack="100" data-cost="99">Выбрать</button>
+            </div>
+
+            <div class="coin-pack-card" data-coins="500" data-price="449">
+              <div class="pack-tag-pill">Бонус +50 LC</div>
+              <div class="pack-coin-badge gold">
+                <span class="pack-l-letter">L</span>
+              </div>
+              <div class="pack-amount">500 LC</div>
+              <div class="pack-sub">Сквад пак</div>
+              <div class="pack-price">449 ₽</div>
+              <button type="button" class="btn-pack-buy" data-pack="500" data-cost="449">Выбрать</button>
+            </div>
+
+            <div class="coin-pack-card featured" data-coins="1200" data-price="990">
+              <div class="pack-tag-pill featured-tag">Хит продаж 🔥</div>
+              <div class="pack-coin-badge gold-glow">
+                <span class="pack-l-letter">L</span>
+              </div>
+              <div class="pack-amount">1 200 LC</div>
+              <div class="pack-sub">PRO Геймер (+200 LC)</div>
+              <div class="pack-price">990 ₽</div>
+              <button type="button" class="btn-pack-buy featured-btn" data-pack="1200" data-cost="990">Выбрать</button>
+            </div>
+
+            <div class="coin-pack-card legend" data-coins="2500" data-price="1890">
+              <div class="pack-tag-pill legend-tag">Выгода +25%</div>
+              <div class="pack-coin-badge legend-glow">
+                <span class="pack-l-letter">L</span>
+              </div>
+              <div class="pack-amount">2 500 LC</div>
+              <div class="pack-sub">Легендарный (+500 LC)</div>
+              <div class="pack-price">1 890 ₽</div>
+              <button type="button" class="btn-pack-buy legend-btn" data-pack="2500" data-cost="1890">Выбрать</button>
+            </div>
+          </div>
+
+          <!-- Калькулятор / Конвертация -->
+          <div class="coin-converter-box">
+            <div class="converter-title">
+              <svg><use href="#icon-sparkles"/></svg>
+              <span>Калькулятор конвертации</span>
+            </div>
+            <div class="converter-row">
+              <div class="converter-input-wrap">
+                <label for="calcRubles">Сумма в рублях (₽):</label>
+                <input type="number" id="calcRubles" min="50" max="50000" value="500" />
+              </div>
+              <div class="converter-arrow">➔</div>
+              <div class="converter-result-wrap">
+                <div class="converter-result-label">Вы получите:</div>
+                <div class="converter-result-value"><span id="calcCoinsResult">550</span> LC</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-buy-custom-coins" id="buyCustomCoinsBtn">
+              <span>Пополнить баланс</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: АДМИН-ПАНЕЛЬ (ADMIN PANEL MODAL) -->
+    <div class="modal-overlay" id="adminPanelModal">
+      <div class="modal admin-modal-glass">
+        <button class="modal-close" id="adminPanelCloseBtn" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+
+        <!-- Шапка админ-панели -->
+        <div class="admin-modal-header">
+          <div class="admin-brand-icon">
+            <svg><use href="#icon-admin-shield"/></svg>
+          </div>
+          <div class="admin-header-info">
+            <div class="admin-modal-tag">LOBBIVO SECURITY &amp; MODERATION</div>
+            <h2 class="admin-modal-title">Панель администратора</h2>
+          </div>
+        </div>
+
+        <!-- Статистика админ-панели -->
+        <div class="admin-stats-bar">
+          <div class="admin-stat-item">
+            <span class="stat-label">Всего игроков</span>
+            <span class="stat-val" id="statTotalUsers">0</span>
+          </div>
+          <div class="admin-stat-item highlight-red">
+            <span class="stat-label">Жалобы</span>
+            <span class="stat-val" id="statTotalComplaints">0</span>
+          </div>
+          <div class="admin-stat-item highlight-orange">
+            <span class="stat-label">В бане</span>
+            <span class="stat-val" id="statTotalBanned">0</span>
+          </div>
+          <div class="admin-stat-item highlight-yellow">
+            <span class="stat-label">В муте</span>
+            <span class="stat-val" id="statTotalMuted">0</span>
+          </div>
+        </div>
+
+        <!-- Вкладки админ-панели -->
+        <div class="admin-nav-tabs">
+          <button type="button" class="admin-tab-btn active" data-tab="complaints">
+            <svg style="width:14px;height:14px;"><use href="#icon-flag"/></svg>
+            <span>Жалобы игроков</span>
+          </button>
+          <button type="button" class="admin-tab-btn" data-tab="users">
+            <svg style="width:14px;height:14px;"><use href="#icon-profile"/></svg>
+            <span>Игроки и модерация</span>
+          </button>
+          <button type="button" class="admin-tab-btn" data-tab="punishments">
+            <svg style="width:14px;height:14px;"><use href="#icon-lock"/></svg>
+            <span>Активные наказания</span>
+          </button>
+        </div>
+
+        <!-- Контент 1: Жалобы -->
+        <div class="admin-tab-content" id="adminComplaintsView">
+          <div class="admin-complaints-scroll" id="adminComplaintsList"></div>
+        </div>
+
+        <!-- Контент 2: Пользователи -->
+        <div class="admin-tab-content" id="adminUsersView" style="display:none;">
+          <div class="admin-filters-bar">
+            <div class="admin-search-wrap">
+              <svg><use href="#icon-search"/></svg>
+              <input type="text" id="adminSearchUsers" placeholder="Поиск по никнейму или ID..." autocomplete="off">
+            </div>
+            <select id="adminFilterStatus" class="admin-select-filter">
+              <option value="all">Все статусы</option>
+              <option value="banned">🚫 Только забаненные</option>
+              <option value="muted">🔇 Только в муте</option>
+              <option value="admin">👑 Администраторы</option>
+              <option value="online">🟢 Сейчас в сети</option>
+            </select>
+          </div>
+          <div class="admin-table-scroll">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Игрок</th>
+                  <th>Игра</th>
+                  <th>Платформа</th>
+                  <th>Статус</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Контент 3: Наказания -->
+        <div class="admin-tab-content" id="adminPunishmentsView" style="display:none;">
+          <div class="admin-punishments-scroll" id="adminPunishmentsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: ЗАБАНИТЬ ПОЛЬЗОВАТЕЛЯ (BAN MODAL) -->
+    <div class="modal-overlay" id="adminBanModal">
+      <div class="modal ban-modal-glass" style="max-width: 480px;">
+        <button class="modal-close" id="adminBanModalClose" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+
+        <div class="ban-modal-header">
+          <div class="ban-modal-icon">🚫</div>
+          <div>
+            <h3>Блокировка аккаунта (Бан)</h3>
+            <div class="ban-target-subtitle">Нарушитель: <strong id="banModalTargetUser">User</strong></div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top: 14px;">
+          <label>Срок блокировки:</label>
+          <div class="ban-presets-grid">
+            <button type="button" class="ban-preset-btn" data-duration="60">1 час</button>
+            <button type="button" class="ban-preset-btn active" data-duration="1440">24 часа</button>
+            <button type="button" class="ban-preset-btn" data-duration="4320">3 дня</button>
+            <button type="button" class="ban-preset-btn" data-duration="10080">7 дней</button>
+            <button type="button" class="ban-preset-btn" data-duration="43200">30 дней</button>
+            <button type="button" class="ban-preset-btn preset-danger" data-duration="-1">Навсегда</button>
+          </div>
+          <div class="input-cyber-wrapper" style="margin-top: 8px;">
+            <input type="number" id="banCustomHours" placeholder="Или укажите срок в часах (например, 12)" min="1">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Причина блокировки:</label>
+          <div class="ban-reasons-presets">
+            <span class="ban-reason-pill">Оскорбления и токсичность</span>
+            <span class="ban-reason-pill">Спам / Флуд</span>
+            <span class="ban-reason-pill">Читы и стороннее ПО</span>
+            <span class="ban-reason-pill">Мошенничество / Реклама</span>
+            <span class="ban-reason-pill">Неподобающий аватар / био</span>
+          </div>
+          <div class="cyber-textarea-wrapper" style="margin-top: 8px;">
+            <textarea id="banReasonInput" rows="2" placeholder="Опишите причину блокировки..."></textarea>
+          </div>
+          <span class="field-hint">Причина будет отображаться нарушителю на странице входа</span>
+        </div>
+
+        <div class="ban-modal-actions">
+          <button type="button" class="btn btn-outline" id="banCancelBtn">Отмена</button>
+          <button type="button" class="btn btn-danger" id="banSubmitBtn">
+            <svg style="width:14px;height:14px;"><use href="#icon-flag"/></svg>
+            Заблокировать аккаунт
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА: ЗАМЬЮТИТЬ ПОЛЬЗОВАТЕЛЯ (MUTE MODAL) -->
+    <div class="modal-overlay" id="adminMuteModal">
+      <div class="modal mute-modal-glass" style="max-width: 480px;">
+        <button class="modal-close" id="adminMuteModalClose" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+
+        <div class="mute-modal-header">
+          <div class="mute-modal-icon">🔇</div>
+          <div>
+            <h3>Блокировка чата (Мут)</h3>
+            <div class="mute-target-subtitle">Нарушитель: <strong id="muteModalTargetUser">User</strong></div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top: 14px;">
+          <label>Срок мута:</label>
+          <div class="mute-presets-grid">
+            <button type="button" class="mute-preset-btn" data-duration="5">5 мин.</button>
+            <button type="button" class="mute-preset-btn active" data-duration="15">15 мин.</button>
+            <button type="button" class="mute-preset-btn" data-duration="60">1 час</button>
+            <button type="button" class="mute-preset-btn" data-duration="360">6 часов</button>
+            <button type="button" class="mute-preset-btn" data-duration="1440">24 часа</button>
+            <button type="button" class="mute-preset-btn preset-danger" data-duration="-1">Навсегда</button>
+          </div>
+          <div class="input-cyber-wrapper" style="margin-top: 8px;">
+            <input type="number" id="muteCustomMinutes" placeholder="Или укажите срок в минутах (например, 30)" min="1">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Причина мута:</label>
+          <div class="mute-reasons-presets">
+            <span class="mute-reason-pill">Спам и флуд в чате</span>
+            <span class="mute-reason-pill">Оскорбление участников</span>
+            <span class="mute-reason-pill">Капс / Засорение эфира</span>
+            <span class="mute-reason-pill">Реклама сторонних ресурсов</span>
+          </div>
+          <div class="cyber-textarea-wrapper" style="margin-top: 8px;">
+            <textarea id="muteReasonInput" rows="2" placeholder="Опишите причину мута..."></textarea>
+          </div>
+          <span class="field-hint">Игрок не сможет отправлять сообщения в чат во время мута</span>
+        </div>
+
+        <div class="mute-modal-actions">
+          <button type="button" class="btn btn-outline" id="muteCancelBtn">Отмена</button>
+          <button type="button" class="btn btn-warning" id="muteSubmitBtn">
+            <svg style="width:14px;height:14px;"><use href="#icon-lock"/></svg>
+            Заблокировать чат
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (TOAST) -->
+    <div class="notification" id="notification">
+      <button class="notif-close" id="notifClose" title="Закрыть">
+        <svg><use href="#icon-close"/></svg>
+      </button>
+      <div class="notif-title" id="notifTitle">Уведомление</div>
+      <div class="notif-body" id="notifBody">Текст сообщения</div>
+    </div>
+
+    <!-- ОВЕРЛЕЙ БЫСТРОЙ СИСТЕМНОЙ ЗАГРУЗКИ (SYSTEM LOADER OVERLAY) -->
+    <div class="system-loader-overlay" id="systemLoaderOverlay">
+      <div class="system-loader-backdrop"></div>
+      <div class="system-loader-card">
+        <div class="system-loader-spinner-wrapper">
+          <div class="system-loader-ring outer-ring"></div>
+          <div class="system-loader-ring inner-ring"></div>
+          <div class="system-loader-core-badge">
+            <span class="system-loader-l">L</span>
+          </div>
+        </div>
+        <div class="loader-status-text" id="loaderStatusText">Загрузка...</div>
+        <div class="loader-scan-track">
+          <div class="loader-scan-bar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIREBASE CLOUD REALTIME SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ -->
+  <script src="js/data.js"></script>
+  <script src="js/security-shield.js"></script>
+  <script src="js/firebase-sync.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/games.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
