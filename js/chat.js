@@ -12,7 +12,7 @@ let isInChat = false;
 // Форматирование текста сообщений и радужная пасхалка для слова "гей" / "gay"
 function formatChatMessage(rawText) {
   if (!rawText) return '';
-  let safe = escapeHtml(rawText);
+  let safe = escapeHtml(String(rawText).trim());
   const gayRegex = /(^|[^\p{L}\p{N}_])(гей|геи|геем|геев|гейский|гейская|гейское|гейские|гейству|геями|геях|gay|gays)(?=[^\p{L}\p{N}_]|$)/giu;
   safe = safe.replace(gayRegex, (match, prefix) => {
     return `${prefix}<span class="rainbow-gay-tag" title="✨ Pride Rainbow">Gay</span>`;
@@ -452,6 +452,9 @@ function renderWorldChat() {
     const gameObj = GAMES.find(g => g.id === (authorData ? authorData.game : msg.game)) || GAMES[0];
     const isAuthorPremium = isUserPremium(msg.from);
     const authorFrame = getUserEquippedFrame(msg.from);
+    const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(msg.from) : null;
+    const userTags = typeof getUserCustomTags === 'function' ? getUserCustomTags(msg.from) : [];
+    const primaryTag = userTags.length > 0 ? userTags[0] : null;
 
     let avatarHtml;
     if (authorData && authorData.avatar) {
@@ -466,7 +469,26 @@ function renderWorldChat() {
     }
 
     const premiumBadgeHtml = isAuthorPremium ? `<span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>` : '';
+    const adminBadgeHtml = adminBadge ? `
+      <span class="admin-custom-badge badge-style-${adminBadge.style}" title="Администратор Lobbivo: ${escapeHtml(adminBadge.text)}">
+        <svg><use href="#${adminBadge.icon}"/></svg>
+        <span>${escapeHtml(adminBadge.text)}</span>
+      </span>
+    ` : '';
     const authorClass = isAuthorPremium ? 'world-msg-author premium-author' : 'world-msg-author';
+
+    const gameBadgeHtml = gameObj ? `
+      <span class="chat-game-badge" title="Игра: ${escapeHtml(gameObj.name)}">
+        <svg class="chat-game-icon"><use href="#${escapeHtml(gameObj.icon)}"/></svg>
+        <span class="chat-game-title">${escapeHtml(gameObj.name)}</span>
+      </span>
+    ` : '';
+
+    const tagBadgeHtml = primaryTag ? `
+      <span class="chat-user-tag-mini" title="Тег игрока: ${escapeHtml(primaryTag)}">
+        ${escapeHtml(primaryTag)}
+      </span>
+    ` : '';
 
     // Рендеринг цитаты ответа (если есть)
     let replyQuoteHtml = '';
@@ -502,13 +524,14 @@ function renderWorldChat() {
     if (isBlocked) {
       html += `
         <div class="world-msg-item world-msg-blocked" id="${msgId}" data-msg-id="${msgId}" data-user="${safeAuthor}">
+          ${actionsHtml}
           <div class="world-msg-avatar">${avatarHtml}</div>
           <div class="world-msg-body">
             <div class="world-msg-header">
               <span class="${authorClass}" data-username="${safeAuthor}">${safeAuthor}</span>
               ${premiumBadgeHtml}
+              ${adminBadgeHtml}
               <span class="world-msg-time">${timeStr}</span>
-              ${actionsHtml}
             </div>
             <div class="world-msg-text">🚫 Сообщение от заблокированного пользователя</div>
           </div>
@@ -517,14 +540,16 @@ function renderWorldChat() {
     } else {
       html += `
         <div class="world-msg-item ${isMe ? 'from-me' : ''}" id="${msgId}" data-msg-id="${msgId}" data-user="${safeAuthor}">
+          ${actionsHtml}
           <div class="world-msg-avatar" data-username="${safeAuthor}" title="Открыть профиль">${avatarHtml}</div>
           <div class="world-msg-body">
             <div class="world-msg-header">
               <span class="${authorClass}" data-username="${safeAuthor}" title="Открыть профиль">${safeAuthor}</span>
               ${premiumBadgeHtml}
-              <span class="world-msg-tag">${escapeHtml(gameObj.name)}</span>
+              ${adminBadgeHtml}
+              ${gameBadgeHtml}
+              ${tagBadgeHtml}
               <span class="world-msg-time">${timeStr}</span>
-              ${actionsHtml}
             </div>
             ${replyQuoteHtml}
             <div class="world-msg-text">${formatChatMessage(msg.text)}</div>
@@ -652,9 +677,11 @@ function openUserQuickPopover(username) {
 
   const isPremium = isUserPremium(username);
   const frameId = getUserEquippedFrame(username);
+  const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
+  const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" title="Администратор Lobbivo"><svg><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
 
   if (nameEl) {
-    nameEl.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(username)}</span>${isPremium ? ' <span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : ''}`;
+    nameEl.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(username)}</span>${isPremium ? ' <span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : ''} ${adminBadgeHtml}`;
   }
 
   let avatarContent;
@@ -676,7 +703,10 @@ function openUserQuickPopover(username) {
 
   if (gameTagEl) {
     gameTagEl.innerHTML = `
-      <span>${escapeHtml(gameObj.name)}${rankStr}</span>
+      <div class="chat-game-badge popover-game-pill" title="${escapeHtml(gameObj.name)}">
+        <svg class="chat-game-icon"><use href="#${escapeHtml(gameObj.icon)}"/></svg>
+        <span class="chat-game-title">${escapeHtml(gameObj.name)}${rankStr}</span>
+      </div>
       <span class="popover-online-status ${isOnline ? 'online' : 'offline'}">• ${statusStr}</span>
     `;
   }
@@ -686,9 +716,20 @@ function openUserQuickPopover(username) {
   }
 
   if (tagsEl) {
-    let tagHtml = `<span class="world-msg-tag">${escapeHtml(data ? (data.device || 'PC') : 'PC')}</span>`;
-    if (data && data.discord) tagHtml += `<span class="world-msg-tag">Discord: ${escapeHtml(data.discord)}</span>`;
-    if (areFriends(AppState.currentUser, username)) tagHtml += `<span class="world-msg-tag" style="border-color:#34d399;color:#34d399;">🤝 В друзьях</span>`;
+    let tagHtml = `<span class="world-msg-tag"><svg class="device-icon device-icon-sm" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#${getDeviceIconSVG(data ? (data.device || 'PC') : 'PC')}"/></svg>${escapeHtml(data ? (data.device || 'PC') : 'PC')}</span>`;
+    
+    if (data && data.discord) {
+      tagHtml += `<span class="world-msg-tag">Discord: ${escapeHtml(data.discord)}</span>`;
+    }
+    if (areFriends(AppState.currentUser, username)) {
+      tagHtml += `<span class="world-msg-tag" style="border-color:#34d399;color:#34d399;">🤝 В друзьях</span>`;
+    }
+    
+    const userCustomTags = typeof getUserCustomTags === 'function' ? getUserCustomTags(username) : [];
+    userCustomTags.forEach(t => {
+      tagHtml += `<span class="chat-user-tag-mini">${escapeHtml(t)}</span>`;
+    });
+
     tagsEl.innerHTML = tagHtml;
   }
 
@@ -1024,10 +1065,17 @@ function openChatWith(username) {
   if (chatList) chatList.classList.remove('open');
   if (directRoom) directRoom.style.display = 'flex';
   if (chatBackBtn) chatBackBtn.style.display = 'inline-flex';
-  if (chatUserName) chatUserName.textContent = username;
-
   const userData = AppState.users[username];
   const isOnline = isUserOnline(username);
+  const isPremium = isUserPremium(username);
+  const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
+  const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" style="margin-left:5px;font-size:0.65rem;padding:2px 6px;"><svg style="width:11px;height:11px;"><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
+  const crownHtml = isPremium ? ' <span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : '';
+  const frameId = getUserEquippedFrame(username);
+
+  if (chatUserName) {
+    chatUserName.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(username)}</span>${crownHtml}${adminBadgeHtml}`;
+  }
 
   if (chatUserStatus) {
     chatUserStatus.style.display = 'block';
@@ -1035,14 +1083,20 @@ function openChatWith(username) {
     chatUserStatus.textContent = formatLastSeen(userData ? userData.lastSeen : null, username);
   }
 
+  let avatarInner = '';
   if (userData && userData.avatar) {
-    if (chatAvatar) chatAvatar.innerHTML = `<img src="${userData.avatar}" alt="${escapeHtml(username)}">`;
+    avatarInner = `<img src="${userData.avatar}" alt="${escapeHtml(username)}">`;
   } else {
     const initials = username.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    if (chatAvatar) chatAvatar.textContent = initials || '?';
+    avatarInner = `<span>${initials || '?'}</span>`;
+  }
+
+  if (frameId && frameId !== 'none') {
+    avatarInner = `<div class="avatar-frame-wrap frame-${frameId}">${avatarInner}</div>`;
   }
 
   if (chatAvatar) {
+    chatAvatar.innerHTML = avatarInner;
     chatAvatar.title = `Нажмите, чтобы посмотреть профиль ${username}`;
   }
   if (chatUserName) {
@@ -1580,19 +1634,44 @@ function sendWebPushNotification(sender, text, options = {}) {
   playNotificationSound();
 
   try {
-    const title = options.isTest ? sender : `LOBBIVO · Новое сообщение от ${sender}`;
+    const title = options.isTest ? sender : `LOBBIVO · Сообщение от ${sender}`;
     const cleanText = (text || '').replace(/<[^>]*>?/gm, '');
     const bodyText = cleanText.length > 90 ? cleanText.substring(0, 90) + '...' : (cleanText || 'Вам пришло новое сообщение');
 
-    const notif = new Notification(title, {
+    const notifPayload = {
       body: bodyText,
       icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Cdefs%3E%3ClinearGradient id="g" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%2300d4ff"/%3E%3Cstop offset="50%25" stop-color="%23b44dff"/%3E%3Cstop offset="100%25" stop-color="%23ff44cc"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="100" height="100" rx="24" fill="url(%23g)"/%3E%3Ctext x="50" y="70" font-family="sans-serif" font-weight="900" font-size="60" fill="%23ffffff" text-anchor="middle"%3EL%3C/text%3E%3C/svg%3E',
       badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="24" fill="%2300d4ff"/%3E%3Ctext x="50" y="70" font-family="sans-serif" font-weight="900" font-size="60" fill="%23ffffff" text-anchor="middle"%3EL%3C/text%3E%3C/svg%3E',
       tag: `lobbivo-msg-${sender}`,
       renotify: true,
-      silent: false
-    });
+      silent: false,
+      vibrate: [250, 100, 250, 100, 250],
+      data: {
+        sender: sender,
+        url: window.location.origin + window.location.pathname + `?chat=${encodeURIComponent(sender)}`
+      }
+    };
 
+    // 1. Попытка отправки через Service Worker (работает в фоне, на заблокированном экране и мобильных)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification(title, notifPayload).catch(() => {
+          triggerStandardNotification(title, notifPayload, sender, options);
+        });
+      }).catch(() => {
+        triggerStandardNotification(title, notifPayload, sender, options);
+      });
+    } else {
+      triggerStandardNotification(title, notifPayload, sender, options);
+    }
+  } catch (err) {
+    console.warn('Push notification delivery error:', err);
+  }
+}
+
+function triggerStandardNotification(title, notifPayload, sender, options) {
+  try {
+    const notif = new Notification(title, notifPayload);
     notif.onclick = function() {
       window.focus();
       if (!options.isTest) {
@@ -1602,7 +1681,7 @@ function sendWebPushNotification(sender, text, options = {}) {
       this.close();
     };
   } catch (err) {
-    console.warn('Push notification delivery error:', err);
+    console.warn('Standard Notification fallback error:', err);
   }
 }
 

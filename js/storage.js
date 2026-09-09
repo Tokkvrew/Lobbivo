@@ -192,6 +192,54 @@ function isUserAdmin(username) {
   return u.isAdmin === true || u.role === 'admin';
 }
 
+// Получение информации о бейдже администратора (с поддержкой переключателя вкл/выкл)
+function getUserAdminBadge(username) {
+  if (!username) return null;
+  const u = AppState.users[username];
+  if (!u) return null;
+  if (!isUserAdmin(username)) return null;
+  
+  // Если администратор отключил бейдж (режим Инкогнито)
+  if (u.adminBadgeEnabled === false) return null;
+
+  const style = u.adminBadgeStyle || 'admin';
+  const type = u.adminBadgeType || 'admin';
+  const customText = (u.adminBadgeText || '').trim();
+
+  let defaultText = 'АДМИНИСТРАТОР';
+  let defaultIcon = 'icon-admin-shield';
+
+  if (type === 'team') {
+    defaultText = 'LOBBIVO TEAM';
+    defaultIcon = 'icon-crown';
+  } else if (type === 'dev') {
+    defaultText = 'DEVELOPER';
+    defaultIcon = 'icon-sparkles';
+  } else if (type === 'moderator') {
+    defaultText = 'МОДЕРАТОР';
+    defaultIcon = 'icon-admin-shield';
+  }
+
+  return {
+    enabled: true,
+    type: type,
+    style: style,
+    text: customText || defaultText,
+    icon: defaultIcon
+  };
+}
+
+// Получение списка кастомных тегов игрока
+function getUserCustomTags(username) {
+  if (!username) return [];
+  const u = AppState.users[username];
+  if (!u) return [];
+  if (Array.isArray(u.tags)) return u.tags.filter(Boolean);
+  if (Array.isArray(u.customTags)) return u.customTags.filter(Boolean);
+  return [];
+}
+
+
 // Проверка блокировки аккаунта (Бан)
 function isUserBanned(username) {
   if (!username) return false;

@@ -86,6 +86,11 @@ function updateHeaderAvatar() {
           <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-profile"/></svg>
           <span>Мой профиль</span>
         </button>
+        <button class="profile-menu-item" data-action="my-squads">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;color:var(--neon-cyan);"><use href="#icon-users"/></svg>
+          <span>Мои анкеты</span>
+          <span class="menu-badge-count" id="headerSquadsCount"></span>
+        </button>
         <button class="profile-menu-item" data-action="about">
           <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-about"/></svg>
           <span>О платформе</span>
@@ -214,14 +219,22 @@ function renderProfile() {
   }
   if (editDesc) editDesc.value = data.desc || '';
 
-  // 6. Обновление кастомизации (рамок и тем)
+  // 6. Обновление пользовательских тегов
+  if (typeof initProfileEditingTags === 'function') {
+    initProfileEditingTags(current);
+  }
+
+  // 7. Обновление кастомизации (рамок и тем)
   renderProfileCustomization();
 
-  // 7. Обновление настроек приватности, Push и черного списка
+  // 8. Обновление секции «Мои анкеты»
+  if (typeof renderMySquads === 'function') renderMySquads();
+
+  // 9. Обновление настроек приватности, Push и черного списка
   if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
   if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
 
-  // 8. Обновление аватара в шапке
+  // 10. Обновление аватара в шапке
   updateHeaderAvatar();
 }
 
@@ -437,6 +450,7 @@ function finishProfileSave(oldUsername, newUsername, game, device, desc) {
   data.game = game;
   data.device = device;
   data.desc = desc;
+  data.tags = Array.isArray(currentProfileEditingTags) ? [...currentProfileEditingTags] : [];
 
   if (newUsername && newUsername !== oldUsername) {
     if (AppState.users[newUsername]) {
@@ -579,3 +593,172 @@ function deleteAccount() {
   showNotification('Аккаунт удален', 'Ваш аккаунт был успешно удален.');
   switchPage('pageGames');
 }
+
+// ============================================================
+//  11. СИСТЕМА КАСТОМНЫХ ТЕГОВ ПРОФИЛЯ (CUSTOM GAMER TAGS)
+// ============================================================
+
+const PRESET_PROFILE_TAGS = [
+  '🎯 Снайпер',
+  '🛡️ Саппорт',
+  '👑 Капитан / IGL',
+  '⚡ Рифлер / Fragger',
+  '😎 Chill / Без токсика',
+  '🔞 18+',
+  '🎙️ Микрофон ON',
+  '🔥 Tryhard / Only Win',
+  '🏆 Турниры / FastCup',
+  '🌙 Ночной прайм',
+  '🎮 Full-time',
+  '🔰 Новичок'
+];
+
+let currentProfileEditingTags = [];
+
+function initProfileEditingTags(username) {
+  if (!username) {
+    currentProfileEditingTags = [];
+  } else {
+    currentProfileEditingTags = [...getUserCustomTags(username)];
+  }
+  renderCustomTagsUI();
+}
+
+function renderCustomTagsUI() {
+  const activeList = document.getElementById('profileActiveTagsList');
+  const heroList = document.getElementById('profileHeroTagsList');
+  const counterEl = document.getElementById('profileTagsCounter');
+  const presetGrid = document.getElementById('profilePresetTagsGrid');
+
+  // 1. Счетчик
+  if (counterEl) {
+    counterEl.textContent = `${currentProfileEditingTags.length} / 6`;
+    counterEl.classList.toggle('full', currentProfileEditingTags.length >= 6);
+  }
+
+  // 2. Теги в шапке Hero баннера
+  if (heroList) {
+    if (currentProfileEditingTags.length === 0) {
+      heroList.innerHTML = '';
+    } else {
+      heroList.innerHTML = currentProfileEditingTags.map(t => {
+        return `<span class="profile-hero-tag-pill">${escapeHtml(t)}</span>`;
+      }).join('');
+    }
+  }
+
+  // 3. Активные теги в форме редактирования
+  if (activeList) {
+    if (currentProfileEditingTags.length === 0) {
+      activeList.innerHTML = `
+        <div class="no-custom-tags-hint">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:4px;"><use href="#icon-sparkles"/></svg>
+          Теги ещё не выбраны. Выберите популярные теги ниже или создайте свой!
+        </div>
+      `;
+    } else {
+      activeList.innerHTML = currentProfileEditingTags.map((t, idx) => {
+        return `
+          <div class="active-tag-chip">
+            <span class="active-tag-text">${escapeHtml(t)}</span>
+            <button type="button" class="btn-remove-tag-chip" onclick="removeUserCustomTag(${idx})" title="Удалить тег">
+              <svg style="width:12px;height:12px;"><use href="#icon-close"/></svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // 4. Популярные пресеты
+  if (presetGrid) {
+    presetGrid.innerHTML = PRESET_PROFILE_TAGS.map(preset => {
+      const isAdded = currentProfileEditingTags.includes(preset);
+      return `
+        <button type="button" class="btn-preset-chip ${isAdded ? 'active-added' : ''}" onclick="toggleUserPresetTag('${escapeHtml(preset)}')">
+          <span>${escapeHtml(preset)}</span>
+          ${isAdded 
+            ? '<svg style="width:12px;height:12px;"><use href="#icon-check"/></svg>' 
+            : '<svg style="width:12px;height:12px;"><use href="#icon-plus"/></svg>'
+          }
+        </button>
+      `;
+    }).join('');
+  }
+}
+
+function addUserCustomTag(rawTag) {
+  if (!rawTag) return;
+  let tag = String(rawTag).trim();
+  if (!tag) return;
+
+  // Ограничение по длине
+  if (tag.length > 20) {
+    tag = tag.slice(0, 20);
+  }
+
+  // Автоматический префикс # если нет эмодзи и спецсимволов
+  if (!tag.startsWith('#') && !tag.match(/^[^\p{L}\p{N}]/u)) {
+    tag = '#' + tag;
+  }
+
+  if (currentProfileEditingTags.length >= 6) {
+    showNotification('Лимит тегов', 'Вы можете добавить максимум 6 тегов');
+    return;
+  }
+
+  if (currentProfileEditingTags.includes(tag)) {
+    showNotification('Тег уже добавлен', 'Этот тег уже есть в вашем списке');
+    return;
+  }
+
+  currentProfileEditingTags.push(tag);
+  renderCustomTagsUI();
+
+  const input = document.getElementById('customTagInput');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+}
+
+function removeUserCustomTag(index) {
+  if (index >= 0 && index < currentProfileEditingTags.length) {
+    currentProfileEditingTags.splice(index, 1);
+    renderCustomTagsUI();
+  }
+}
+
+function toggleUserPresetTag(preset) {
+  const existingIdx = currentProfileEditingTags.indexOf(preset);
+  if (existingIdx !== -1) {
+    removeUserCustomTag(existingIdx);
+  } else {
+    if (currentProfileEditingTags.length >= 6) {
+      showNotification('Лимит тегов', 'Вы можете добавить максимум 6 тегов');
+      return;
+    }
+    currentProfileEditingTags.push(preset);
+    renderCustomTagsUI();
+  }
+}
+
+function initProfileCustomTagsControls() {
+  const addBtn = document.getElementById('addCustomTagBtn');
+  const tagInput = document.getElementById('customTagInput');
+
+  if (addBtn && tagInput) {
+    addBtn.addEventListener('click', () => {
+      addUserCustomTag(tagInput.value);
+    });
+
+    tagInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addUserCustomTag(tagInput.value);
+      }
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initProfileCustomTagsControls);

@@ -63,16 +63,19 @@ function switchAdminTab(tab = 'complaints') {
   const complaintsView = document.getElementById('adminComplaintsView');
   const usersView = document.getElementById('adminUsersView');
   const punishmentsView = document.getElementById('adminPunishmentsView');
+  const badgeView = document.getElementById('adminBadgeView');
 
   if (complaintsView) complaintsView.style.display = tab === 'complaints' ? 'block' : 'none';
   if (usersView) usersView.style.display = tab === 'users' ? 'block' : 'none';
   if (punishmentsView) punishmentsView.style.display = tab === 'punishments' ? 'block' : 'none';
+  if (badgeView) badgeView.style.display = tab === 'badge' ? 'block' : 'none';
 
   updateAdminStats();
 
   if (tab === 'complaints') renderAdminComplaints();
   if (tab === 'users') renderAdminUsers();
   if (tab === 'punishments') renderAdminPunishments();
+  if (tab === 'badge') renderAdminBadgeSettings();
 }
 
 function updateAdminStats() {
@@ -680,6 +683,134 @@ function initAdminControls() {
       if (input) input.value = this.textContent;
     });
   });
+
+  // Настройки тега администратора
+  document.getElementById('adminBadgeToggle')?.addEventListener('change', updateAdminLivePreview);
+  document.querySelectorAll('input[name="adminBadgePreset"]').forEach(radio => {
+    radio.addEventListener('change', updateAdminLivePreview);
+  });
+  document.getElementById('adminBadgeCustomText')?.addEventListener('input', updateAdminLivePreview);
+  document.getElementById('saveAdminBadgeBtn')?.addEventListener('click', saveAdminBadgeSettings);
+}
+
+// ============================================================
+//  10. УПРАВЛЕНИЕ ТЕГОМ АДМИНИСТРАТОРА (ADMIN BADGE CONTROLLER)
+// ============================================================
+
+function renderAdminBadgeSettings() {
+  const current = AppState.currentUser;
+  if (!current || !isUserAdmin(current)) return;
+  const user = AppState.users[current];
+  if (!user) return;
+
+  const toggle = document.getElementById('adminBadgeToggle');
+  const customTextInput = document.getElementById('adminBadgeCustomText');
+  const presetRadios = document.querySelectorAll('input[name="adminBadgePreset"]');
+
+  const isEnabled = user.adminBadgeEnabled !== false;
+  const activePreset = user.adminBadgeType || 'admin';
+  const customText = user.adminBadgeText || '';
+
+  if (toggle) toggle.checked = isEnabled;
+  if (customTextInput) customTextInput.value = customText;
+
+  presetRadios.forEach(radio => {
+    radio.checked = (radio.value === activePreset);
+  });
+
+  updateAdminLivePreview();
+}
+
+function updateAdminLivePreview() {
+  const current = AppState.currentUser || 'Admin';
+  const user = current ? AppState.users[current] : null;
+  const toggle = document.getElementById('adminBadgeToggle');
+  const isEnabled = toggle ? toggle.checked : true;
+  const selectedRadio = document.querySelector('input[name="adminBadgePreset"]:checked');
+  const presetType = selectedRadio ? selectedRadio.value : 'admin';
+  const customTextInput = document.getElementById('adminBadgeCustomText');
+  const customText = customTextInput ? customTextInput.value.trim() : '';
+
+  const previewAvatar = document.getElementById('previewAdminAvatar');
+  const previewName = document.getElementById('previewAdminName');
+  const previewContainer = document.getElementById('previewAdminBadgeContainer');
+
+  if (previewAvatar) {
+    if (user && user.avatar) {
+      previewAvatar.innerHTML = `<img src="${user.avatar}" alt="${escapeHtml(current)}">`;
+    } else {
+      previewAvatar.innerHTML = `<span>${current.slice(0, 2).toUpperCase()}</span>`;
+    }
+  }
+
+  if (previewName) {
+    previewName.textContent = current;
+  }
+
+  if (previewContainer) {
+    if (!isEnabled) {
+      previewContainer.innerHTML = '<span style="font-size:0.7rem;color:var(--text-muted);font-style:italic;">(Инкогнито: тег скрыт)</span>';
+    } else {
+      let defaultText = 'АДМИНИСТРАТОР';
+      let icon = 'icon-admin-shield';
+      let styleClass = 'badge-style-admin';
+
+      if (presetType === 'team') {
+        defaultText = 'LOBBIVO TEAM';
+        icon = 'icon-crown';
+        styleClass = 'badge-style-team';
+      } else if (presetType === 'dev') {
+        defaultText = 'DEVELOPER';
+        icon = 'icon-sparkles';
+        styleClass = 'badge-style-dev';
+      } else if (presetType === 'moderator') {
+        defaultText = 'МОДЕРАТОР';
+        icon = 'icon-admin-shield';
+        styleClass = 'badge-style-mod';
+      }
+
+      const displayText = customText || defaultText;
+      previewContainer.innerHTML = `
+        <span class="admin-custom-badge ${styleClass}">
+          <svg><use href="#${icon}"/></svg>
+          <span>${escapeHtml(displayText)}</span>
+        </span>
+      `;
+    }
+  }
+}
+
+function saveAdminBadgeSettings() {
+  const current = AppState.currentUser;
+  if (!current || !isUserAdmin(current)) return;
+  const user = AppState.users[current];
+  if (!user) return;
+
+  const toggle = document.getElementById('adminBadgeToggle');
+  const selectedRadio = document.querySelector('input[name="adminBadgePreset"]:checked');
+  const customTextInput = document.getElementById('adminBadgeCustomText');
+
+  const isEnabled = toggle ? toggle.checked : true;
+  const presetType = selectedRadio ? selectedRadio.value : 'admin';
+  const customText = customTextInput ? customTextInput.value.trim() : '';
+
+  user.adminBadgeEnabled = isEnabled;
+  user.adminBadgeType = presetType;
+  user.adminBadgeStyle = presetType; // 'admin' | 'team' | 'dev' | 'moderator'
+  user.adminBadgeText = customText;
+
+  saveUsers(current);
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    FirebaseSync.saveUser(current, user);
+  }
+
+  showNotification('Настройки сохранены', isEnabled ? 'Тег администратора обновлён и активен!' : 'Включен режим Инкогнито: тег скрыт');
+
+  updateAdminLivePreview();
+  if (typeof renderWorldChat === 'function') renderWorldChat();
+  if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
+  if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
 }
 
 document.addEventListener('DOMContentLoaded', initAdminControls);
+

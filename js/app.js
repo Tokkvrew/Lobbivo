@@ -27,6 +27,9 @@ function showSystemLoader(message = 'Загрузка...', duration = 650, callb
 }
 
 function switchPage(pageId) {
+  if (pageId === 'pageSettings') {
+    pageId = 'pageProfile';
+  }
   const pages = document.querySelectorAll('.page');
   const targetPage = document.getElementById(pageId);
   if (!targetPage) return;
@@ -59,10 +62,12 @@ function switchPage(pageId) {
     }
   });
 
-  if (pageId === 'pageSettings') {
+  if (pageId === 'pageProfile') {
+    if (typeof renderProfile === 'function') renderProfile();
     if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
     if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
-    if (typeof renderSettingsCustomization === 'function') renderSettingsCustomization();
+    if (typeof renderProfileCustomization === 'function') renderProfileCustomization();
+    if (typeof renderMySquads === 'function') renderMySquads();
   }
 
   // Скролл вверх при смене страницы
@@ -139,33 +144,31 @@ function sendComplaint() {
 
   const reason = typeof SecurityShield !== 'undefined' ? SecurityShield.sanitizeText(rawReason, 500) : rawReason;
 
-  const targetData = AppState.users[target];
-  const complaint = {
-    id: Date.now(),
-    target: target,
-    targetId: targetData?.id || '---',
+  if (!Array.isArray(AppState.complaints)) {
+    AppState.complaints = [];
+  }
+
+  const complaintObj = {
+    id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
     from: AppState.currentUser,
+    target: target,
     reason: reason,
-    date: new Date().toLocaleString('ru-RU'),
+    timestamp: Date.now(),
     status: 'pending'
   };
 
-  AppState.complaints.push(complaint);
+  AppState.complaints.push(complaintObj);
   saveComplaints();
 
-  showNotification(
-    '✅ Жалоба принята',
-    `Жалоба на пользователя ${target} отправлена модераторам.`
-  );
-
+  showNotification('Жалоба отправлена', 'Ваша жалоба передана модераторам');
   closeComplaintModal();
 }
 
 // ============================================================
-//  СОЗДАНИЕ АНКЕТЫ (CREATE SQUAD)
+//  СОЗДАНИЕ И РЕДАКТИРОВАНИЕ АНКЕТЫ (CREATE & EDIT SQUAD)
 // ============================================================
 
-function openCreateSquadModal() {
+function openCreateSquadModal(defaultGame = null) {
   if (!AppState.currentUser) {
     showNotification('Требуется вход', 'Войдите в аккаунт, чтобы создать анкету');
     showAuthModal('login');
@@ -173,28 +176,35 @@ function openCreateSquadModal() {
   }
 
   const modal = document.getElementById('createSquadModal');
+  const modalTitle = document.getElementById('createSquadModalTitle');
+  const modalSub = document.getElementById('createSquadModalSub');
+  const submitBtnText = document.getElementById('submitSquadBtnText');
+  const editIdInput = document.getElementById('squadEditId');
   const squadRank = document.getElementById('squadRank');
   const squadDesc = document.getElementById('squadDescription');
-  const squadGameSelect = document.getElementById('squadGame');
   const gameField = document.getElementById('squadGameField');
-  const currentFilter = AppState.selectedGameFilter || 'all';
+  const currentFilter = defaultGame || AppState.selectedGameFilter || 'all';
 
-  if (squadRank) squadRank.value = AppState.users[AppState.currentUser]?.rank || '';
-  if (squadDesc) squadDesc.value = AppState.users[AppState.currentUser]?.desc || '';
+  if (editIdInput) editIdInput.value = '';
+  if (modalTitle) modalTitle.innerHTML = '<svg><use href="#icon-users"/></svg> <span>Создать анкету</span>';
+  if (modalSub) modalSub.textContent = 'Найдите тиммейтов в выбранной онлайн-игре';
+  if (submitBtnText) submitBtnText.textContent = 'Опубликовать анкету';
+
+  if (squadRank) squadRank.value = '';
+  if (squadDesc) squadDesc.value = '';
   if (typeof setDevicePickerValue === 'function') {
     setDevicePickerValue('squadDevicePicker', AppState.users[AppState.currentUser]?.device || 'PC');
   }
 
+  if (gameField) gameField.style.display = 'block';
   if (currentFilter !== 'all') {
     if (typeof setGamePickerValue === 'function') setGamePickerValue('squadGamePicker', currentFilter);
-    if (gameField) gameField.style.display = 'none';
   } else {
     const userGame = AppState.users[AppState.currentUser]?.game || 'csgo';
     if (typeof setGamePickerValue === 'function') setGamePickerValue('squadGamePicker', userGame);
-    if (gameField) gameField.style.display = 'block';
   }
 
-  modal.classList.add('show');
+  if (modal) modal.classList.add('show');
 }
 
 function closeCreateSquadModal() {
@@ -209,14 +219,10 @@ function submitSquad() {
     return;
   }
 
-  const currentFilter = AppState.selectedGameFilter || 'all';
-  let game;
-  if (currentFilter !== 'all') {
-    game = currentFilter;
-  } else {
-    game = document.getElementById('squadGame')?.value || 'csgo';
-  }
+  const editIdInput = document.getElementById('squadEditId');
+  const editingId = editIdInput ? editIdInput.value : '';
 
+  const game = document.getElementById('squadGame')?.value || 'csgo';
   const rank = (document.getElementById('squadRank')?.value || '').trim();
   const device = document.getElementById('squadDevice')?.value || 'PC';
   const rawDescription = (document.getElementById('squadDescription')?.value || '').trim();
@@ -231,6 +237,49 @@ function submitSquad() {
   const userData = AppState.users[AppState.currentUser];
   if (!userData) return;
 
+  if (!Array.isArray(userData.squads)) {
+    userData.squads = [];
+  }
+
+  if (editingId) {
+    const existingIndex = userData.squads.findIndex(s => s.id === editingId);
+    if (existingIndex !== -1) {
+      userData.squads[existingIndex] = {
+        ...userData.squads[existingIndex],
+        game,
+        rank: rank || 'Не указан',
+        device,
+        desc: description,
+        updatedAt: Date.now()
+      };
+      showNotification('✅ Анкета обновлена', 'Изменения успешно сохранены!');
+    }
+  } else {
+    // Проверяем, есть ли уже анкета для этой игры
+    const duplicateIndex = userData.squads.findIndex(s => s.game === game);
+    if (duplicateIndex !== -1) {
+      userData.squads[duplicateIndex] = {
+        ...userData.squads[duplicateIndex],
+        rank: rank || userData.squads[duplicateIndex].rank || 'Не указан',
+        device,
+        desc: description,
+        updatedAt: Date.now()
+      };
+      showNotification('✅ Анкета обновлена', 'Анкета для этой игры была обновлена!');
+    } else {
+      userData.squads.push({
+        id: 'sq_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        game,
+        rank: rank || 'Не указан',
+        device,
+        desc: description,
+        createdAt: Date.now(),
+        active: true
+      });
+      showNotification('✅ Анкета опубликована', 'Ваша анкета теперь видна в каталоге игроков!');
+    }
+  }
+
   userData.game = game;
   userData.rank = rank || userData.rank || 'Не указан';
   userData.device = device;
@@ -240,8 +289,8 @@ function submitSquad() {
 
   saveUsers();
   closeCreateSquadModal();
-  showNotification('✅ Анкета опубликована', 'Ваша анкета теперь видна в каталоге игроков!');
 
+  if (typeof renderMySquads === 'function') renderMySquads();
   renderPlayers(AppState.selectedGameFilter || 'all');
   updateGameCounts();
   updateUI();
@@ -1284,16 +1333,14 @@ function init() {
         if (typeof openAdminPanel === 'function') openAdminPanel('complaints');
       } else if (action === 'coins') {
         openCoinModal('earn');
-      } else if (action === 'profile') {
-        showProfile('overview');
-      } else if (action === 'customization') {
-        showProfile('custom');
+      } else if (action === 'profile' || action === 'customization' || action === 'settings') {
+        showProfile();
+      } else if (action === 'my-squads') {
+        if (typeof openMySquadsModal === 'function') openMySquadsModal();
       } else if (action === 'login') {
         showAuthModal('login');
       } else if (action === 'register') {
         showAuthModal('register');
-      } else if (action === 'settings') {
-        switchPage('pageSettings');
       } else if (action === 'about') {
         switchPage('pageAbout');
       } else if (action === 'logout') {
@@ -1716,6 +1763,36 @@ function init() {
   } else {
     AppState.currentUser = null;
     switchPage('pageWelcome');
+  }
+
+  // Регистрация PWA Service Worker для фоновых Push-уведомлений на телефоне и ПК
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => {
+          console.log('⚡ Lobbivo Service Worker успешно активен:', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('Service Worker registration issue:', err);
+        });
+    });
+
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'OPEN_DIRECT_CHAT') {
+        if (typeof openChat === 'function') openChat();
+        if (typeof openDirectChat === 'function') openDirectChat(event.data.sender);
+      }
+    });
+  }
+
+  // Проверка прямого перехода в чат из Push-уведомления через URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const chatPartnerFromUrl = urlParams.get('chat');
+  if (chatPartnerFromUrl) {
+    setTimeout(() => {
+      if (typeof openChat === 'function') openChat();
+      if (typeof openDirectChat === 'function') openDirectChat(chatPartnerFromUrl);
+    }, 600);
   }
 
   updateUI();
