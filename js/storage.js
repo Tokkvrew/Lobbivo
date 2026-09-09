@@ -233,15 +233,61 @@ function formatLastSeen(lastSeen, username = null) {
 //  АДМИНИСТРИРОВАНИЕ, БАНЫ И МУТЫ (ADMIN, BANS & MUTES)
 // ============================================================
 
-// Проверка прав администратора (выдаются через базу данных isAdmin: true или role: 'admin')
+// Проверка прав персонала (GA или Модератор)
 function isUserAdmin(username) {
   if (!username) return false;
   const u = AppState.users[username];
   if (!u) return false;
+  return u.isAdmin === true || u.role === 'admin' || u.role === 'ga' || u.role === 'moderator';
+}
+
+// Проверка роли Главного Администратора (GA)
+function isUserGA(username) {
+  if (!username) return false;
+  const u = AppState.users[username];
+  if (!u) return false;
+  if (u.role === 'ga') return true;
+  if (u.role === 'moderator') return false;
   return u.isAdmin === true || u.role === 'admin';
 }
 
-// Получение информации о бейдже администратора (с поддержкой переключателя вкл/выкл)
+// Проверка роли Модератора
+function isUserModerator(username) {
+  if (!username) return false;
+  const u = AppState.users[username];
+  if (!u) return false;
+  return u.role === 'moderator';
+}
+
+// Получение роли персонала пользователя ('ga' | 'moderator' | null)
+function getUserAdminRole(username) {
+  if (!username) return null;
+  if (isUserGA(username)) return 'ga';
+  if (isUserModerator(username)) return 'moderator';
+  return null;
+}
+
+// Проверка права наказания: модератор НЕ может банить/мутить других модераторов и GA
+function canAdminPunishTarget(actorUsername, targetUsername) {
+  if (!actorUsername || !targetUsername) return false;
+  if (actorUsername === targetUsername) return false; // Нельзя наказывать самого себя
+  
+  // Главный администратор (GA) имеет полный доступ
+  if (isUserGA(actorUsername)) return true;
+
+  // Модератор:
+  if (isUserModerator(actorUsername)) {
+    // Не может наказывать GA, модераторов или любого сотрудника персонала
+    if (isUserAdmin(targetUsername) || isUserGA(targetUsername) || isUserModerator(targetUsername)) {
+      return false;
+    }
+    return true;
+  }
+
+  return false;
+}
+
+// Получение информации о бейдже администратора (с поддержкой GA и Модераторов)
 function getUserAdminBadge(username) {
   if (!username) return null;
   const u = AppState.users[username];
@@ -251,22 +297,28 @@ function getUserAdminBadge(username) {
   // Если администратор отключил бейдж (режим Инкогнито)
   if (u.adminBadgeEnabled === false) return null;
 
-  const style = u.adminBadgeStyle || 'admin';
-  const type = u.adminBadgeType || 'admin';
+  const isGA = isUserGA(username);
+  const isMod = isUserModerator(username);
+
+  const style = u.adminBadgeStyle || (isMod ? 'moderator' : 'admin');
+  const type = u.adminBadgeType || (isMod ? 'moderator' : 'admin');
   const customText = (u.adminBadgeText || '').trim();
 
-  let defaultText = 'АДМИНИСТРАТОР';
-  let defaultIcon = 'icon-admin-shield';
+  let defaultText = 'GA';
+  let defaultIcon = 'icon-crown';
 
-  if (type === 'team') {
+  if (isMod || type === 'moderator') {
+    defaultText = 'МОДЕРАТОР';
+    defaultIcon = 'icon-shield';
+  } else if (type === 'team') {
     defaultText = 'LOBBIVO TEAM';
     defaultIcon = 'icon-crown';
   } else if (type === 'dev') {
     defaultText = 'DEVELOPER';
     defaultIcon = 'icon-sparkles';
-  } else if (type === 'moderator') {
-    defaultText = 'МОДЕРАТОР';
-    defaultIcon = 'icon-admin-shield';
+  } else if (type === 'admin' || type === 'ga') {
+    defaultText = 'GA';
+    defaultIcon = 'icon-crown';
   }
 
   return {
@@ -401,6 +453,14 @@ function formatDurationRemaining(ms, isPermanent = false) {
 function banUser(target, durationMinutes, reason, adminName = null) {
   const u = AppState.users[target];
   if (!u) return false;
+  const actor = adminName || AppState.currentUser;
+  if (actor && typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(actor, target)) {
+    console.warn(`[Security] ${actor} не имеет прав забанить ${target}`);
+    if (typeof showNotification === 'function') {
+      showNotification('Отказано в доступе', 'Модератор не может заблокировать другого модератора или Главного Администратора (GA)');
+    }
+    return false;
+  }
   const now = Date.now();
   let bannedUntil = -1;
   if (durationMinutes !== -1 && durationMinutes > 0) {
@@ -408,7 +468,7 @@ function banUser(target, durationMinutes, reason, adminName = null) {
   }
   u.bannedUntil = bannedUntil;
   u.banReason = reason || 'Нарушение правил сообщества Lobbivo';
-  u.bannedBy = adminName || AppState.currentUser || 'Администратор';
+  u.bannedBy = actor || (isUserGA(actor) ? 'GA' : 'Модератор');
   u.bannedAt = now;
   saveUsers(target);
   return true;
@@ -430,6 +490,14 @@ function unbanUser(target) {
 function muteUser(target, durationMinutes, reason, adminName = null) {
   const u = AppState.users[target];
   if (!u) return false;
+  const actor = adminName || AppState.currentUser;
+  if (actor && typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(actor, target)) {
+    console.warn(`[Security] ${actor} не имеет прав замутить ${target}`);
+    if (typeof showNotification === 'function') {
+      showNotification('Отказано в доступе', 'Модератор не может замутить другого модератора или Главного Администратора (GA)');
+    }
+    return false;
+  }
   const now = Date.now();
   let mutedUntil = -1;
   if (durationMinutes !== -1 && durationMinutes > 0) {
@@ -437,7 +505,7 @@ function muteUser(target, durationMinutes, reason, adminName = null) {
   }
   u.mutedUntil = mutedUntil;
   u.muteReason = reason || 'Нарушение правил чата';
-  u.mutedBy = adminName || AppState.currentUser || 'Модератор';
+  u.mutedBy = actor || (isUserGA(actor) ? 'GA' : 'Модератор');
   u.mutedAt = now;
   saveUsers(target);
   return true;

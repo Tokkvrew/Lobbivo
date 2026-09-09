@@ -237,13 +237,19 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
   container.innerHTML = filtered.map(name => {
     const u = AppState.users[name];
     const safeName = escapeHtml(name);
-    const isAdmin = isUserAdmin(name);
+    const isGA = typeof isUserGA === 'function' && isUserGA(name);
+    const isMod = typeof isUserModerator === 'function' && isUserModerator(name);
     const isBanned = isUserBanned(name);
     const isMuted = isUserMuted(name);
     const isOnline = isUserOnline(name);
+    const canPunish = typeof canAdminPunishTarget === 'function' ? canAdminPunishTarget(AppState.currentUser, name) : true;
 
     let badgesHtml = '';
-    if (isAdmin) badgesHtml += '<span class="admin-badge badge-admin"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-crown"/></svg> АДМИН</span> ';
+    if (isGA) {
+      badgesHtml += '<span class="admin-badge badge-admin" style="background:linear-gradient(135deg,#ff2a5f,#ff007f);color:#fff;border-color:#ff007f;"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-crown"/></svg> GA</span> ';
+    } else if (isMod) {
+      badgesHtml += '<span class="admin-badge badge-mod" style="background:rgba(0,229,255,0.15);color:#00f0ff;border-color:rgba(0,229,255,0.4);"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-shield"/></svg> МОД</span> ';
+    }
     if (isBanned) badgesHtml += '<span class="admin-badge badge-ban"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-ban"/></svg> БАН</span> ';
     if (isMuted) badgesHtml += '<span class="admin-badge badge-mute"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-mute"/></svg> МУТ</span> ';
     if (isOnline) badgesHtml += '<span class="admin-badge badge-online"><span class="status-dot online" style="width:8px;height:8px;display:inline-block;border-radius:50%;background:var(--neon-green);box-shadow:0 0 8px var(--neon-green);"></span> ONLINE</span> ';
@@ -266,12 +272,20 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
           <div class="admin-row-actions">
             <button class="admin-mini-btn" onclick="showUserProfileModal('${safeName}')" title="Профиль"><svg style="width:14px;height:14px;"><use href="#icon-eye"/></svg></button>
             ${isBanned 
-              ? `<button class="admin-mini-btn btn-unban" onclick="adminUnbanUser('${safeName}')" title="Снять бан"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`
-              : `<button class="admin-mini-btn btn-ban" onclick="openBanModal('${safeName}')" title="Забанить"><svg style="width:14px;height:14px;"><use href="#icon-ban"/></svg></button>`
+              ? (canPunish 
+                  ? `<button class="admin-mini-btn btn-unban" onclick="adminUnbanUser('${safeName}')" title="Снять бан"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`
+                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может разбанить персонал"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`)
+              : (canPunish 
+                  ? `<button class="admin-mini-btn btn-ban" onclick="openBanModal('${safeName}')" title="Забанить"><svg style="width:14px;height:14px;"><use href="#icon-ban"/></svg></button>`
+                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может банить модераторов и GA"><svg style="width:14px;height:14px;"><use href="#icon-ban"/></svg></button>`)
             }
             ${isMuted 
-              ? `<button class="admin-mini-btn btn-unmute" onclick="adminUnmuteUser('${safeName}')" title="Снять мут"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`
-              : `<button class="admin-mini-btn btn-mute" onclick="openMuteModal('${safeName}')" title="Замьютить"><svg style="width:14px;height:14px;"><use href="#icon-mute"/></svg></button>`
+              ? (canPunish 
+                  ? `<button class="admin-mini-btn btn-unmute" onclick="adminUnmuteUser('${safeName}')" title="Снять мут"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`
+                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может снять мут с персонала"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`)
+              : (canPunish 
+                  ? `<button class="admin-mini-btn btn-mute" onclick="openMuteModal('${safeName}')" title="Замьютить"><svg style="width:14px;height:14px;"><use href="#icon-mute"/></svg></button>`
+                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может мутить модераторов и GA"><svg style="width:14px;height:14px;"><use href="#icon-mute"/></svg></button>`)
             }
           </div>
         </td>
@@ -352,6 +366,10 @@ function renderAdminPunishments() {
 
 function openBanModal(targetUsername) {
   if (!targetUsername) return;
+  if (typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(AppState.currentUser, targetUsername)) {
+    showNotification('Отказано в доступе', 'Модератор не может заблокировать другого модератора или Главного Администратора (GA)');
+    return;
+  }
   activeBanTarget = targetUsername;
 
   const modal = document.getElementById('adminBanModal');
@@ -412,6 +430,10 @@ function submitBan() {
 }
 
 function adminUnbanUser(username) {
+  if (typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(AppState.currentUser, username)) {
+    showNotification('Отказано в доступе', 'Модератор не может управлять блокировками персонала');
+    return;
+  }
   if (confirm(`Разбанить пользователя ${username}?`)) {
     unbanUser(username);
     showNotification('Бан снят', `Пользователь ${username} успешно разблокирован`);
@@ -429,6 +451,10 @@ function adminUnbanUser(username) {
 
 function openMuteModal(targetUsername) {
   if (!targetUsername) return;
+  if (typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(AppState.currentUser, targetUsername)) {
+    showNotification('Отказано в доступе', 'Модератор не может замутить другого модератора или Главного Администратора (GA)');
+    return;
+  }
   activeMuteTarget = targetUsername;
 
   const modal = document.getElementById('adminMuteModal');
@@ -751,8 +777,8 @@ function updateAdminLivePreview() {
     if (!isEnabled) {
       previewContainer.innerHTML = '<span style="font-size:0.7rem;color:var(--text-muted);font-style:italic;">(Инкогнито: тег скрыт)</span>';
     } else {
-      let defaultText = 'АДМИНИСТРАТОР';
-      let icon = 'icon-admin-shield';
+      let defaultText = 'GA';
+      let icon = 'icon-crown';
       let styleClass = 'badge-style-admin';
 
       if (presetType === 'team') {
@@ -765,8 +791,12 @@ function updateAdminLivePreview() {
         styleClass = 'badge-style-dev';
       } else if (presetType === 'moderator') {
         defaultText = 'МОДЕРАТОР';
-        icon = 'icon-admin-shield';
+        icon = 'icon-shield';
         styleClass = 'badge-style-mod';
+      } else if (presetType === 'admin' || presetType === 'ga') {
+        defaultText = 'GA';
+        icon = 'icon-crown';
+        styleClass = 'badge-style-admin';
       }
 
       const displayText = customText || defaultText;

@@ -52,11 +52,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <!-- CSS Стили (с авто-обновлением кэша) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.8.1" />
-  <link rel="stylesheet" href="css/base.css?v=2.8.1" />
-  <link rel="stylesheet" href="css/components.css?v=2.8.1" />
-  <link rel="stylesheet" href="css/animations.css?v=2.8.1" />
-  <link rel="stylesheet" href="css/media.css?v=2.8.1" />
+  <link rel="stylesheet" href="css/variables.css?v=2.8.2" />
+  <link rel="stylesheet" href="css/base.css?v=2.8.2" />
+  <link rel="stylesheet" href="css/components.css?v=2.8.2" />
+  <link rel="stylesheet" href="css/animations.css?v=2.8.2" />
+  <link rel="stylesheet" href="css/media.css?v=2.8.2" />
 </head>
 <body>
 
@@ -965,11 +965,13 @@
 
               <!-- Добавление своего тега -->
               <div class="custom-tag-input-row">
-                <div class="input-cyber-wrapper" style="flex:1;">
-                  <span class="custom-tag-hash-prefix">#</span>
-                  <input type="text" id="customTagInput" maxlength="18" placeholder="Свой тег (например: Sniper, OnlyWin, 18+)" autocomplete="off">
+                <div class="custom-tag-input-wrapper">
+                  <div class="custom-tag-hash-pill">
+                    <span>#</span>
+                  </div>
+                  <input type="text" id="customTagInput" class="custom-tag-cyber-input" maxlength="18" placeholder="Свой тег (например: Sniper, OnlyWin, 18+)" autocomplete="off">
                 </div>
-                <button type="button" class="btn btn-outline btn-add-custom-tag" id="addCustomTagBtn">
+                <button type="button" class="btn btn-add-custom-tag" id="addCustomTagBtn">
                   <svg style="width:14px;height:14px;"><use href="#icon-plus"/></svg>
                   <span>Добавить</span>
                 </button>
@@ -2384,10 +2386,10 @@
                   <input type="radio" name="adminBadgePreset" value="admin" checked>
                   <div class="preset-card-inner">
                     <span class="admin-custom-badge badge-style-admin">
-                      <svg><use href="#icon-admin-shield"/></svg>
-                      <span>АДМИНИСТРАТОР</span>
+                      <svg><use href="#icon-crown"/></svg>
+                      <span>GA</span>
                     </span>
-                    <span class="preset-desc">Классический рубиново-неоновый щит</span>
+                    <span class="preset-desc">Главный администратор (GA)</span>
                   </div>
                 </label>
 
@@ -2417,10 +2419,10 @@
                   <input type="radio" name="adminBadgePreset" value="moderator">
                   <div class="preset-card-inner">
                     <span class="admin-custom-badge badge-style-mod">
-                      <svg><use href="#icon-admin-shield"/></svg>
+                      <svg><use href="#icon-shield"/></svg>
                       <span>МОДЕРАТОР</span>
                     </span>
-                    <span class="preset-desc">Изумрудный щит защиты</span>
+                    <span class="preset-desc">Изумрудный щит модерации</span>
                   </div>
                 </label>
 
@@ -2616,15 +2618,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (с авто-обновлением кэша) -->
-  <script src="js/data.js?v=2.8.1"></script>
-  <script src="js/security-shield.js?v=2.8.1"></script>
-  <script src="js/firebase-sync.js?v=2.8.1"></script>
-  <script src="js/storage.js?v=2.8.1"></script>
-  <script src="js/auth.js?v=2.8.1"></script>
-  <script src="js/games.js?v=2.8.1"></script>
-  <script src="js/chat.js?v=2.8.1"></script>
-  <script src="js/profile.js?v=2.8.1"></script>
-  <script src="js/admin.js?v=2.8.1"></script>
-  <script src="js/app.js?v=2.8.1"></script>
+  <script src="js/data.js?v=2.8.2"></script>
+  <script src="js/security-shield.js?v=2.8.2"></script>
+  <script src="js/firebase-sync.js?v=2.8.2"></script>
+  <script src="js/storage.js?v=2.8.2"></script>
+  <script src="js/auth.js?v=2.8.2"></script>
+  <script src="js/games.js?v=2.8.2"></script>
+  <script src="js/chat.js?v=2.8.2"></script>
+  <script src="js/profile.js?v=2.8.2"></script>
+  <script src="js/admin.js?v=2.8.2"></script>
+  <script src="js/app.js?v=2.8.2"></script>
 </body>
 </html>

@@ -1866,11 +1866,11 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.8.1', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.8.2', { updateViaCache: 'none' })
         .then((reg) => {
           // Проверяем обновления файлов немедленно при загрузке страницы
           reg.update();
-          console.log('⚡ Lobbivo Service Worker v2.8.1 активен:', reg.scope);
+          console.log('⚡ Lobbivo Service Worker v2.8.2 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку (на телефоне и ПК)
           document.addEventListener('visibilitychange', () => {

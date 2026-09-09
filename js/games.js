@@ -574,29 +574,41 @@ function showUserProfileModal(username) {
   }
 
   const isViewerAdmin = typeof isUserAdmin === 'function' && isUserAdmin(AppState.currentUser);
+  const canModerateTarget = typeof canAdminPunishTarget === 'function' ? canAdminPunishTarget(AppState.currentUser, username) : isViewerAdmin;
   const isTargetBanned = typeof isUserBanned === 'function' && isUserBanned(username);
   const isTargetMuted = typeof isUserMuted === 'function' && isUserMuted(username);
 
   let adminActionsHtml = '';
   if (isViewerAdmin && AppState.currentUser !== username) {
-    adminActionsHtml = `
-      <div class="modal-admin-section">
-        <div class="admin-section-title">
-          <svg style="width:14px;height:14px;"><use href="#icon-admin-shield"/></svg>
-          <span>Управление администратора</span>
+    if (canModerateTarget) {
+      adminActionsHtml = `
+        <div class="modal-admin-section">
+          <div class="admin-section-title">
+            <svg style="width:14px;height:14px;"><use href="#icon-admin-shield"/></svg>
+            <span>Управление администратора</span>
+          </div>
+          <div class="admin-actions-grid">
+            ${isTargetBanned 
+              ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnbanBtn">✅ Снять бан</button>`
+              : `<button type="button" class="btn btn-sm btn-danger" id="modalAdminBanBtn">🔨 Забанить игрока</button>`
+            }
+            ${isTargetMuted 
+              ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnmuteBtn">🔊 Снять мут</button>`
+              : `<button type="button" class="btn btn-sm btn-warning" id="modalAdminMuteBtn">🔇 Замьютить в чате</button>`
+            }
+          </div>
         </div>
-        <div class="admin-actions-grid">
-          ${isTargetBanned 
-            ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnbanBtn">✅ Снять бан</button>`
-            : `<button type="button" class="btn btn-sm btn-danger" id="modalAdminBanBtn">🔨 Забанить игрока</button>`
-          }
-          ${isTargetMuted 
-            ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnmuteBtn">🔊 Снять мут</button>`
-            : `<button type="button" class="btn btn-sm btn-warning" id="modalAdminMuteBtn">🔇 Замьютить в чате</button>`
-          }
+      `;
+    } else {
+      adminActionsHtml = `
+        <div class="modal-admin-section" style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.25);border-radius:10px;padding:8px 12px;">
+          <div class="admin-section-title" style="color:var(--neon-cyan);margin:0;font-size:0.78rem;">
+            <svg style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"><use href="#icon-shield"/></svg>
+            <span>Персонал платформы (Защита от модерации)</span>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
   }
 
   const existing = document.getElementById('userProfileModalOverlay');

@@ -40,16 +40,10 @@ function updateHeaderAvatar() {
     dropdownUsername.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(current || 'Гость')}</span>${isPremium ? ' <span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : ''}`;
   }
   if (dropdownStatusText) {
-    if (isAdmin) {
-      dropdownStatusText.innerHTML = `<svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#icon-admin-shield"/></svg> Администратор`;
-    } else if (isPremium) {
-      dropdownStatusText.innerHTML = `<svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#icon-crown"/></svg> Lobbivo Premium`;
-    } else {
-      dropdownStatusText.textContent = current ? 'В сети' : 'Не авторизован';
-    }
+    dropdownStatusText.textContent = current ? 'В сети' : 'Не авторизован';
   }
   if (dropdownStatusDot) {
-    dropdownStatusDot.className = isAdmin ? 'online-glow-dot admin' : (isPremium ? 'online-glow-dot premium' : (current ? 'online-glow-dot active' : 'online-glow-dot guest'));
+    dropdownStatusDot.className = current ? 'online-glow-dot active' : 'online-glow-dot guest';
   }
   if (capsuleLabel) {
     capsuleLabel.textContent = current || 'Профиль';
