@@ -137,6 +137,22 @@ function renderPlayers(gameFilter = 'all') {
         return data.game === gameFilter;
       }
       return true;
+    })
+    .sort(([nameA], [nameB]) => {
+      // 1. VIP-буст анкеты (первое место)
+      const boostA = isSquadVipBoosted(nameA) ? 1 : 0;
+      const boostB = isSquadVipBoosted(nameB) ? 1 : 0;
+      if (boostA !== boostB) return boostB - boostA;
+
+      // 2. Lobbivo Premium (второе место)
+      const premA = isUserPremium(nameA) ? 1 : 0;
+      const premB = isUserPremium(nameB) ? 1 : 0;
+      if (premA !== premB) return premB - premA;
+
+      // 3. Онлайн статус
+      const onlA = isUserOnline(nameA) ? 1 : 0;
+      const onlB = isUserOnline(nameB) ? 1 : 0;
+      return onlB - onlA;
     });
 
   if (list.length === 0) {
@@ -153,6 +169,9 @@ function renderPlayers(gameFilter = 'all') {
     const safeDesc = escapeHtml(data.desc || '');
     const safeDevice = escapeHtml(data.device || 'PC');
     const deviceIconSVG = getDeviceIconSVG(data.device || 'PC');
+    const isPremium = isUserPremium(name);
+    const isBoosted = isSquadVipBoosted(name);
+    const frameId = getUserEquippedFrame(name);
     
     let avatarContent;
     if (data.avatar) {
@@ -162,16 +181,27 @@ function renderPlayers(gameFilter = 'all') {
       avatarContent = `<span>${initials || '?'}</span>`;
     }
 
+    if (frameId && frameId !== 'none') {
+      avatarContent = `<div class="avatar-frame-wrap frame-${frameId}">${avatarContent}</div>`;
+    }
+
+    const premiumCrownHtml = isPremium ? '<span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : '';
+    const vipPillHtml = isBoosted ? '<span class="vip-squad-badge"><svg><use href="#icon-badge-vip"/></svg> VIP СБОР</span>' : '';
+
     const lookingTag = data.lookingForTeam 
       ? `<span class="looking-for-team"><svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#icon-search"/></svg>Ищет команду</span>` 
       : '';
 
     return `
-      <div class="player-card" data-username="${safeName}" data-game="${escapeHtml(data.game || 'csgo')}">
+      <div class="player-card ${isBoosted ? 'vip-boosted-card' : ''} ${isPremium ? 'premium-user-card' : ''}" data-username="${safeName}" data-game="${escapeHtml(data.game || 'csgo')}">
         <div class="player-top">
           <div class="player-avatar">${avatarContent}</div>
           <div class="player-info">
-            <div class="player-name">${safeName}</div>
+            <div class="player-name">
+              <span class="${isPremium ? 'premium-author' : ''}">${safeName}</span>
+              ${premiumCrownHtml}
+              ${vipPillHtml}
+            </div>
             <div class="player-game">
               <svg><use href="#${escapeHtml(game.icon)}"/></svg>
               <span>${escapeHtml(game.name)}</span>

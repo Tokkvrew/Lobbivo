@@ -62,6 +62,7 @@ function switchPage(pageId) {
   if (pageId === 'pageSettings') {
     if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
     if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
+    if (typeof renderSettingsCustomization === 'function') renderSettingsCustomization();
   }
 
   // Скролл вверх при смене страницы
@@ -283,9 +284,54 @@ function createParticles(theme) {
       p.innerHTML = '<span class="particle-l-glyph">L</span>';
       frag.appendChild(p);
     }
+  } else if (currentTheme === 'crimson') {
+    // Огненные искры / тлеющие угли
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle particle-ember';
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.animationDuration = `${7 + Math.random() * 10}s`;
+      p.style.animationDelay = `${(Math.random() * 6).toFixed(2)}s`;
+      const size = 3 + Math.random() * 5;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.opacity = `${0.3 + Math.random() * 0.6}`;
+      frag.appendChild(p);
+    }
+  } else if (currentTheme === 'nebula') {
+    // Сияющая космическая звездная пыль
+    const count = 32;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle particle-star';
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.animationDuration = `${10 + Math.random() * 14}s`;
+      p.style.animationDelay = `${(Math.random() * 8).toFixed(2)}s`;
+      const size = 2.5 + Math.random() * 5.5;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.opacity = `${0.25 + Math.random() * 0.55}`;
+      frag.appendChild(p);
+    }
+  } else if (currentTheme === 'matrix') {
+    // Зеленый терминальный кибер-код
+    const glyphs = ['0', '1', '<', '>', '/', '#', '$', 'λ', '⌘', '⚡'];
+    const count = 26;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle particle-matrix';
+      p.style.left = `${Math.random() * 96 + 2}%`;
+      p.style.animationDuration = `${9 + Math.random() * 12}s`;
+      p.style.animationDelay = `${(Math.random() * 8).toFixed(2)}s`;
+      p.style.fontSize = `${(11 + Math.random() * 8).toFixed(0)}px`;
+      p.style.opacity = `${(0.25 + Math.random() * 0.6).toFixed(2)}`;
+      p.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+      frag.appendChild(p);
+    }
   } else {
-    // Дефолтные неоновые частицы-сферы
-    for (let i = 0; i < 20; i++) {
+    // Дефолтные неоновые циановые сферы
+    for (let i = 0; i < 22; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
       p.style.left = `${Math.random() * 100}%`;
@@ -294,7 +340,7 @@ function createParticles(theme) {
       const size = 3 + Math.random() * 5;
       p.style.width = `${size}px`;
       p.style.height = `${size}px`;
-      p.style.opacity = `${0.1 + Math.random() * 0.25}`;
+      p.style.opacity = `${0.12 + Math.random() * 0.28}`;
       frag.appendChild(p);
     }
   }
@@ -341,21 +387,219 @@ function closeCoinModal() {
 
 function switchCoinTab(tab = 'earn') {
   const tabEarnBtn = document.getElementById('tabCoinEarnBtn');
+  const tabShopBtn = document.getElementById('tabCoinShopBtn');
   const tabBuyBtn = document.getElementById('tabCoinBuyBtn');
   const earnContent = document.getElementById('coinEarnContent');
+  const shopContent = document.getElementById('coinShopContent');
   const buyContent = document.getElementById('coinBuyContent');
 
-  if (tab === 'buy') {
-    if (tabEarnBtn) tabEarnBtn.classList.remove('active');
-    if (tabBuyBtn) tabBuyBtn.classList.add('active');
-    if (earnContent) earnContent.style.display = 'none';
+  [tabEarnBtn, tabShopBtn, tabBuyBtn].forEach(b => b?.classList.remove('active'));
+  if (earnContent) earnContent.style.display = 'none';
+  if (shopContent) shopContent.style.display = 'none';
+  if (buyContent) buyContent.style.display = 'none';
+
+  if (tab === 'shop') {
+    tabShopBtn?.classList.add('active');
+    if (shopContent) {
+      shopContent.style.display = 'block';
+      renderShopItems();
+    }
+  } else if (tab === 'buy') {
+    tabBuyBtn?.classList.add('active');
     if (buyContent) buyContent.style.display = 'block';
   } else {
-    if (tabEarnBtn) tabEarnBtn.classList.add('active');
-    if (tabBuyBtn) tabBuyBtn.classList.remove('active');
+    tabEarnBtn?.classList.add('active');
     if (earnContent) earnContent.style.display = 'block';
-    if (buyContent) buyContent.style.display = 'none';
   }
+}
+
+function renderShopItems() {
+  const current = AppState.currentUser;
+  const user = current ? AppState.users[current] : null;
+  const isPremium = current ? isUserPremium(current) : false;
+  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], boosts: 0 };
+  const hasVipBoost = current ? isSquadVipBoosted(current) : false;
+
+  // 1. Статус Premium
+  const statusEl = document.getElementById('shopPremiumStatusText');
+  const statusBox = document.getElementById('shopPremiumStatusIndicator');
+  if (statusEl && statusBox) {
+    if (isPremium) {
+      statusBox.className = 'shop-premium-status-indicator active';
+      if (user.premiumUntil && Number(user.premiumUntil) > Date.now()) {
+        const remainingDays = Math.ceil((Number(user.premiumUntil) - Date.now()) / (24 * 60 * 60 * 1000));
+        statusEl.textContent = `Активен (${remainingDays} дн.)`;
+      } else {
+        statusEl.textContent = 'Активен (LIFETIME)';
+      }
+    } else {
+      statusBox.className = 'shop-premium-status-indicator';
+      statusEl.textContent = 'Не активен';
+    }
+  }
+
+  // Обновление кнопок тарифов Premium
+  document.querySelectorAll('.btn-buy-premium').forEach(btn => {
+    if (isPremium && user?.isPremium === true && !user?.premiumUntil) {
+      btn.disabled = true;
+      btn.className = 'btn-buy-shop-item btn-buy-premium bought-disabled';
+      btn.innerHTML = '<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-check-circle"/></svg><span>Куплено навсегда</span>';
+    } else {
+      btn.disabled = false;
+      const plan = btn.closest('.premium-plan-card')?.dataset.plan;
+      btn.textContent = plan === '9999' ? 'Навсегда' : (plan === '30' ? 'Выбрать' : 'Купить');
+    }
+  });
+
+  // 2. Рамки: аватарки превью и кнопки
+  const frameIds = ['fire', 'cyber', 'gold', 'ice', 'ghost'];
+  frameIds.forEach(id => {
+    const previewEl = document.getElementById(`framePreview_${id}`);
+    if (previewEl) {
+      if (user && user.avatar) {
+        previewEl.innerHTML = `<img src="${user.avatar}" alt="${escapeHtml(current)}">`;
+      } else {
+        const initials = current ? current.slice(0, 2).toUpperCase() : 'VIP';
+        previewEl.innerHTML = `<span>${initials}</span>`;
+      }
+    }
+
+    const btn = document.querySelector(`.btn-frame-action[data-frame-id="${id}"]`);
+    if (btn) {
+      const isOwned = inventory.frames.includes(id);
+
+      if (isOwned) {
+        btn.className = 'btn-shop-action btn-frame-action bought-disabled';
+        btn.disabled = true;
+        btn.innerHTML = '<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-check-circle"/></svg><span>Куплено</span>';
+        btn.onclick = null;
+      } else {
+        btn.disabled = false;
+        btn.className = 'btn-shop-action btn-frame-action';
+        const cost = parseInt(btn.dataset.cost, 10) || 120;
+        const discountCost = isPremium ? Math.round(cost * 0.9) : cost;
+        btn.textContent = isPremium ? `Купить (${discountCost} LC -10%)` : `Купить (${cost} LC)`;
+        btn.onclick = () => buyShopItem('frame', id, cost);
+      }
+    }
+  });
+
+  // 3. VIP-Буст анкеты
+  const boostBtn = document.getElementById('btnBuySquadBoost');
+  if (boostBtn) {
+    if (hasVipBoost && user.vipBoostUntil) {
+      const remainingHours = Math.max(1, Math.ceil((Number(user.vipBoostUntil) - Date.now()) / (60 * 60 * 1000)));
+      boostBtn.className = 'btn-shop-action btn-buy-boost active';
+      boostBtn.textContent = `Закреп активен (ещё ${remainingHours} ч.)`;
+      boostBtn.onclick = () => showNotification('VIP-Закреп', `Ваша анкета закреплена в мировом чате ещё ${remainingHours} ч.`);
+    } else {
+      const cost = isPremium ? 81 : 90;
+      boostBtn.className = 'btn-shop-action btn-buy-boost';
+      boostBtn.textContent = isPremium ? `Закрепить анкету (${cost} LC -10%)` : `Закрепить анкету (${cost} LC)`;
+      boostBtn.onclick = () => buyShopItem('boost', 'vip_squad', 90);
+    }
+  }
+
+  // 4. Темы оформления
+  const themeIds = ['nebula', 'crimson', 'matrix'];
+  themeIds.forEach(id => {
+    const btn = document.querySelector(`.btn-theme-action[data-theme-id="${id}"]`);
+    if (btn) {
+      const isOwned = inventory.themes.includes(id);
+
+      if (isOwned) {
+        btn.className = 'btn-shop-action btn-theme-action bought-disabled';
+        btn.disabled = true;
+        btn.innerHTML = '<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-check-circle"/></svg><span>Куплено</span>';
+        btn.onclick = null;
+      } else {
+        btn.disabled = false;
+        btn.className = 'btn-shop-action btn-theme-action';
+        const cost = parseInt(btn.dataset.cost, 10) || 80;
+        const discountCost = isPremium ? Math.round(cost * 0.9) : cost;
+        btn.textContent = isPremium ? `Купить (${discountCost} LC -10%)` : `Купить (${cost} LC)`;
+        btn.onclick = () => buyShopItem('theme', id, cost);
+      }
+    }
+  });
+}
+
+function buyShopItem(type, id, baseCost, durationDays = 0) {
+  const current = AppState.currentUser;
+  if (!current || !AppState.users[current]) {
+    showNotification('Требуется вход', 'Войдите или создайте аккаунт, чтобы делать покупки в магазине!');
+    showAuthModal('login');
+    return;
+  }
+
+  const user = AppState.users[current];
+  const isPremium = isUserPremium(current);
+  const cost = (type !== 'premium' && isPremium) ? Math.round(baseCost * 0.9) : baseCost;
+
+  if (typeof user.coins !== 'number') user.coins = 0;
+
+  if (user.coins < cost) {
+    showNotification('Недостаточно LC', `Для покупки требуется ${cost} LC. На вашем балансе: ${user.coins} LC.`);
+    switchCoinTab('buy');
+    return;
+  }
+
+  // Списание монет
+  user.coins -= cost;
+
+  if (type === 'premium') {
+    if (durationDays >= 9999) {
+      user.isPremium = true;
+      user.premiumUntil = null;
+    } else {
+      const currentUntil = (user.premiumUntil && Number(user.premiumUntil) > Date.now()) ? Number(user.premiumUntil) : Date.now();
+      user.premiumUntil = currentUntil + (durationDays * 24 * 60 * 60 * 1000);
+      user.isPremium = true;
+    }
+    showNotification('Поздравляем с Premium!', 'Вам открыты GIF-аватарки, значок короны, неоновый ник и приоритет в поиске!');
+  } else if (type === 'frame') {
+    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], boosts: 0 };
+    if (!Array.isArray(user.inventory.frames)) user.inventory.frames = [];
+    if (!user.inventory.frames.includes(id)) {
+      user.inventory.frames.push(id);
+    }
+    showNotification('Рамка куплена!', 'Новая рамка добавлена в раздел «Кастомизация» в Настройках вашего профиля.');
+  } else if (type === 'boost') {
+    const now = Date.now();
+    const currentUntil = (user.vipBoostUntil && Number(user.vipBoostUntil) > now) ? Number(user.vipBoostUntil) : now;
+    user.vipBoostUntil = currentUntil + (24 * 60 * 60 * 1000);
+    user.lookingForTeam = true;
+    user.hasCreatedSquad = true;
+    showNotification('VIP-Закреп активирован!', 'Ваша анкета закреплена в шапке мирового чата на 24 часа!');
+  } else if (type === 'theme') {
+    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], boosts: 0 };
+    if (!Array.isArray(user.inventory.themes)) user.inventory.themes = [];
+    if (!user.inventory.themes.includes(id)) {
+      user.inventory.themes.push(id);
+    }
+    showNotification('Тема куплена!', 'Новая тема добавлена в раздел «Кастомизация» в Настройках вашего профиля.');
+  }
+
+  saveUsers(current);
+  renderCoinModal();
+  renderShopItems();
+  if (typeof renderSettingsCustomization === 'function') renderSettingsCustomization();
+  if (typeof renderWorldChat === 'function') renderWorldChat();
+  if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
+  if (typeof updateUI === 'function') updateUI();
+
+  // Звуковой эффект
+  if (typeof playNotificationSound === 'function') {
+    playNotificationSound();
+  }
+}
+
+// ============================================================
+//  КАСТОМИЗАЦИЯ ПРОФИЛЯ (ГАРДЕРОБ РАМОК И ТЕМ)
+// ============================================================
+
+function openShopForCustomization(tab = 'shop') {
+  openCoinModal(tab);
 }
 
 function renderCoinModal() {
@@ -534,11 +778,11 @@ function renderCoinModal() {
   const badgeEl = document.getElementById('coinTasksBadge');
   if (badgeEl) {
     if (availableRewardsCount > 0) {
-      badgeEl.textContent = `🎁 +${availableRewardsCount} забрать!`;
+      badgeEl.textContent = `+${availableRewardsCount}`;
       badgeEl.classList.add('highlight-badge');
     } else {
       const remainingTasks = [isAvatarClaimed, isBioClaimed, isSquadClaimed, isTeammatesClaimed].filter(c => !c).length;
-      badgeEl.textContent = remainingTasks > 0 ? `${remainingTasks} заданий` : 'Все выполнены 🎉';
+      badgeEl.textContent = remainingTasks > 0 ? `${remainingTasks}` : '✓';
       badgeEl.classList.remove('highlight-badge');
     }
   }
@@ -546,7 +790,7 @@ function renderCoinModal() {
 
 function renderGuestCoinTasks() {
   const badgeEl = document.getElementById('coinTasksBadge');
-  if (badgeEl) badgeEl.textContent = '4 задания';
+  if (badgeEl) badgeEl.textContent = '4';
 
   ['taskCardAvatar', 'taskCardBio', 'taskCardSquad', 'taskCardTeammates'].forEach(id => {
     document.getElementById(id)?.classList.remove('claimed', 'ready-to-claim');
@@ -1041,7 +1285,9 @@ function init() {
       } else if (action === 'coins') {
         openCoinModal('earn');
       } else if (action === 'profile') {
-        showProfile();
+        showProfile('overview');
+      } else if (action === 'customization') {
+        showProfile('custom');
       } else if (action === 'login') {
         showAuthModal('login');
       } else if (action === 'register') {
@@ -1380,7 +1626,19 @@ function init() {
 
   // Вкладки Lobbivo Coin Hub
   document.getElementById('tabCoinEarnBtn')?.addEventListener('click', () => switchCoinTab('earn'));
+  document.getElementById('tabCoinShopBtn')?.addEventListener('click', () => switchCoinTab('shop'));
   document.getElementById('tabCoinBuyBtn')?.addEventListener('click', () => switchCoinTab('buy'));
+
+  // Клик по тарифам Premium в магазине
+  document.querySelectorAll('.btn-buy-premium').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const type = this.dataset.type || 'premium';
+      const id = this.dataset.id || 'premium_30';
+      const cost = parseInt(this.dataset.cost, 10) || 450;
+      const duration = parseInt(this.dataset.duration, 10) || 30;
+      buyShopItem(type, id, cost, duration);
+    });
+  });
 
   // Делегирование клика по кнопкам заданий
   document.getElementById('coinTasksList')?.addEventListener('click', (e) => {

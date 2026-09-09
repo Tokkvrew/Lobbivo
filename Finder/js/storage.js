@@ -30,9 +30,23 @@ function debounce(func, wait = 150) {
 // Оптимизация и сжатие аватара через Canvas (макс. 256x256, JPEG 0.85)
 function compressImage(file, maxSize = 256, quality = 0.85) {
   return new Promise((resolve, reject) => {
-    if (!file || !file.type.startsWith('image/')) {
+    if (!file || (!file.type.startsWith('image/') && !file.name?.toLowerCase().endsWith('.gif'))) {
       return reject(new Error('Выбранный файл не является изображением'));
     }
+
+    const isGif = file.type === 'image/gif' || (file.name && file.name.toLowerCase().endsWith('.gif'));
+    if (isGif) {
+      // GIF аватарка: сохраняем кадры анимации напрямую без сжатия через Canvas
+      if (file.size > 3.5 * 1024 * 1024) {
+        return reject(new Error('Размер GIF-аватарки не должен превышать 3.5 МБ'));
+      }
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Не удалось прочитать GIF файл'));
+      reader.onload = (e) => resolve(e.target.result);
+      reader.readAsDataURL(file);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
     reader.onload = function(e) {
@@ -82,8 +96,49 @@ const AppState = {
   gameSearchQuery: '',
   selectedGameFilter: 'all',
   activeReply: null, // { id, author, text, chatType }
-  typingUsers: { world: {}, direct: {} } // Хранилище статуса набора текста
+  typingUsers: { world: {}, direct: {} }, // Хранилище статуса набора текста
+  vipSquad: null // Активная VIP-анкета
 };
+
+// Проверка активности подписки Lobbivo Premium
+function isUserPremium(username) {
+  if (!username) return false;
+  const user = AppState.users[username];
+  if (!user) return false;
+  if (user.isPremium === true) return true;
+  if (user.premiumUntil && Number(user.premiumUntil) > Date.now()) return true;
+  return false;
+}
+
+// Получение надетой рамки профиля
+function getUserEquippedFrame(username) {
+  if (!username) return 'none';
+  const user = AppState.users[username];
+  if (!user || !user.equippedFrame) return 'none';
+  return user.equippedFrame;
+}
+
+// Получение инвентаря пользователя
+function getUserInventory(username) {
+  if (!username) return { frames: [], themes: [], boosts: 0 };
+  const user = AppState.users[username];
+  if (!user) return { frames: [], themes: [], boosts: 0 };
+  if (!user.inventory || typeof user.inventory !== 'object') {
+    user.inventory = { frames: [], themes: [], boosts: 0 };
+  }
+  if (!Array.isArray(user.inventory.frames)) user.inventory.frames = [];
+  if (!Array.isArray(user.inventory.themes)) user.inventory.themes = [];
+  return user.inventory;
+}
+
+// Проверка активности VIP-буста анкеты
+function isSquadVipBoosted(username) {
+  if (!username) return false;
+  const user = AppState.users[username];
+  if (!user) return false;
+  if (user.vipBoostUntil && Number(user.vipBoostUntil) > Date.now()) return true;
+  return false;
+}
 
 // Проверка онлайн-статуса пользователя
 function isUserOnline(username) {
@@ -358,6 +413,13 @@ function loadUsers() {
     if (typeof u.hasCreatedSquad !== 'boolean') {
       u.hasCreatedSquad = Boolean(u.lookingForTeam);
     }
+    if (typeof u.isPremium !== 'boolean') u.isPremium = false;
+    if (typeof u.equippedFrame !== 'string') u.equippedFrame = 'none';
+    if (!u.inventory || typeof u.inventory !== 'object') {
+      u.inventory = { frames: [], themes: [], boosts: 0 };
+    }
+    if (!Array.isArray(u.inventory.frames)) u.inventory.frames = [];
+    if (!Array.isArray(u.inventory.themes)) u.inventory.themes = [];
   }
 
   saveUsers();
@@ -747,8 +809,9 @@ function saveComplaints() {
 // Тема оформления
 function loadTheme() {
   const saved = localStorage.getItem('squad_theme');
-  if (saved === 'lobbivo' || saved === 'finder') {
-    AppState.currentTheme = 'lobbivo';
+  const validThemes = ['default', 'lobbivo', 'finder', 'nebula', 'crimson', 'matrix'];
+  if (saved && validThemes.includes(saved)) {
+    AppState.currentTheme = (saved === 'finder') ? 'lobbivo' : saved;
   } else {
     AppState.currentTheme = 'default';
   }
@@ -756,9 +819,18 @@ function loadTheme() {
 }
 
 function saveTheme(theme) {
-  AppState.currentTheme = theme;
-  localStorage.setItem('squad_theme', theme);
-  applyTheme(theme);
+  const currentTheme = theme || 'default';
+  AppState.currentTheme = currentTheme;
+  localStorage.setItem('squad_theme', currentTheme);
+
+  // Сохраняем тему в профиль пользователя, если авторизован
+  const current = AppState.currentUser;
+  if (current && AppState.users[current]) {
+    AppState.users[current].theme = currentTheme;
+    if (typeof saveUsers === 'function') saveUsers(current);
+  }
+
+  applyTheme(currentTheme);
 }
 
 function applyTheme(theme) {
@@ -771,12 +843,17 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', currentTheme);
   }
 
-  document.querySelectorAll('.theme-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.theme === currentTheme);
+  // Обновляем активные классы на карточках тем
+  document.querySelectorAll('.theme-card, .settings-theme-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.theme === currentTheme || c.dataset.themeId === currentTheme);
   });
 
   if (typeof createParticles === 'function') {
     createParticles(currentTheme);
+  }
+
+  if (typeof renderSettingsCustomization === 'function') {
+    renderSettingsCustomization();
   }
 }
 

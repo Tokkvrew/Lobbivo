@@ -638,6 +638,17 @@
   margin-bottom: 24px;
 }
 
+/* ============================================================
+   ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ И КАСТОМИЗАЦИЯ (PROFILE DASHBOARD & CUSTOM)
+   ============================================================ */
+
+.profile-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+/* 1. ГЛАВНАЯ ПАНЕЛЬ ПРОФИЛЯ (GAMER HERO BANNER) */
 .profile-hero-card {
   position: relative;
   background: rgba(10, 18, 36, 0.78);
@@ -645,10 +656,10 @@
   -webkit-backdrop-filter: blur(36px) saturate(200%);
   border: 1px solid rgba(0, 212, 255, 0.32);
   border-radius: 24px;
-  padding: 34px 30px;
+  padding: 28px 28px 20px;
   box-shadow: 0 28px 75px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 212, 255, 0.15), inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
   overflow: hidden;
-  transition: all 0.3s ease;
+  margin-bottom: 24px;
 }
 
 .profile-card-glow-bg {
@@ -663,13 +674,13 @@
   pointer-events: none;
 }
 
-.profile-header {
+.profile-hero-top {
   display: flex;
   align-items: center;
-  gap: 24px;
-  margin-bottom: 26px;
+  gap: 22px;
   padding-bottom: 22px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
 }
 
 .profile-avatar-wrapper {
@@ -677,13 +688,23 @@
   flex-shrink: 0;
 }
 
+.profile-avatar-wrapper .avatar-frame-wrap {
+  width: 92px;
+  height: 92px;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
 .profile-avatar {
-  width: 88px;
-  height: 88px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(0, 212, 255, 0.25) 0%, rgba(121, 40, 202, 0.35) 60%, rgba(10, 16, 28, 0.9) 100%);
   backdrop-filter: blur(16px);
-  border: 2px solid rgba(0, 212, 255, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -693,80 +714,72 @@
   color: #00f0ff;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.profile-avatar:hover {
-  border-color: #00f0ff;
-  box-shadow: 0 0 38px rgba(0, 212, 255, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8);
-  transform: scale(1.03);
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .profile-avatar img {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
+  display: block;
 }
 
-.online-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00ff88;
-  box-shadow: 0 0 6px #00ff88;
-}
-
-.online-dot.offline {
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: none;
-}
-
-.profile-avatar .online-dot {
+.profile-avatar-wrapper .online-dot {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 16px;
-  height: 16px;
+  bottom: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #00ff88;
-  border: 2.5px solid rgba(10, 18, 36, 0.95);
+  border: 3px solid rgba(10, 18, 36, 0.95);
   box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+  z-index: 3;
 }
 
-.avatar-edit-btn {
+.avatar-edit-badge {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(4, 9, 20, 0.88);
-  backdrop-filter: blur(8px);
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(4, 9, 20, 0.92);
+  border: 1px solid rgba(0, 212, 255, 0.45);
+  border-radius: 12px;
   color: #00d4ff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-align: center;
-  padding: 5px 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  border-top: 1px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  z-index: 4;
+  transition: all 0.2s ease;
 }
 
-.profile-avatar:hover .avatar-edit-btn {
-  opacity: 1;
+.avatar-edit-badge svg {
+  width: 11px;
+  height: 11px;
 }
 
-.profile-header-info {
+.avatar-edit-badge:hover {
+  background: var(--neon-blue);
+  color: #050b14;
+  border-color: var(--neon-blue);
+  transform: translateX(-50%) scale(1.05);
+}
+
+.profile-hero-details {
   flex: 1;
-  min-width: 0;
+  min-width: 220px;
 }
 
 .profile-name-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -794,8 +807,8 @@
 .profile-tags-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 10px;
   flex-wrap: wrap;
 }
 
@@ -807,7 +820,7 @@
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85);
 }
@@ -818,12 +831,10 @@
   color: #00f0ff;
 }
 
-.profile-tag-pill.game-tag svg {
-  width: 15px;
-  height: 15px;
-  stroke: currentColor;
-  fill: currentColor;
-  fill-opacity: 0.2;
+.profile-tag-pill.game-tag svg,
+.profile-tag-pill.device-tag svg {
+  width: 14px;
+  height: 14px;
 }
 
 .profile-tag-pill.status-tag {
@@ -832,150 +843,550 @@
   color: #00ff88;
 }
 
-.online-pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00ff88;
-  box-shadow: 0 0 8px #00ff88;
-  display: inline-block;
-}
-
-.profile-tag-pill .member-since {
-  color: rgba(255, 255, 255, 0.45);
-  font-weight: 400;
-  font-size: 0.78rem;
-  margin-left: 2px;
-}
-
-/* Сетка карточек с информацией */
-.profile-info-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-
-.profile-info-block {
-  background: rgba(5, 12, 26, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.profile-hero-coins-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  background: rgba(0, 212, 255, 0.06);
+  border: 1px solid rgba(0, 212, 255, 0.25);
   border-radius: 14px;
-  padding: 16px 20px;
+  padding: 10px 16px;
+  backdrop-filter: blur(10px);
+}
+
+.hero-coins-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+}
+
+.hero-coins-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffd700;
+  cursor: pointer;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+.hero-coins-val svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-hero-coin-buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00d4ff, #0077ff);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn-hero-coin-buy:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.6);
+}
+
+.btn-hero-coin-buy svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* 2. НАВИГАЦИОННЫЕ ВКЛАДКИ ПРОФИЛЯ */
+.profile-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  border-radius: 14px;
+  background: rgba(4, 9, 20, 0.6);
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.profile-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  position: relative;
+}
+
+.profile-tab-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.profile-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.profile-tab-btn.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.22) 0%, rgba(121, 40, 202, 0.26) 100%);
+  border-color: rgba(0, 212, 255, 0.5);
+  color: #00f0ff;
+  box-shadow: 0 4px 18px rgba(0, 212, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.tab-hot-badge {
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ff007f, #b44dff);
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+/* 3. КОНТЕНТ ВКЛАДОК */
+.profile-tab-content {
+  display: none;
+  animation: fadeIn 0.28s ease;
+}
+
+.profile-tab-content.active {
+  display: block;
+}
+
+/* 4. ВКЛАДКА 1: ОБЗОР АНКЕТЫ */
+.profile-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-glass-card {
+  background: rgba(10, 18, 36, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 20px 22px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
   transition: all 0.25s ease;
 }
 
-.profile-info-block:hover {
-  border-color: rgba(0, 212, 255, 0.3);
-  background: rgba(7, 16, 34, 0.65);
+.profile-glass-card:hover {
+  border-color: rgba(0, 212, 255, 0.35);
+  transform: translateY(-2px);
 }
 
-.profile-info-block .block-label {
+.profile-glass-card.full-span {
+  grid-column: 1 / -1;
+}
+
+.card-glass-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.75rem;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-glass-header .header-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--neon-cyan);
+}
+
+.card-glass-header h3 {
+  font-size: 1.05rem;
   font-weight: 800;
-  text-transform: uppercase;
-  color: var(--neon-blue);
-  letter-spacing: 0.6px;
-  margin-bottom: 8px;
-}
-
-.profile-info-block .block-label svg {
-  width: 15px;
-  height: 15px;
-  stroke: currentColor;
-  fill: none;
-}
-
-.profile-info-block .block-value {
-  font-size: 0.96rem;
   color: #ffffff;
-  line-height: 1.5;
-  font-weight: 500;
+  margin: 0;
 }
 
-.profile-info-block .block-value.desc-value {
-  font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.85);
+.overview-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.profile-info-block .block-value .empty {
+.overview-stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+.stat-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.stat-val.highlight {
+  color: #00f0ff;
+  font-weight: 800;
+}
+
+.badge-pill-on {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  color: #00ff88;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.badge-pill-off {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.desc-text-clean {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.desc-box .empty,
+.profile-desc-box .empty {
   color: rgba(255, 255, 255, 0.4);
   font-style: italic;
   font-size: 0.88rem;
 }
 
-.device-pill-view {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #00f0ff;
-  font-weight: 700;
+.premium-showcase-card {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(20, 15, 30, 0.85) 100%) !important;
+  border-color: rgba(255, 215, 0, 0.35) !important;
 }
 
-/* Кнопка открытия редактора профиля */
-.btn-edit-profile-toggle {
-  width: 100%;
+.premium-showcase-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.premium-showcase-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffd700, #ff8800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.premium-showcase-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.premium-showcase-text {
+  flex: 1;
+}
+
+.premium-showcase-text h4 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.premium-showcase-text p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.btn-upgrade-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ffd700, #ff8800);
+  color: #070709;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-upgrade-premium svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-upgrade-premium:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.overview-bottom-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.btn-cyber-gradient {
+  flex: 1;
+  min-width: 180px;
   padding: 12px 20px;
-  background: rgba(0, 212, 255, 0.14);
+  background: linear-gradient(135deg, #00d4ff 0%, #0070f3 60%, #7928ca 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 112, 243, 0.35);
+  transition: all 0.25s ease;
+}
+
+.btn-cyber-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 112, 243, 0.55), 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+.btn-outline-cyan {
+  padding: 12px 20px;
+  background: rgba(0, 212, 255, 0.1);
   border: 1px solid rgba(0, 212, 255, 0.45);
   border-radius: 12px;
   color: #00f0ff;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-outline-cyan:hover {
+  background: rgba(0, 212, 255, 0.22);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+/* 5. ВКЛАДКА 2: КАСТОМИЗАЦИЯ И ГАРДЕРОБ */
+.custom-avatar-stage-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12) 0%, rgba(121, 40, 202, 0.15) 50%, rgba(8, 14, 28, 0.95) 100%);
+  border: 1.5px solid rgba(0, 212, 255, 0.4);
+  border-radius: 20px;
+  padding: 24px 28px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 212, 255, 0.15);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.stage-card-glow {
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
+  filter: blur(25px);
+  pointer-events: none;
+}
+
+.stage-avatar-display {
+  flex-shrink: 0;
+}
+
+.stage-avatar-display .avatar-frame-wrap {
+  width: 96px;
+  height: 96px;
+  padding: 4px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.25);
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-sizing: border-box;
 }
 
-.btn-edit-profile-toggle:hover {
-  background: rgba(0, 212, 255, 0.25);
-  border-color: #00f0ff;
+.stage-avatar-circle {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d4ff, #b44dff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 900;
+  font-family: 'Orbitron', sans-serif;
   color: #ffffff;
-  box-shadow: 0 6px 28px rgba(0, 212, 255, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
+  overflow: hidden;
 }
 
-.btn-edit-profile-toggle.active {
-  background: rgba(255, 70, 85, 0.16);
-  border-color: rgba(255, 70, 85, 0.5);
-  color: #ff4655;
-  box-shadow: 0 4px 20px rgba(255, 70, 85, 0.2);
-}
-
-.btn-edit-profile-toggle.active:hover {
-  background: rgba(255, 70, 85, 0.28);
-  border-color: #ff4655;
-  color: #ffffff;
-}
-
-/* Форма редактирования настроек */
-.profile-edit-form {
-  display: none;
-  margin-top: 26px;
-  padding-top: 26px;
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-  animation: modalSlide 0.3s ease;
-}
-
-.profile-edit-form.open {
+.stage-avatar-circle img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
   display: block;
 }
 
-.edit-form-header {
-  margin-bottom: 20px;
+.stage-info {
+  flex: 1;
 }
 
-.edit-form-title {
+.stage-title-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--neon-cyan);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.stage-frame-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.stage-hint {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.4;
+}
+
+/* ============================================================
+   ЕДИНЫЕ СЕКЦИИ ПРОФИЛЯ (UNIFIED PROFILE SECTIONS)
+   ============================================================ */
+
+.profile-unified-section {
+  background: rgba(10, 16, 32, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  margin-bottom: 24px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-unified-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.6) 0%, rgba(180, 77, 255, 0.6) 50%, rgba(255, 68, 204, 0) 100%);
+}
+
+.unified-section-header {
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.unified-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.unified-section-title svg {
+  width: 22px;
+  height: 22px;
+  color: var(--neon-cyan);
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.5));
+}
+
+.unified-section-sub {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+.custom-wardrobe-block {
+  margin-bottom: 28px;
+}
+
+.wardrobe-header {
+  margin-bottom: 14px;
+}
+
+.wardrobe-title {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -985,81 +1396,366 @@
   color: #ffffff;
 }
 
-.edit-form-title svg {
+.wardrobe-title svg {
   width: 18px;
   height: 18px;
-  stroke: var(--neon-blue);
-  fill: none;
+  color: var(--neon-cyan);
 }
 
-.edit-form-sub {
-  font-size: 0.82rem;
+.wardrobe-sub {
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.55);
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
-/* Кастомная кнопка загрузки файла */
-.custom-file-upload {
-  position: relative;
-  width: 100%;
+.custom-frames-grid,
+.custom-themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
 }
 
-.file-input-hidden {
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  z-index: 2;
+.custom-frame-card,
+.custom-theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(10, 18, 36, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 18px 14px;
+  backdrop-filter: blur(14px);
+  transition: all 0.22s ease;
 }
 
-.file-upload-btn {
+.custom-frame-card:hover,
+.custom-theme-card:hover {
+  border-color: rgba(0, 212, 255, 0.4);
+  background: rgba(12, 22, 44, 0.85);
+  transform: translateY(-2px);
+}
+
+.custom-frame-card.active,
+.custom-theme-card.active {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 212, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.frame-preview-box {
+  margin-bottom: 12px;
+}
+
+.frame-preview-box .avatar-frame-wrap {
+  width: 68px;
+  height: 68px;
+  padding: 3px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  background: rgba(6, 12, 26, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1.5px dashed rgba(0, 212, 255, 0.45);
-  border-radius: 12px;
-  padding: 14px 20px;
-  color: #00d4ff;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-align: center;
-  user-select: none;
+  box-sizing: border-box;
 }
 
-.file-upload-btn:hover {
-  background: rgba(10, 22, 46, 0.85);
-  border-color: #00f0ff;
+.frame-preview-box .frame-preview-avatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d4ff, #b44dff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.3rem;
   color: #ffffff;
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  overflow: hidden;
 }
 
-.file-upload-btn svg {
+.frame-preview-box .frame-preview-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.frame-card-info,
+.theme-card-info {
+  margin-bottom: 14px;
+  flex: 1;
+}
+
+.frame-name,
+.theme-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.frame-desc,
+.theme-desc {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.3;
+}
+
+.theme-palette-preview {
+  width: 72px;
+  height: 48px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.theme-default-preview {
+  background: linear-gradient(135deg, #00d4ff 0%, #0077ff 50%, #040914 100%);
+}
+
+.theme-lobbivo-preview {
+  background: linear-gradient(135deg, #7928ca 0%, #b44dff 50%, #060b18 100%);
+}
+
+.preview-l-glyph {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 10px #b44dff;
+}
+
+.theme-nebula-preview {
+  background: linear-gradient(135deg, #2b0938 0%, #7b2cbf 50%, #00f0ff 100%);
+}
+
+.theme-crimson-preview {
+  background: linear-gradient(135deg, #40050b 0%, #ff1a00 50%, #ff8800 100%);
+}
+
+.theme-matrix-preview {
+  background: linear-gradient(135deg, #031c0d 0%, #00ff88 50%, #003816 100%);
+}
+
+.btn-custom-action {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-custom-action.btn-equip {
+  background: rgba(0, 212, 255, 0.18);
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  color: #00f0ff;
+}
+
+.btn-custom-action.btn-equip:hover {
+  background: var(--neon-cyan);
+  color: #040914;
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.5);
+}
+
+.btn-custom-action.btn-active {
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid rgba(0, 255, 136, 0.5);
+  color: #00ff88;
+  cursor: default;
+}
+
+.btn-custom-action.btn-buy-link {
+  background: rgba(255, 215, 0, 0.12);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+}
+
+.btn-custom-action.btn-buy-link:hover {
+  background: linear-gradient(135deg, #ffd700, #ff8800);
+  color: #070709;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.5);
+}
+
+.btn-custom-action svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 6. ВКЛАДКА 3: РЕДАКТИРОВАНИЕ ПРОФИЛЯ */
+.profile-edit-container-clean {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edit-clean-card {
+  background: rgba(10, 18, 36, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+}
+
+.edit-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-card-title svg {
   width: 18px;
   height: 18px;
-  stroke: currentColor;
-  fill: none;
+  color: var(--neon-cyan);
 }
 
-/* Кнопки в форме сохранения */
-.profile-buttons {
+.edit-avatar-upload-row {
   display: flex;
-  gap: 10px;
-  margin-top: 24px;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.edit-avatar-preview-box {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.edit-avatar-preview-box .avatar-frame-wrap {
+  width: 76px;
+  height: 76px;
+  padding: 3px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.edit-avatar-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.25) 0%, rgba(121, 40, 202, 0.35) 60%, rgba(10, 16, 28, 0.9) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 900;
+  font-family: 'Orbitron', sans-serif;
+  color: #00f0ff;
+  overflow: hidden;
+}
+
+.edit-avatar-circle img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.edit-avatar-upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: rgba(4, 9, 20, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #00f0ff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.edit-avatar-preview-box:hover .edit-avatar-upload-overlay {
+  opacity: 1;
+}
+
+.edit-avatar-upload-overlay svg {
+  width: 14px;
+  height: 14px;
+}
+
+.edit-avatar-upload-info {
+  flex: 1;
+}
+
+.upload-info-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 3px;
+}
+
+.upload-info-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.premium-feature-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.premium-feature-tag svg {
+  width: 12px;
+  height: 12px;
+}
+
+.edit-field-spaced {
+  margin-top: 14px;
+}
+
+.edit-clean-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
   flex-wrap: wrap;
 }
 
-.btn-save-profile {
+.btn-save-clean {
   flex: 1;
-  min-width: 140px;
-  padding: 12px 20px;
+  min-width: 180px;
+  padding: 13px 24px;
   background: linear-gradient(135deg, #00d4ff 0%, #0070f3 60%, #7928ca 100%);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 12px;
@@ -1070,7 +1766,7 @@
   letter-spacing: 0.6px;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 112, 243, 0.4), 0 0 16px rgba(0, 212, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 112, 243, 0.4), 0 0 16px rgba(0, 212, 255, 0.3);
   transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
@@ -1078,26 +1774,73 @@
   gap: 8px;
 }
 
-.btn-save-profile:hover {
+.btn-save-clean:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px rgba(0, 112, 243, 0.55), 0 0 24px rgba(0, 212, 255, 0.5);
 }
 
-.btn-danger-glass {
-  padding: 12px 18px;
-  background: rgba(255, 46, 85, 0.12);
-  border: 1px solid rgba(255, 46, 85, 0.45);
-  border-radius: 12px;
-  color: #ff4655;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
+.btn-save-clean svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 7. КАРТОЧКА ССЫЛКИ В НАСТРОЙКАХ */
+.settings-custom-link-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12) 0%, rgba(121, 40, 202, 0.15) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 18px;
+  padding: 18px 22px;
   cursor: pointer;
+  margin-bottom: 24px;
   transition: all 0.25s ease;
-  display: inline-flex;
+}
+
+.settings-custom-link-card:hover {
+  border-color: var(--neon-cyan);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(121, 40, 202, 0.22) 100%);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.link-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.link-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(0, 212, 255, 0.15);
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  color: var(--neon-cyan);
+  flex-shrink: 0;
+}
+
+.link-card-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.link-card-text h4 {
+  margin: 0 0 3px;
+  font-size: 1rem;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.link-card-text p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .btn-danger-glass:hover {
@@ -5430,44 +6173,48 @@ select:-webkit-autofill {
 }
 
 /* СЕГМЕНТИРОВАННЫЕ ВКЛАДКИ */
+/* СЕГМЕНТИРОВАННЫЕ ВКЛАДКИ (3 В 1 СТРОКУ) */
 .coin-modal-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
   padding: 4px;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  margin-bottom: 20px;
+  border-radius: 14px;
+  margin-bottom: 18px;
 }
 
 .coin-tab-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 42px;
-  border-radius: 12px;
+  gap: 6px;
+  height: 38px;
+  padding: 0 6px;
+  border-radius: 10px;
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.22s ease;
+  transition: all 0.2s ease;
   outline: none;
+  white-space: nowrap;
 }
 
 .coin-tab-btn svg {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   stroke: currentColor;
+  flex-shrink: 0;
 }
 
 .coin-tab-btn:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .coin-tab-btn.active {
@@ -5478,19 +6225,20 @@ select:-webkit-autofill {
 }
 
 .coin-tab-badge {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
   transition: all 0.2s ease;
+  line-height: 1;
 }
 
 .coin-tab-badge.highlight-badge {
   background: #ffd700;
   color: #000;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
   animation: coinPulse 2s infinite ease-in-out;
 }
 
@@ -6719,4 +7467,1204 @@ select:-webkit-autofill {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+/* ============================================================
+   LOBBIVO SHOP & PREMIUM & AVATAR FRAMES SYSTEM
+   ============================================================ */
+
+/* Кнопка вкладки Магазин (горячий бейдж) */
+.shop-hot-badge {
+  background: linear-gradient(135deg, #ff3366, #ff9900) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  animation: pulseRedGlow 2s infinite;
+}
+
+/* Стили секций магазина */
+.shop-section {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.shop-section-premium {
+  background: linear-gradient(145deg, rgba(255, 190, 30, 0.08) 0%, rgba(20, 15, 30, 0.7) 100%);
+  border: 1px solid rgba(255, 200, 50, 0.3);
+  box-shadow: 0 8px 32px rgba(255, 180, 0, 0.1);
+}
+
+.shop-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.shop-header-left {
+  flex: 1;
+}
+
+.shop-category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+.shop-category-badge.premium {
+  background: rgba(255, 190, 30, 0.2);
+  border: 1px solid rgba(255, 200, 50, 0.5);
+  color: #ffcc00;
+}
+
+.shop-category-badge.frames {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+}
+
+.shop-category-badge.boost {
+  background: rgba(255, 80, 0, 0.18);
+  border: 1px solid rgba(255, 100, 0, 0.45);
+  color: #ff7733;
+}
+
+.shop-category-badge.themes {
+  background: rgba(180, 77, 255, 0.18);
+  border: 1px solid rgba(180, 77, 255, 0.45);
+  color: #d880ff;
+}
+
+.shop-category-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.shop-section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.shop-section-sub {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 2px;
+}
+
+.shop-premium-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.shop-premium-status-indicator.active {
+  background: rgba(255, 200, 50, 0.18);
+  border-color: rgba(255, 215, 0, 0.6);
+  color: #ffd700;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.25);
+}
+
+.shop-premium-status-indicator .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.shop-premium-status-indicator.active .status-dot {
+  background: #ffd700;
+  box-shadow: 0 0 8px #ffd700;
+}
+
+/* Сетка преимуществ Premium */
+.premium-perks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.perk-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.perk-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 200, 50, 0.15);
+  border: 1px solid rgba(255, 200, 50, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd700;
+  flex-shrink: 0;
+}
+
+.perk-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.perk-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.perk-info strong {
+  font-size: 0.82rem;
+  color: #ffffff;
+}
+
+.perk-info span {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Тарифные карточки Premium */
+.premium-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.premium-plan-card {
+  position: relative;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.premium-plan-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 200, 50, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.premium-plan-card.featured {
+  background: linear-gradient(180deg, rgba(255, 190, 30, 0.12) 0%, rgba(0, 0, 0, 0.45) 100%);
+  border: 1.5px solid rgba(255, 200, 50, 0.65);
+  box-shadow: 0 0 20px rgba(255, 180, 0, 0.18);
+}
+
+.premium-plan-card.legend {
+  background: linear-gradient(180deg, rgba(180, 77, 255, 0.15) 0%, rgba(0, 0, 0, 0.5) 100%);
+  border: 1.5px solid rgba(180, 77, 255, 0.7);
+  box-shadow: 0 0 24px rgba(180, 77, 255, 0.22);
+}
+
+.plan-tag {
+  position: absolute;
+  top: -10px;
+  background: linear-gradient(135deg, #ff3366, #ff9900);
+  color: #ffffff;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 51, 102, 0.5);
+}
+
+.plan-tag.gold-tag {
+  background: linear-gradient(135deg, #ffd700, #ff8800);
+  color: #070709;
+}
+
+.plan-period {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.plan-coin-l, .shop-coin-l {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd700, #ff8800);
+  color: #070709;
+  font-weight: 900;
+  font-size: 0.7rem;
+}
+
+.plan-price-num {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+.plan-price-cur {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.plan-hint {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+}
+
+.btn-buy-premium {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-buy-premium:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.featured-plan-btn {
+  background: linear-gradient(135deg, #ffd700, #ff8800) !important;
+  color: #070709 !important;
+  border: none !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(255, 180, 0, 0.35);
+}
+
+.featured-plan-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(255, 180, 0, 0.5);
+}
+
+.legend-plan-btn {
+  background: linear-gradient(135deg, #b44dff, #ff3399) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 16px rgba(180, 77, 255, 0.4);
+}
+
+/* ============================================================
+   АНИМИРОВАННЫЕ РАМКИ ДЛЯ АВАТАРОК (AVATAR FRAMES)
+   ============================================================ */
+
+.shop-frames-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.shop-frame-card {
+  padding: 14px 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.shop-frame-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.frame-preview-box {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame-card-info {
+  margin-bottom: 10px;
+}
+
+.frame-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #ffffff;
+}
+
+.frame-desc {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+
+.frame-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffd700;
+  margin-top: 4px;
+}
+
+.btn-shop-action {
+  width: 100%;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-shop-action:hover {
+  background: rgba(0, 240, 255, 0.3);
+  transform: scale(1.02);
+}
+
+.btn-shop-action.owned {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.45);
+  color: #34d399;
+}
+
+.btn-shop-action.owned:hover {
+  background: rgba(52, 211, 153, 0.3);
+}
+
+.btn-shop-action.equipped {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.7);
+  color: #ffd700;
+  cursor: pointer;
+}
+
+/* CSS ОБЁРТКА РАМОК ДЛЯ АВАТАРОК */
+.avatar-frame-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 3px;
+  box-sizing: border-box;
+}
+
+.avatar-frame-wrap img,
+.avatar-frame-wrap > span,
+.avatar-frame-wrap .frame-preview-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame-preview-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d4ff, #b44dff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* 1. РАМКА ОГОНЬ (Flame Fury) */
+.avatar-frame-wrap.frame-fire {
+  background: linear-gradient(135deg, #ff1a00, #ff8800, #ffcc00);
+  animation: flameBorderGlow 1.8s infinite alternate;
+}
+
+/* 2. РАМКА КИБЕРПАНК (Cyber Neon) */
+.avatar-frame-wrap.frame-cyber {
+  background: linear-gradient(135deg, #00f0ff, #ff007f, #00f0ff);
+  animation: cyberNeonPulse 2s infinite alternate;
+}
+
+/* 3. РАМКА ЗОЛОТО (Imperial Gold) */
+.avatar-frame-wrap.frame-gold {
+  background: linear-gradient(135deg, #ffd700, #ffae00, #fff275, #ffae00);
+  animation: goldImperialGleam 2.2s infinite alternate;
+}
+
+/* 4. РАМКА ЛЕД (Glacier Ice) */
+.avatar-frame-wrap.frame-ice {
+  background: linear-gradient(135deg, #a0f0ff, #00b4d8, #caf0f8);
+  animation: glacierIcePulse 2s infinite alternate;
+}
+
+/* 5. РАМКА ПРИЗРАК (Ghost Void) */
+.avatar-frame-wrap.frame-ghost {
+  background: linear-gradient(135deg, #9d4edd, #7b2cbf, #c77dff);
+  animation: ghostVoidMist 2.4s infinite alternate;
+}
+
+/* ПРЕМИУМ КОРОНА И ГРАДИЕНТНЫЙ НИК */
+.premium-crown-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  color: #ffd700;
+  margin-left: 3px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+}
+
+.premium-crown-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.premium-author {
+  background: linear-gradient(90deg, #ffd700, #ff9900, #ff3399, #00d4ff, #ffd700) !important;
+  background-size: 300% 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: rainbowAuthorShimmer 4s linear infinite !important;
+  font-weight: 800 !important;
+}
+
+/* ============================================================
+   VIP ПИН-БАННЕР АНКЕТЫ В МИРОВОМ ЧАТЕ (VIP SQUAD PINNED BAR)
+   ============================================================ */
+
+.vip-squad-pinned-bar {
+  margin: 6px 10px 10px;
+  animation: msgAppear 0.28s ease;
+  transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+.vip-squad-pinned-bar.dismissing {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.vip-pinned-capsule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255, 190, 30, 0.12) 0%, rgba(20, 15, 30, 0.85) 100%);
+  border: 1px solid rgba(255, 200, 50, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 16px rgba(255, 190, 30, 0.18);
+  backdrop-filter: blur(12px);
+  animation: vipCapsulePulse 3s infinite alternate;
+}
+
+.vip-pinned-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.vip-pinned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ffd700, #ff8800);
+  color: #070709;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  flex-shrink: 0;
+}
+
+.vip-pinned-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.vip-pinned-avatar {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.vip-pinned-avatar .avatar-frame-wrap {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vip-pinned-avatar img,
+.vip-pinned-avatar .avatar-frame-wrap img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.vip-pinned-avatar span,
+.vip-pinned-avatar .avatar-frame-wrap span {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: rgba(0, 212, 255, 0.2);
+  color: #ffffff;
+}
+
+.vip-pinned-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.vip-pinned-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vip-pinned-name {
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.vip-pinned-game {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.72rem;
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.vip-pinned-game svg {
+  width: 11px;
+  height: 11px;
+}
+
+.vip-pinned-rank {
+  font-size: 0.72rem;
+  color: #ffd700;
+}
+
+.vip-pinned-desc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.vip-pinned-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-vip-join {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00d4ff, #0077ff);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn-vip-join:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
+}
+
+.btn-vip-join svg {
+  width: 13px;
+  height: 13px;
+}
+
+.vip-my-squad-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffd700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 215, 0, 0.15);
+}
+
+.btn-vip-dismiss {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-vip-dismiss:hover {
+  background: rgba(255, 51, 102, 0.25);
+  border-color: #ff3366;
+  color: #ff3366;
+}
+
+.btn-vip-dismiss svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* КАРТОЧКИ ИГРОКОВ С VIP БУСТОМ */
+.vip-boosted-card {
+  border-color: rgba(255, 190, 30, 0.6) !important;
+  background: linear-gradient(145deg, rgba(255, 190, 30, 0.08) 0%, rgba(20, 15, 30, 0.75) 100%) !important;
+  box-shadow: 0 6px 24px rgba(255, 180, 0, 0.18) !important;
+}
+
+.vip-squad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+.vip-squad-badge svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* СЕКЦИЯ БУСТА В МАГАЗИНЕ */
+.shop-boost-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 100, 0, 0.35);
+  flex-wrap: wrap;
+}
+
+.boost-card-preview {
+  flex: 1;
+  min-width: 200px;
+}
+
+.boost-preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ff7733;
+  margin-bottom: 6px;
+}
+
+.boost-preview-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.boost-preview-text {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+}
+
+.boost-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.boost-price-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.boost-price-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+.boost-duration {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-buy-boost {
+  padding: 10px 18px !important;
+  background: linear-gradient(135deg, #ff5500, #ffaa00) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(255, 85, 0, 0.35);
+}
+
+.btn-buy-boost:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(255, 85, 0, 0.5);
+}
+
+/* ============================================================
+   РАЗДЕЛ КАСТОМИЗАЦИИ В НАСТРОЙКАХ (CUSTOMIZATION HUB)
+   ============================================================ */
+
+.settings-custom-box {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+}
+
+.settings-custom-header {
+  margin-bottom: 16px;
+}
+
+.settings-custom-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-custom-label svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+.settings-custom-sub {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* БАННЕР ПРЕДПРОСМОТРА АВАТАРА */
+.settings-avatar-preview-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(121, 40, 202, 0.08) 100%);
+  border: 1.5px solid var(--glass-border);
+  margin-bottom: 18px;
+}
+
+.preview-banner-avatar-wrap {
+  flex-shrink: 0;
+}
+
+.settings-live-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-start), var(--brand-mid));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #060913;
+  overflow: hidden;
+}
+
+.settings-live-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-banner-info {
+  flex: 1;
+}
+
+.preview-banner-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-banner-sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* СЕТКА РАМОК В НАСТРОЙКАХ */
+.settings-frames-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.settings-frame-card {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: var(--transition);
+  position: relative;
+}
+
+.settings-frame-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(0, 212, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.settings-frame-card.active {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 212, 255, 0.08);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.settings-frame-card .frame-preview-box {
+  margin-bottom: 10px;
+}
+
+.settings-frame-card .frame-preview-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-start), var(--brand-mid));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #060913;
+  overflow: hidden;
+}
+
+.settings-frame-card .frame-preview-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.settings-frame-card .frame-card-info {
+  margin-bottom: 10px;
+  flex: 1;
+}
+
+.settings-frame-card .frame-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.settings-frame-card .frame-desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+/* СЕТКА ТЕМ В НАСТРОЙКАХ */
+.settings-themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.settings-theme-card {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  position: relative;
+  cursor: pointer;
+}
+
+.settings-theme-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(0, 212, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.settings-theme-card.active {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 212, 255, 0.08);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.theme-preview-default {
+  background: linear-gradient(135deg, #050814 0%, #00d4ff 50%, #7928ca 100%);
+}
+
+.theme-preview-lobbivo {
+  background: linear-gradient(135deg, #111116 0%, #ffffff 40%, #00f0ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-theme-card .theme-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.settings-theme-card .theme-desc {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.35;
+  flex: 1;
+}
+
+/* КНОПКИ КАСТОМИЗАЦИИ */
+.btn-custom-action {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  margin-top: 10px;
+}
+
+.btn-custom-action.btn-equip {
+  background: linear-gradient(135deg, var(--brand-start), var(--brand-mid));
+  color: #060913;
+}
+
+.btn-custom-action.btn-equip:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 14px rgba(0, 212, 255, 0.4);
+}
+
+.btn-custom-action.btn-active {
+  background: rgba(34, 197, 94, 0.18);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  color: #4ade80;
+  cursor: default;
+}
+
+.btn-custom-action.btn-buy-link {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  color: #ffd700;
+}
+
+.btn-custom-action.btn-buy-link:hover {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: #ffd700;
+  transform: scale(1.03);
+}
+
+.btn-custom-action svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* СТАТУС В МАГАЗИНЕ: КУПЛЕНО */
+.btn-shop-action.bought-disabled {
+  background: rgba(34, 197, 94, 0.14) !important;
+  border: 1px solid rgba(34, 197, 94, 0.35) !important;
+  color: #4ade80 !important;
+  cursor: default !important;
+  opacity: 0.95 !important;
+}
+
+.btn-shop-action.bought-disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ИКОНКИ ДЛЯ ТАЙТЛОВ КАРТОЧЕК */
+.item-title-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.item-title-icon.flame-icon {
+  color: #ff5500;
+}
+
+.item-title-icon.cyber-icon {
+  color: #00f0ff;
+}
+
+.item-title-icon.gold-icon {
+  color: #ffd700;
+}
+
+.item-title-icon.ice-icon {
+  color: #38bdf8;
+}
+
+.item-title-icon.ghost-icon {
+  color: #c084fc;
+}
+
+.item-title-icon.nebula-icon {
+  color: #e879f9;
+}
+
+.item-title-icon.crimson-icon {
+  color: #ff2a4b;
+}
+
+.item-title-icon.matrix-icon {
+  color: #00ff88;
+}
+
+.tag-svg {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 3px;
 }

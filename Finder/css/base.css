@@ -154,6 +154,55 @@ body {
     radial-gradient(circle at 85% 35%, rgba(255, 255, 255, 0.03) 0%, transparent 45%);
 }
 
+[data-theme="nebula"] .space-nebula {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(217, 70, 239, 0.18) 0%, transparent 55%),
+    radial-gradient(circle at 15% 30%, rgba(139, 92, 246, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 85% 40%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 45% 75%, rgba(168, 85, 247, 0.10) 0%, transparent 60%);
+}
+
+[data-theme="crimson"] .space-nebula {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(255, 42, 75, 0.22) 0%, transparent 55%),
+    radial-gradient(circle at 12% 25%, rgba(255, 87, 34, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 88% 35%, rgba(255, 0, 51, 0.14) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(185, 28, 28, 0.12) 0%, transparent 60%);
+}
+
+[data-theme="matrix"] .space-nebula {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(0, 255, 136, 0.18) 0%, transparent 55%),
+    radial-gradient(circle at 15% 25%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 85% 35%, rgba(5, 150, 105, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 75%, rgba(0, 255, 157, 0.08) 0%, transparent 60%);
+}
+
+/* ТЕМАТИЧЕСКИЕ ЧАСТИЦЫ */
+.particle.particle-ember {
+  background: #ff5722;
+  box-shadow: 0 0 10px #ff2a4b, 0 0 18px #ff7700;
+  border-radius: 50%;
+}
+
+.particle.particle-star {
+  background: #f472b6;
+  box-shadow: 0 0 12px #d946ef, 0 0 20px #c084fc;
+  border-radius: 50%;
+}
+
+.particle.particle-matrix {
+  font-family: 'Fira Code', monospace;
+  font-weight: 700;
+  color: #00ff88;
+  text-shadow: 0 0 8px #00ff88, 0 0 14px #10b981;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  user-select: none;
+  animation: floatParticleL linear infinite;
+}
+
 /* ГЛАВНЫЙ КОНТЕЙНЕР ПРИЛОЖЕНИЯ */
 .app-wrapper {
   position: relative;
