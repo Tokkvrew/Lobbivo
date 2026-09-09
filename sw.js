@@ -2,7 +2,7 @@
 //  LOBBIVO SERVICE WORKER (BACKGROUND WEB PUSH & NOTIFICATIONS)
 // ============================================================
 
-const CACHE_NAME = 'lobbivo-cache-v2.8.5';
+const CACHE_NAME = 'lobbivo-cache-v2.8.6';
 const OFFLINE_URL = './index.html';
 
 self.addEventListener('install', (event) => {

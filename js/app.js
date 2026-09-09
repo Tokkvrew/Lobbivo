@@ -1894,11 +1894,11 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.8.3', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.8.6', { updateViaCache: 'none' })
         .then((reg) => {
           // Проверяем обновления файлов немедленно при загрузке страницы
           reg.update();
-          console.log('[Lobbivo SW] Service Worker v2.8.3 активен:', reg.scope);
+          console.log('[Lobbivo SW] Service Worker v2.8.6 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку (на телефоне и ПК)
           document.addEventListener('visibilitychange', () => {
@@ -1923,6 +1923,15 @@ function init() {
     });
   }
 
+  // Очистка параметра ?nocache= из адресной строки браузера для чистого красивого URL
+  if (window.location.search.includes('nocache=')) {
+    const cleanSearch = window.location.search
+      .replace(/(\?|&)nocache=[^&]*/g, '')
+      .replace(/^&/, '?');
+    const cleanUrl = window.location.pathname + (cleanSearch || '') + window.location.hash;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
   // Проверка прямого перехода в чат из Push-уведомления через URL
   const urlParams = new URLSearchParams(window.location.search);
   const chatPartnerFromUrl = urlParams.get('chat');
@@ -1937,7 +1946,7 @@ function init() {
 }
 
 /**
- * Принудительный сброс локального кэша, PWA Service Worker и жесткая перезагрузка
+ * Принудительный сброс локального кэша, PWA Service Worker и чистая перезагрузка
  */
 window.forceClearCacheAndReload = async function() {
   if (typeof showNotification === 'function') {
@@ -1959,8 +1968,7 @@ window.forceClearCacheAndReload = async function() {
   } catch (err) {
     console.warn('Cache clearing error:', err);
   }
-  const cleanUrl = window.location.origin + window.location.pathname + '?nocache=' + Date.now();
-  window.location.replace(cleanUrl);
+  window.location.href = window.location.origin + window.location.pathname;
 };
 
 document.addEventListener('DOMContentLoaded', init);

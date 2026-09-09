@@ -50,7 +50,7 @@ const DEVICE_ICONS = {
 
 const FRAME_DEFINITIONS = [
   { id: 'none', name: 'Без рамки', icon: 'icon-ban', desc: 'Стандартный профиль без эффектов', cost: 0 },
-  { id: 'ga_overlord', name: 'GA Singularity Overlord', icon: 'icon-admin-shield', desc: 'Эксклюзив Главного Администратора: плазменная корона сингулярности, орбитальные кольца и багрово-золотое сияние', cost: 0, gaOnly: true },
+  { id: 'ga_overlord', name: 'CEO Blood-Fire Dominator', icon: 'icon-crown', desc: 'Эксклюзив Владельца и CEO: адская плазма, багрово-золотое лезвие и корона превосходства', cost: 0, gaOnly: true },
   { id: 'fire', name: 'Flame Fury', icon: 'icon-flame', desc: 'Пылающий неоновый огонь', cost: 120 },
   { id: 'cyber', name: 'Cyber Neon', icon: 'icon-cyber', desc: 'Киберпанковое свечение', cost: 140 },
   { id: 'gold', name: 'Imperial Gold', icon: 'icon-crown', desc: 'Золотой ореол императора', cost: 180 },

@@ -237,7 +237,7 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
   container.innerHTML = filtered.map(name => {
     const u = AppState.users[name];
     const safeName = escapeHtml(name);
-    const isGA = typeof isUserGA === 'function' && isUserGA(name);
+    const isCEO = typeof isUserCEO === 'function' ? isUserCEO(name) : (typeof isUserGA === 'function' && isUserGA(name));
     const isMod = typeof isUserModerator === 'function' && isUserModerator(name);
     const isBanned = isUserBanned(name);
     const isMuted = isUserMuted(name);
@@ -245,8 +245,8 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
     const canPunish = typeof canAdminPunishTarget === 'function' ? canAdminPunishTarget(AppState.currentUser, name) : true;
 
     let badgesHtml = '';
-    if (isGA) {
-      badgesHtml += '<span class="admin-badge badge-admin" style="background:linear-gradient(135deg,#ff2a5f,#ff007f);color:#fff;border-color:#ff007f;"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-crown"/></svg> GA</span> ';
+    if (isCEO) {
+      badgesHtml += '<span class="admin-badge badge-admin" style="background:linear-gradient(135deg,#ff003c,#b8001f);color:#fff;border-color:#ff3355;"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-crown"/></svg> CEO</span> ';
     } else if (isMod) {
       badgesHtml += '<span class="admin-badge badge-mod" style="background:rgba(0,229,255,0.15);color:#00f0ff;border-color:rgba(0,229,255,0.4);"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-shield"/></svg> МОД</span> ';
     }
@@ -277,7 +277,7 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
                   : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может разбанить персонал"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`)
               : (canPunish 
                   ? `<button class="admin-mini-btn btn-ban" onclick="openBanModal('${safeName}')" title="Забанить"><svg style="width:14px;height:14px;"><use href="#icon-ban"/></svg></button>`
-                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может банить модераторов и GA"><svg style="width:14px;height:14px;"><use href="#icon-ban"/></svg></button>`)
+                  : `<button class="admin-mini-btn" disabled style="opacity:0.3;cursor:not-allowed;" title="Модератор не может банить модераторов и CEO"><svg style="width:14px;height:14px;"><use href="#icon-ban"/></svg></button>`)
             }
             ${isMuted 
               ? (canPunish 
@@ -367,7 +367,7 @@ function renderAdminPunishments() {
 function openBanModal(targetUsername) {
   if (!targetUsername) return;
   if (typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(AppState.currentUser, targetUsername)) {
-    showNotification('Отказано в доступе', 'Модератор не может заблокировать другого модератора или Главного Администратора (GA)');
+    showNotification('Отказано в доступе', 'Модератор не может заблокировать другого модератора или CEO');
     return;
   }
   activeBanTarget = targetUsername;
@@ -452,7 +452,7 @@ function adminUnbanUser(username) {
 function openMuteModal(targetUsername) {
   if (!targetUsername) return;
   if (typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(AppState.currentUser, targetUsername)) {
-    showNotification('Отказано в доступе', 'Модератор не может замутить другого модератора или Главного Администратора (GA)');
+    showNotification('Отказано в доступе', 'Модератор не может замутить другого модератора или CEO');
     return;
   }
   activeMuteTarget = targetUsername;
@@ -777,7 +777,7 @@ function updateAdminLivePreview() {
     if (!isEnabled) {
       previewContainer.innerHTML = '<span style="font-size:0.7rem;color:var(--text-muted);font-style:italic;">(Инкогнито: тег скрыт)</span>';
     } else {
-      let defaultText = 'GA';
+      let defaultText = 'CEO';
       let icon = 'icon-crown';
       let styleClass = 'badge-style-admin';
 
@@ -793,8 +793,8 @@ function updateAdminLivePreview() {
         defaultText = 'МОДЕРАТОР';
         icon = 'icon-shield';
         styleClass = 'badge-style-mod';
-      } else if (presetType === 'admin' || presetType === 'ga') {
-        defaultText = 'GA';
+      } else if (presetType === 'admin' || presetType === 'ga' || presetType === 'ceo') {
+        defaultText = 'CEO';
         icon = 'icon-crown';
         styleClass = 'badge-style-admin';
       }

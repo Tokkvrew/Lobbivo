@@ -10283,51 +10283,54 @@ select:-webkit-autofill {
 }
 
 /* ============================================================
-   ЭКСКЛЮЗИВНАЯ РАМКА GA (GA SINGULARITY OVERLORD FRAME)
+   ЭКСКЛЮЗИВНАЯ РАМКА CEO (CEO BLOOD-FIRE DOMINATOR FRAME)
    ============================================================ */
-.avatar-frame-wrap.frame-ga_overlord {
+.avatar-frame-wrap.frame-ga_overlord,
+.avatar-frame-wrap.frame-ceo_overlord {
   position: relative !important;
-  background: conic-gradient(from 0deg, #ff0055, #ff3b00, #ffd700, #b44dff, #00d4ff, #ff0055) !important;
-  animation: gaSingularityPulse 2.8s ease-in-out infinite alternate !important;
-  box-shadow: 0 0 16px rgba(255, 0, 85, 0.8), 0 0 32px rgba(255, 60, 0, 0.5), 0 0 44px rgba(180, 77, 255, 0.45) !important;
-  border: 1.5px solid rgba(255, 215, 0, 0.7) !important;
+  background: conic-gradient(from 0deg, #ff003c 0%, #ff3700 25%, #ff8c00 50%, #990014 75%, #ff003c 100%) !important;
+  animation: ceoOverlordPulse 2.4s ease-in-out infinite alternate !important;
+  box-shadow: 0 0 18px rgba(255, 0, 60, 0.85), 0 0 35px rgba(255, 55, 0, 0.55), inset 0 0 10px rgba(255, 0, 50, 0.4) !important;
+  border: 2px solid rgba(255, 190, 40, 0.9) !important;
   overflow: visible !important;
 }
 
-.avatar-frame-wrap.frame-ga_overlord::before {
+.avatar-frame-wrap.frame-ga_overlord::before,
+.avatar-frame-wrap.frame-ceo_overlord::before {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: -4px;
   border-radius: 50%;
-  background: conic-gradient(from 180deg, #ffd700, #ff0055, #00e5ff, #b44dff, #ffd700);
+  background: conic-gradient(from 180deg, #ff003c, #ff5500, #ffd700, #800010, #ff003c);
   filter: blur(5px);
   z-index: -1;
-  animation: gaSingularityRotate 3.2s linear infinite;
-  opacity: 0.85;
+  animation: ceoOverlordRotate 2.6s linear infinite;
+  opacity: 0.92;
 }
 
-@keyframes gaSingularityPulse {
+@keyframes ceoOverlordPulse {
   0% {
-    box-shadow: 0 0 14px rgba(255, 0, 85, 0.8), 0 0 28px rgba(255, 60, 0, 0.5), 0 0 38px rgba(180, 77, 255, 0.4);
+    box-shadow: 0 0 14px rgba(255, 0, 60, 0.8), 0 0 28px rgba(255, 55, 0, 0.5), inset 0 0 8px rgba(255, 0, 40, 0.3);
     transform: scale(1);
   }
   100% {
-    box-shadow: 0 0 22px rgba(255, 0, 85, 0.95), 0 0 42px rgba(255, 215, 0, 0.7), 0 0 55px rgba(0, 212, 255, 0.5);
-    transform: scale(1.02);
+    box-shadow: 0 0 24px rgba(255, 0, 60, 1), 0 0 44px rgba(255, 85, 0, 0.75), inset 0 0 14px rgba(255, 190, 40, 0.5);
+    transform: scale(1.025);
   }
 }
 
-@keyframes gaSingularityRotate {
+@keyframes ceoOverlordRotate {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-.frame-ga-pill {
+.frame-ga-pill,
+.frame-ceo-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(135deg, rgba(255, 0, 85, 0.2), rgba(255, 215, 0, 0.2));
-  border: 1px solid rgba(255, 215, 0, 0.5);
+  background: linear-gradient(135deg, rgba(255, 0, 60, 0.25), rgba(255, 190, 40, 0.25));
+  border: 1px solid rgba(255, 190, 40, 0.6);
   color: #ffd700;
   font-size: 0.62rem;
   font-weight: 800;
@@ -10335,23 +10338,26 @@ select:-webkit-autofill {
   border-radius: 6px;
   margin-left: 6px;
   letter-spacing: 0.4px;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 0 8px rgba(255, 190, 40, 0.6);
 }
 
-.frame-ga-pill svg {
+.frame-ga-pill svg,
+.frame-ceo-pill svg {
   width: 10px;
   height: 10px;
 }
 
-.custom-frame-card.ga-exclusive-card {
-  border-color: rgba(255, 0, 85, 0.4) !important;
-  background: linear-gradient(145deg, rgba(255, 0, 85, 0.06), rgba(255, 215, 0, 0.04)) !important;
+.custom-frame-card.ga-exclusive-card,
+.custom-frame-card.ceo-exclusive-card {
+  border-color: rgba(255, 0, 60, 0.45) !important;
+  background: linear-gradient(145deg, rgba(255, 0, 60, 0.08), rgba(255, 190, 40, 0.04)) !important;
 }
 
-.btn-locked-ga {
-  background: rgba(255, 0, 85, 0.12) !important;
-  border: 1px solid rgba(255, 0, 85, 0.3) !important;
-  color: #ff4466 !important;
+.btn-locked-ga,
+.btn-locked-ceo {
+  background: rgba(255, 0, 60, 0.12) !important;
+  border: 1px solid rgba(255, 0, 60, 0.35) !important;
+  color: #ff3355 !important;
   cursor: not-allowed !important;
 }
 
@@ -10362,8 +10368,8 @@ select:-webkit-autofill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(255, 0, 85, 0.24));
-  border: 1px solid rgba(255, 215, 0, 0.5);
+  background: linear-gradient(135deg, rgba(255, 190, 40, 0.22), rgba(255, 0, 60, 0.25));
+  border: 1px solid rgba(255, 190, 40, 0.6);
   color: #ffd700;
   font-size: 0.65rem;
   font-weight: 800;
@@ -10371,46 +10377,48 @@ select:-webkit-autofill {
   border-radius: 6px;
   letter-spacing: 0.8px;
   vertical-align: middle;
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+  box-shadow: 0 0 12px rgba(255, 190, 40, 0.35);
   animation: ceoGlowPulse 2.5s infinite alternate;
   margin-left: 6px;
 }
 
 @keyframes ceoGlowPulse {
   0% {
-    box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
-    border-color: rgba(255, 215, 0, 0.35);
+    box-shadow: 0 0 6px rgba(255, 190, 40, 0.3);
+    border-color: rgba(255, 190, 40, 0.35);
   }
   100% {
-    box-shadow: 0 0 16px rgba(255, 0, 85, 0.6), 0 0 10px rgba(255, 215, 0, 0.8);
-    border-color: rgba(255, 215, 0, 0.85);
+    box-shadow: 0 0 16px rgba(255, 0, 60, 0.6), 0 0 10px rgba(255, 190, 40, 0.8);
+    border-color: rgba(255, 190, 40, 0.85);
   }
 }
 
 /* ============================================================
-   ФИРМЕННЫЕ ЦВЕТА И СТИЛИ НИКНЕЙМА (GA & MODERATOR NAME ENGINE)
+   ФИРМЕННЫЕ ЦВЕТА И СТИЛИ НИКНЕЙМА (CEO & MODERATOR NAME ENGINE)
    ============================================================ */
 
-/* 1. GA Inferno Crimson (Багрово-пламенный) */
-.name-style-ga-inferno {
-  background: linear-gradient(90deg, #ff0055, #ff3700, #ffbb00, #ff0055) !important;
+/* 1. CEO Inferno Blood (Кроваво-пламенный) */
+.name-style-ga-inferno,
+.name-style-ceo-inferno {
+  background: linear-gradient(90deg, #ff003c, #ff3700, #ff8c00, #ff1a40, #ff003c) !important;
   background-size: 250% 100% !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  animation: nameShimmerCycle 3s linear infinite !important;
+  animation: nameShimmerCycle 2.8s linear infinite !important;
   font-weight: 800 !important;
-  filter: drop-shadow(0 0 7px rgba(255, 55, 0, 0.65)) !important;
+  filter: drop-shadow(0 0 8px rgba(255, 0, 60, 0.75)) !important;
 }
 
-/* 2. GA Cosmic Singularity (Императорский фиолетово-золотой) */
-.name-style-ga-void {
-  background: linear-gradient(90deg, #b44dff, #ff007f, #ffd700, #00d4ff, #b44dff) !important;
+/* 2. CEO Obsidian & Imperial Gold (Императорский золотой престиж) */
+.name-style-ga-void,
+.name-style-ceo-void {
+  background: linear-gradient(90deg, #ffd700, #ff9900, #fff099, #ff7700, #ffd700) !important;
   background-size: 250% 100% !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  animation: nameShimmerCycle 3.5s linear infinite !important;
+  animation: nameShimmerCycle 3.2s linear infinite !important;
   font-weight: 800 !important;
-  filter: drop-shadow(0 0 7px rgba(180, 77, 255, 0.65)) !important;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.75)) !important;
 }
 
 /* 3. Mod Emerald Matrix (Изумрудный кибер-код) */

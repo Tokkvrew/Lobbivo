@@ -233,23 +233,26 @@ function formatLastSeen(lastSeen, username = null) {
 //  АДМИНИСТРИРОВАНИЕ, БАНЫ И МУТЫ (ADMIN, BANS & MUTES)
 // ============================================================
 
-// Проверка прав персонала (GA или Модератор)
+// Проверка прав персонала (CEO или Модератор)
 function isUserAdmin(username) {
   if (!username) return false;
   const u = AppState.users[username];
   if (!u) return false;
-  return u.isAdmin === true || u.role === 'admin' || u.role === 'ga' || u.role === 'moderator';
+  return u.isAdmin === true || u.role === 'admin' || u.role === 'ga' || u.role === 'ceo' || u.role === 'moderator';
 }
 
-// Проверка роли Главного Администратора (GA)
-function isUserGA(username) {
+// Проверка роли Главного Администратора и Владельца (CEO)
+function isUserCEO(username) {
   if (!username) return false;
   const u = AppState.users[username];
   if (!u) return false;
-  if (u.role === 'ga') return true;
+  if (u.role === 'ceo' || u.role === 'ga') return true;
   if (u.role === 'moderator') return false;
   return u.isAdmin === true || u.role === 'admin';
 }
+
+// Алиас для обратной совместимости
+const isUserGA = isUserCEO;
 
 // Проверка роли Модератора
 function isUserModerator(username) {
@@ -259,26 +262,26 @@ function isUserModerator(username) {
   return u.role === 'moderator';
 }
 
-// Получение роли персонала пользователя ('ga' | 'moderator' | null)
+// Получение роли персонала пользователя ('ceo' | 'moderator' | null)
 function getUserAdminRole(username) {
   if (!username) return null;
-  if (isUserGA(username)) return 'ga';
+  if (isUserCEO(username)) return 'ceo';
   if (isUserModerator(username)) return 'moderator';
   return null;
 }
 
-// Проверка права наказания: модератор НЕ может банить/мутить других модераторов и GA
+// Проверка права наказания: модератор НЕ может банить/мутить других модераторов и CEO
 function canAdminPunishTarget(actorUsername, targetUsername) {
   if (!actorUsername || !targetUsername) return false;
   if (actorUsername === targetUsername) return false; // Нельзя наказывать самого себя
   
-  // Главный администратор (GA) имеет полный доступ
-  if (isUserGA(actorUsername)) return true;
+  // Владелец и Главный администратор (CEO) имеет полный доступ
+  if (isUserCEO(actorUsername)) return true;
 
   // Модератор:
   if (isUserModerator(actorUsername)) {
-    // Не может наказывать GA, модераторов или любого сотрудника персонала
-    if (isUserAdmin(targetUsername) || isUserGA(targetUsername) || isUserModerator(targetUsername)) {
+    // Не может наказывать CEO, модераторов или любого сотрудника персонала
+    if (isUserAdmin(targetUsername) || isUserCEO(targetUsername) || isUserModerator(targetUsername)) {
       return false;
     }
     return true;
@@ -287,7 +290,7 @@ function canAdminPunishTarget(actorUsername, targetUsername) {
   return false;
 }
 
-// Получение информации о бейдже администратора (с поддержкой GA и Модераторов)
+// Получение информации о бейдже администратора (с поддержкой CEO и Модераторов)
 function getUserAdminBadge(username) {
   if (!username) return null;
   const u = AppState.users[username];
@@ -297,14 +300,14 @@ function getUserAdminBadge(username) {
   // Если администратор отключил бейдж (режим Инкогнито)
   if (u.adminBadgeEnabled === false) return null;
 
-  const isGA = isUserGA(username);
+  const isCEO = isUserCEO(username);
   const isMod = isUserModerator(username);
 
   const style = u.adminBadgeStyle || (isMod ? 'moderator' : 'admin');
   const type = u.adminBadgeType || (isMod ? 'moderator' : 'admin');
   const customText = (u.adminBadgeText || '').trim();
 
-  let defaultText = 'GA';
+  let defaultText = 'CEO';
   let defaultIcon = 'icon-crown';
 
   if (isMod || type === 'moderator') {
@@ -316,8 +319,8 @@ function getUserAdminBadge(username) {
   } else if (type === 'dev') {
     defaultText = 'DEVELOPER';
     defaultIcon = 'icon-sparkles';
-  } else if (type === 'admin' || type === 'ga') {
-    defaultText = 'GA';
+  } else if (type === 'admin' || type === 'ga' || type === 'ceo') {
+    defaultText = 'CEO';
     defaultIcon = 'icon-crown';
   }
 
@@ -457,7 +460,7 @@ function banUser(target, durationMinutes, reason, adminName = null) {
   if (actor && typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(actor, target)) {
     console.warn(`[Security] ${actor} не имеет прав забанить ${target}`);
     if (typeof showNotification === 'function') {
-      showNotification('Отказано в доступе', 'Модератор не может заблокировать другого модератора или Главного Администратора (GA)');
+      showNotification('Отказано в доступе', 'Модератор не может заблокировать другого модератора или CEO');
     }
     return false;
   }
@@ -468,7 +471,7 @@ function banUser(target, durationMinutes, reason, adminName = null) {
   }
   u.bannedUntil = bannedUntil;
   u.banReason = reason || 'Нарушение правил сообщества Lobbivo';
-  u.bannedBy = actor || (isUserGA(actor) ? 'GA' : 'Модератор');
+  u.bannedBy = actor || (isUserCEO(actor) ? 'CEO' : 'Модератор');
   u.bannedAt = now;
   saveUsers(target);
   return true;
@@ -494,7 +497,7 @@ function muteUser(target, durationMinutes, reason, adminName = null) {
   if (actor && typeof canAdminPunishTarget === 'function' && !canAdminPunishTarget(actor, target)) {
     console.warn(`[Security] ${actor} не имеет прав замутить ${target}`);
     if (typeof showNotification === 'function') {
-      showNotification('Отказано в доступе', 'Модератор не может замутить другого модератора или Главного Администратора (GA)');
+      showNotification('Отказано в доступе', 'Модератор не может замутить другого модератора или CEO');
     }
     return false;
   }
@@ -505,7 +508,7 @@ function muteUser(target, durationMinutes, reason, adminName = null) {
   }
   u.mutedUntil = mutedUntil;
   u.muteReason = reason || 'Нарушение правил чата';
-  u.mutedBy = actor || (isUserGA(actor) ? 'GA' : 'Модератор');
+  u.mutedBy = actor || (isUserCEO(actor) ? 'CEO' : 'Модератор');
   u.mutedAt = now;
   saveUsers(target);
   return true;
@@ -611,16 +614,16 @@ function saveUsers(specificUser = null, immediate = false) {
   }
 }
 
-// Получение CSS-класса для стилизации и раскраски никнейма (GA / Модераторы / Premium)
+// Получение CSS-класса для стилизации и раскраски никнейма (CEO / Модераторы / Premium)
 function getUserNameClass(username) {
   if (!username) return '';
   const user = AppState.users[username];
   const nameStyle = user?.nameStyle || 'default';
 
-  // 1. Стили Главного Администратора (GA)
-  if (isUserGA(username)) {
-    if (nameStyle === 'ga_inferno') return 'name-style-ga-inferno';
-    if (nameStyle === 'ga_void') return 'name-style-ga-void';
+  // 1. Стили Владельца и CEO
+  if (isUserCEO(username)) {
+    if (nameStyle === 'ga_inferno' || nameStyle === 'ceo_inferno') return 'name-style-ceo-inferno';
+    if (nameStyle === 'ga_void' || nameStyle === 'ceo_void') return 'name-style-ceo-void';
   }
 
   // 2. Стили Модераторов

@@ -632,7 +632,7 @@ function showUserProfileModal(username) {
           </div>
           <div class="modal-user-meta">
             <svg class="device-icon device-icon-sm"><use href="#${escapeHtml(deviceIconSVG)}"/></svg>
-            ${safeDevice} · ID: ${data.id || '---'}${isUserGA(username) ? ' <span class="profile-ceo-badge"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>' : ''}
+            ${safeDevice} · ID: ${data.id || '---'}${((typeof isUserCEO === 'function' ? isUserCEO(username) : (typeof isUserGA === 'function' && isUserGA(username)))) ? ' <span class="profile-ceo-badge" title="CEO & Founder"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>' : ''}
           </div>
           <div class="modal-user-status" style="margin-top: 4px; font-size: 0.8rem; font-weight: 600; color: ${isUserOnline(username) ? '#00ff9d' : 'var(--text-muted)'};">
             <span class="online-dot ${isUserOnline(username) ? 'online' : 'offline'}" style="display:inline-block; vertical-align:middle; margin-right:4px;"></span>

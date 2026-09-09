@@ -163,8 +163,8 @@ function renderProfile() {
 
   const idEl = document.getElementById('profileId');
   if (idEl) {
-    const isGA = typeof isUserGA === 'function' && isUserGA(current);
-    const ceoBadge = isGA ? ` <span class="profile-ceo-badge" title="Основатель и Главный Администратор Lobbivo"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>` : '';
+    const isCEO = typeof isUserCEO === 'function' ? isUserCEO(current) : (typeof isUserGA === 'function' && isUserGA(current));
+    const ceoBadge = isCEO ? ` <span class="profile-ceo-badge" title="Основатель и CEO Lobbivo"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>` : '';
     idEl.innerHTML = `ID: ${data.id || '---'}${ceoBadge}`;
   }
 
@@ -275,7 +275,7 @@ function renderProfileCustomization() {
     stageFrameName.innerHTML = `<svg class="item-title-icon ${currentFrameDef.id}-icon"><use href="#${currentFrameDef.icon}"/></svg> <span>${currentFrameDef.name}</span>`;
   }
 
-  const isGa = current && typeof isUserGA === 'function' && isUserGA(current);
+  const isCEO = current && (typeof isUserCEO === 'function' ? isUserCEO(current) : (typeof isUserGA === 'function' && isUserGA(current)));
   const isMod = current && typeof isUserAdmin === 'function' && isUserAdmin(current);
 
   // 2. Сетка рамок
@@ -286,7 +286,7 @@ function renderProfileCustomization() {
       const isEquipped = equippedFrame === frame.id;
       let isOwned = frame.id === 'none' || inventory.frames.includes(frame.id);
       if (frame.gaOnly) {
-        isOwned = isGa || inventory.frames.includes(frame.id);
+        isOwned = isCEO || inventory.frames.includes(frame.id);
       }
       const activeClass = isEquipped ? ' active' : '';
 
@@ -296,14 +296,14 @@ function renderProfileCustomization() {
       } else if (isOwned) {
         btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipFrameFromProfile('${frame.id}')"><span>Надеть</span></button>`;
       } else if (frame.gaOnly) {
-        btnHtml = `<div class="btn-custom-action btn-locked-ga" title="Только для Главного Администратора"><svg><use href="#icon-admin-shield"/></svg> <span>Эксклюзив GA</span></div>`;
+        btnHtml = `<div class="btn-custom-action btn-locked-ga" title="Только для CEO"><svg><use href="#icon-crown"/></svg> <span>Эксклюзив CEO</span></div>`;
       } else {
         btnHtml = `<button type="button" class="btn-custom-action btn-buy-link" onclick="openShopForCustomization('shop')"><svg><use href="#icon-shop"/></svg> <span>В магазине (${frame.cost} LC)</span></button>`;
       }
 
       const avatarContent = (user && user.avatar) ? `<img src="${user.avatar}" alt="${escapeHtml(current)}">` : `<span>${current ? current.slice(0, 2).toUpperCase() : '?'}</span>`;
       const frameWrapClass = frame.id !== 'none' ? ` frame-${frame.id}` : '';
-      const gaBadgeHtml = frame.gaOnly ? '<span class="frame-ga-pill"><svg><use href="#icon-admin-shield"/></svg>GA EXCLUSIVE</span>' : '';
+      const gaBadgeHtml = frame.gaOnly ? '<span class="frame-ga-pill"><svg><use href="#icon-crown"/></svg>CEO EXCLUSIVE</span>' : '';
 
       html += `
         <div class="custom-frame-card${activeClass} ${frame.gaOnly ? 'ga-exclusive-card' : ''}" data-frame-id="${frame.id}">
@@ -364,12 +364,12 @@ function renderProfileCustomization() {
     themesGrid.innerHTML = html;
   }
 
-  // 4. Сетка стилей никнейма (для GA и Модераторов)
+  // 4. Сетка стилей никнейма (для CEO и Модераторов)
   const nameStyleBlock = document.getElementById('adminNameStyleBlock');
   const nameStylesGrid = document.getElementById('profileNameStylesGrid');
 
   if (nameStyleBlock && nameStylesGrid) {
-    if (isGa || isMod) {
+    if (isCEO || isMod) {
       nameStyleBlock.style.display = 'block';
       const currentNameStyle = user?.nameStyle || 'default';
 
@@ -377,10 +377,10 @@ function renderProfileCustomization() {
         { id: 'default', name: 'Стандартный стиль', desc: 'Классический цвет никнейма (или золотой при наличии Premium)', previewClass: '' }
       ];
 
-      if (isGa) {
+      if (isCEO) {
         availableStyles.push(
-          { id: 'ga_inferno', name: 'GA Inferno Crimson', desc: 'Анимированный багрово-пламенный градиент с искрами и сиянием', previewClass: 'name-style-ga-inferno' },
-          { id: 'ga_void', name: 'GA Cosmic Singularity', desc: 'Императорский градиент сингулярности: переливы космического ультра-фиолета и золота', previewClass: 'name-style-ga-void' }
+          { id: 'ga_inferno', name: 'CEO Inferno Blood', desc: 'Анимированный адско-багровый градиент с искрами и пламенем ярости', previewClass: 'name-style-ga-inferno' },
+          { id: 'ga_void', name: 'CEO Obsidian Gold', desc: 'Императорский градиент чистого золота, титана и темного обсидиана', previewClass: 'name-style-ga-void' }
         );
       } else if (isMod) {
         availableStyles.push(
