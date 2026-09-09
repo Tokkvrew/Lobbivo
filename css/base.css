@@ -566,6 +566,11 @@ body {
 .profile-avatar-thumb {
   width: 28px;
   height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   background: linear-gradient(135deg, #00d4ff, #b44dff);
   display: flex;
@@ -577,13 +582,41 @@ body {
   overflow: hidden;
   border: 1px solid rgba(0, 212, 255, 0.5);
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
-.profile-avatar-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
+.profile-avatar-thumb .avatar-frame-wrap {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 2px !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+.profile-avatar-thumb img,
+.profile-avatar-thumb .avatar-frame-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 50% !important;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
 .capsule-profile-btn .notif-dot {
@@ -636,6 +669,11 @@ body {
 .dropdown-avatar-ring {
   width: 48px;
   height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, rgba(0, 212, 255, 0.25), rgba(9, 17, 34, 0.9));
   border: 1.5px solid rgba(0, 212, 255, 0.5);
@@ -649,13 +687,41 @@ body {
   font-size: 1.35rem;
   flex-shrink: 0;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-.dropdown-avatar-ring img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
+.dropdown-avatar-ring .avatar-frame-wrap {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 3px !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+.dropdown-avatar-ring img,
+.dropdown-avatar-ring .avatar-frame-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 50% !important;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
 .dropdown-user-info {

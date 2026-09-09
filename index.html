@@ -52,11 +52,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <!-- CSS Стили (с авто-обновлением кэша) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.8.2" />
-  <link rel="stylesheet" href="css/base.css?v=2.8.2" />
-  <link rel="stylesheet" href="css/components.css?v=2.8.2" />
-  <link rel="stylesheet" href="css/animations.css?v=2.8.2" />
-  <link rel="stylesheet" href="css/media.css?v=2.8.2" />
+  <link rel="stylesheet" href="css/variables.css?v=2.8.3" />
+  <link rel="stylesheet" href="css/base.css?v=2.8.3" />
+  <link rel="stylesheet" href="css/components.css?v=2.8.3" />
+  <link rel="stylesheet" href="css/animations.css?v=2.8.3" />
+  <link rel="stylesheet" href="css/media.css?v=2.8.3" />
 </head>
 <body>
 
@@ -475,6 +475,38 @@
       <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
       <line x1="12" y1="8" x2="12" y2="8.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
       <line x1="12" y1="12" x2="12" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-globe" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M2.5 12h19M12 2.5a15 15 0 0 1 0 19M12 2.5a15 15 0 0 0 0 19" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </symbol>
+    <symbol id="icon-volume" viewBox="0 0 24 24">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25" stroke-linejoin="round"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    </symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24">
+      <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <polyline points="12 5 19 12 12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <line x1="12" y1="2.5" x2="12" y2="5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="12" y1="18.5" x2="12" y2="21.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="2.5" y1="12" x2="5.5" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="18.5" y1="12" x2="21.5" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24">
+      <path d="M6 9H4a2 2 0 0 1-2-2V5h4M18 9h2a2 2 0 0 0 2-2V5h-4" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <path d="M4 5h16v5a8 8 0 0 1-16 0V5z" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2"/>
+      <path d="M12 15v4M8 22h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </symbol>
   </svg>
 
@@ -1046,7 +1078,7 @@
                 <svg><use href="#icon-chat"/></svg>
               </div>
               <div class="settings-tab-text">
-                <span class="settings-tab-title">💬 Чаты</span>
+                <span class="settings-tab-title">Чаты</span>
                 <span class="settings-tab-desc">Цензура и фильтрация сообщений</span>
               </div>
             </button>
@@ -1056,7 +1088,7 @@
                 <svg><use href="#icon-lock"/></svg>
               </div>
               <div class="settings-tab-text">
-                <span class="settings-tab-title">🔒 Приватность</span>
+                <span class="settings-tab-title">Приватность</span>
                 <span class="settings-tab-desc">Доступ к ЛС, Push и черный список</span>
               </div>
             </button>
@@ -2243,7 +2275,9 @@
                 <label for="calcRubles">Сумма в рублях (₽):</label>
                 <input type="number" id="calcRubles" min="50" max="50000" value="500" />
               </div>
-              <div class="converter-arrow">➔</div>
+              <div class="converter-arrow">
+                <svg class="converter-arrow-svg" viewBox="0 0 24 24" width="20" height="20"><use href="#icon-arrow-right"/></svg>
+              </div>
               <div class="converter-result-wrap">
                 <div class="converter-result-label">Вы получите:</div>
                 <div class="converter-result-value"><span id="calcCoinsResult">550</span> LC</div>
@@ -2453,7 +2487,7 @@
                       <span class="chat-game-badge"><svg class="chat-game-icon"><use href="#icon-csgo"/></svg><span class="chat-game-title">CS 2</span></span>
                       <span class="world-msg-time">12:00</span>
                     </div>
-                    <div class="world-msg-text">Привет! Добро пожаловать на платформу Lobbivo 🎮</div>
+                    <div class="world-msg-text">Привет! Добро пожаловать на платформу Lobbivo</div>
                   </div>
                 </div>
               </div>
@@ -2618,15 +2652,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (с авто-обновлением кэша) -->
-  <script src="js/data.js?v=2.8.2"></script>
-  <script src="js/security-shield.js?v=2.8.2"></script>
-  <script src="js/firebase-sync.js?v=2.8.2"></script>
-  <script src="js/storage.js?v=2.8.2"></script>
-  <script src="js/auth.js?v=2.8.2"></script>
-  <script src="js/games.js?v=2.8.2"></script>
-  <script src="js/chat.js?v=2.8.2"></script>
-  <script src="js/profile.js?v=2.8.2"></script>
-  <script src="js/admin.js?v=2.8.2"></script>
-  <script src="js/app.js?v=2.8.2"></script>
+  <script src="js/data.js?v=2.8.3"></script>
+  <script src="js/security-shield.js?v=2.8.3"></script>
+  <script src="js/firebase-sync.js?v=2.8.3"></script>
+  <script src="js/storage.js?v=2.8.3"></script>
+  <script src="js/auth.js?v=2.8.3"></script>
+  <script src="js/games.js?v=2.8.3"></script>
+  <script src="js/chat.js?v=2.8.3"></script>
+  <script src="js/profile.js?v=2.8.3"></script>
+  <script src="js/admin.js?v=2.8.3"></script>
+  <script src="js/app.js?v=2.8.3"></script>
 </body>
 </html>

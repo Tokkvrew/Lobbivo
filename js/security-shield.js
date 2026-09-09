@@ -105,7 +105,7 @@ const SecurityShield = {
 
     let remaining = seconds;
     const updateText = () => {
-      if (titleEl) titleEl.innerHTML = `⚠️ Защита от флуда`;
+      if (titleEl) titleEl.innerHTML = `<svg class="mini-svg" style="width:14px;height:14px;margin-right:4px;vertical-align:-2px;"><use href="#icon-shield"/></svg>Защита от флуда`;
       if (bodyEl) {
         bodyEl.innerHTML = `Слишком много действий (${config.label}). Подождите <b>${remaining} сек.</b>`;
       }
@@ -119,7 +119,7 @@ const SecurityShield = {
       if (remaining <= 0) {
         clearInterval(this.countdownTimers[actionType]);
         delete this.countdownTimers[actionType];
-        if (titleEl) titleEl.innerHTML = `✅ Ограничение снято`;
+        if (titleEl) titleEl.innerHTML = `<svg class="mini-svg" style="width:14px;height:14px;margin-right:4px;vertical-align:-2px;"><use href="#icon-check"/></svg>Ограничение снято`;
         if (bodyEl) bodyEl.innerHTML = `Можете продолжать работу (${config.label}).`;
         setTimeout(() => {
           notif.classList.remove('show');

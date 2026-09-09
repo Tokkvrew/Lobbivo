@@ -250,7 +250,7 @@ function submitSquad() {
         desc: description,
         updatedAt: Date.now()
       };
-      showNotification('✅ Анкета обновлена', 'Изменения успешно сохранены!');
+      showNotification('Анкета обновлена', 'Изменения успешно сохранены!');
     }
   } else {
     // Проверяем, есть ли уже анкета для этой игры
@@ -263,7 +263,7 @@ function submitSquad() {
         desc: description,
         updatedAt: Date.now()
       };
-      showNotification('✅ Анкета обновлена', 'Анкета для этой игры была обновлена!');
+      showNotification('Анкета обновлена', 'Анкета для этой игры была обновлена!');
     } else {
       userData.squads.push({
         id: 'sq_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
@@ -274,7 +274,7 @@ function submitSquad() {
         createdAt: Date.now(),
         active: true
       });
-      showNotification('✅ Анкета опубликована', 'Ваша анкета теперь видна в каталоге игроков!');
+      showNotification('Анкета опубликована', 'Ваша анкета теперь видна в каталоге игроков!');
     }
   }
 
@@ -365,7 +365,7 @@ function createParticles(theme) {
     }
   } else if (currentTheme === 'matrix') {
     // Зеленый терминальный кибер-код
-    const glyphs = ['0', '1', '<', '>', '/', '#', '$', 'λ', '⌘', '⚡'];
+    const glyphs = ['0', '1', '<', '>', '/', '#', '$', 'λ', 'X', 'Z', '7', '9', '%', '&'];
     const count = 26;
     for (let i = 0; i < count; i++) {
       const p = document.createElement('div');
@@ -700,7 +700,7 @@ function renderCoinModal() {
     if (taskBtnAvatar) {
       taskBtnAvatar.disabled = true;
       taskBtnAvatar.className = 'task-action-btn claimed';
-      taskBtnAvatar.innerHTML = '<span>✅ Забрано</span>';
+      taskBtnAvatar.innerHTML = '<span class="task-claimed-text"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-check"/></svg>Забрано</span>';
     }
   } else if (hasAvatar) {
     availableRewardsCount++;
@@ -732,7 +732,7 @@ function renderCoinModal() {
     if (taskBtnBio) {
       taskBtnBio.disabled = true;
       taskBtnBio.className = 'task-action-btn claimed';
-      taskBtnBio.innerHTML = '<span>✅ Забрано</span>';
+      taskBtnBio.innerHTML = '<span class="task-claimed-text"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-check"/></svg>Забрано</span>';
     }
   } else if (hasBio) {
     availableRewardsCount++;
@@ -764,7 +764,7 @@ function renderCoinModal() {
     if (taskBtnSquad) {
       taskBtnSquad.disabled = true;
       taskBtnSquad.className = 'task-action-btn claimed';
-      taskBtnSquad.innerHTML = '<span>✅ Забрано</span>';
+      taskBtnSquad.innerHTML = '<span class="task-claimed-text"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-check"/></svg>Забрано</span>';
     }
   } else if (hasSquad) {
     availableRewardsCount++;
@@ -803,7 +803,7 @@ function renderCoinModal() {
     if (taskBtnTeammates) {
       taskBtnTeammates.disabled = true;
       taskBtnTeammates.className = 'task-action-btn claimed';
-      taskBtnTeammates.innerHTML = '<span>✅ Забрано</span>';
+      taskBtnTeammates.innerHTML = '<span class="task-claimed-text"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-check"/></svg>Забрано</span>';
     }
   } else if (teammatesCount >= 5) {
     availableRewardsCount++;
@@ -831,7 +831,7 @@ function renderCoinModal() {
       badgeEl.classList.add('highlight-badge');
     } else {
       const remainingTasks = [isAvatarClaimed, isBioClaimed, isSquadClaimed, isTeammatesClaimed].filter(c => !c).length;
-      badgeEl.textContent = remainingTasks > 0 ? `${remainingTasks}` : '✓';
+      badgeEl.innerHTML = remainingTasks > 0 ? `${remainingTasks}` : '<svg class="mini-svg" style="width:11px;height:11px;display:inline-block;vertical-align:middle;"><use href="#icon-check"/></svg>';
       badgeEl.classList.remove('highlight-badge');
     }
   }
@@ -943,7 +943,7 @@ function claimTaskReward(taskId) {
   renderCoinModal();
 
   triggerCoinConfetti();
-  showNotification('🎉 Награда получена!', `Задание ${taskTitles[taskId]} выполнено: +${rewardAmount} LC начислено на ваш баланс!`);
+  showNotification('Награда получена', `Задание ${taskTitles[taskId]} выполнено: +${rewardAmount} LC начислено на ваш баланс!`);
 }
 
 function buyCoinPack(coins, cost) {
@@ -966,7 +966,7 @@ function buyCoinPack(coins, cost) {
       updateUI();
       renderCoinModal();
       triggerCoinConfetti();
-      showNotification('✅ Баланс пополнен', `Успешно начислено +${coins} Lobbivo Coins! Спасибо за поддержку платформы.`);
+      showNotification('Баланс пополнен', `Успешно начислено +${coins} Lobbivo Coins! Спасибо за поддержку платформы.`);
     }
   });
 }
@@ -1072,10 +1072,11 @@ function initDevicePickers() {
     trigger?.addEventListener('click', (e) => {
       e.stopPropagation();
       const isOpen = picker.classList.contains('open');
-      document.querySelectorAll('.custom-device-picker.open').forEach(p => {
+      document.querySelectorAll('.custom-device-picker.open, .custom-game-picker.open').forEach(p => {
         if (p !== picker) p.classList.remove('open');
       });
       picker.classList.toggle('open', !isOpen);
+      syncPickerActiveStacking();
     });
 
     // Выбор устройства при клике на карточку
@@ -1087,14 +1088,23 @@ function initDevicePickers() {
       const devId = card.dataset.device;
       setDevicePickerValue(picker.id, devId);
       picker.classList.remove('open');
+      syncPickerActiveStacking();
     });
   });
 
   // Закрытие при клике вне панели
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.custom-device-picker')) {
-      document.querySelectorAll('.custom-device-picker.open').forEach(p => p.classList.remove('open'));
+    if (!e.target.closest('.custom-device-picker, .custom-game-picker')) {
+      document.querySelectorAll('.custom-device-picker.open, .custom-game-picker.open').forEach(p => p.classList.remove('open'));
+      syncPickerActiveStacking();
     }
+  });
+}
+
+function syncPickerActiveStacking() {
+  document.querySelectorAll('.edit-clean-card, .field, .form-group').forEach(el => {
+    const hasOpenPicker = Boolean(el.querySelector('.custom-game-picker.open, .custom-device-picker.open'));
+    el.classList.toggle('is-picker-active', hasOpenPicker);
   });
 }
 
@@ -1172,6 +1182,7 @@ function initGamePickers() {
         if (p !== picker) p.classList.remove('open');
       });
       picker.classList.toggle('open', !isOpen);
+      syncPickerActiveStacking();
       if (!isOpen && searchInput) {
         searchInput.value = '';
         renderGameOptions();
@@ -1192,12 +1203,14 @@ function initGamePickers() {
       const gameId = card.dataset.game;
       setGamePickerValue(picker.id, gameId);
       picker.classList.remove('open');
+      syncPickerActiveStacking();
     });
   });
 
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.custom-game-picker')) {
-      document.querySelectorAll('.custom-game-picker.open').forEach(p => p.classList.remove('open'));
+    if (!e.target.closest('.custom-game-picker, .custom-device-picker')) {
+      document.querySelectorAll('.custom-game-picker.open, .custom-device-picker.open').forEach(p => p.classList.remove('open'));
+      syncPickerActiveStacking();
     }
   });
 }
@@ -1594,7 +1607,7 @@ function init() {
       if (typeof sendWebPushNotification === 'function') {
         sendWebPushNotification(
           'LOBBIVO Test',
-          '🔥 Тестовое Push-уведомление успешно получено! Всё работает отлично на вашем устройстве.',
+          'Тестовое Push-уведомление успешно получено! Всё работает отлично на вашем устройстве.',
           { isTest: true }
         );
       }
@@ -1772,6 +1785,7 @@ function init() {
       document.getElementById('userProfileModalOverlay')?.remove();
       document.getElementById('avatarDropdown')?.classList.remove('open');
       document.querySelectorAll('.custom-device-picker.open, .custom-game-picker.open').forEach(p => p.classList.remove('open'));
+      if (typeof syncPickerActiveStacking === 'function') syncPickerActiveStacking();
       if (isChatOpen) closeChat();
     }
   });
@@ -1817,7 +1831,7 @@ function init() {
       if (typeof updateChatList === 'function') updateChatList();
       if (typeof showNotification === 'function') {
         showNotification(
-          this.checked ? '🛡️ Цензура чата включена' : '⚠️ Цензура чата отключена',
+          this.checked ? 'Цензура чата включена' : 'Цензура чата отключена',
           this.checked ? 'Нецензурные выражения в чате теперь блюрятся' : 'Фильтр отключен, сообщения отображаются без цензуры'
         );
       }
@@ -1866,11 +1880,11 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.8.2', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.8.3', { updateViaCache: 'none' })
         .then((reg) => {
           // Проверяем обновления файлов немедленно при загрузке страницы
           reg.update();
-          console.log('⚡ Lobbivo Service Worker v2.8.2 активен:', reg.scope);
+          console.log('[Lobbivo SW] Service Worker v2.8.3 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку (на телефоне и ПК)
           document.addEventListener('visibilitychange', () => {
@@ -1913,7 +1927,7 @@ function init() {
  */
 window.forceClearCacheAndReload = async function() {
   if (typeof showNotification === 'function') {
-    showNotification('🔄 Сброс кэша и обновление файлов...', 'info');
+    showNotification('Сброс кэша и обновление файлов...', 'info');
   }
   try {
     if ('serviceWorker' in navigator) {

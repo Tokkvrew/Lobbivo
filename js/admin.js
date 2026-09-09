@@ -333,13 +333,13 @@ function renderAdminPunishments() {
       <div class="admin-punishment-card ${isBan ? 'punish-ban' : 'punish-mute'}">
         <div class="punish-header">
           <div class="punish-user-title">
-            <span class="punish-type-icon">${isBan ? '🚫' : '🔇'}</span>
+            <span class="punish-type-icon">${isBan ? '<svg class="mini-svg" style="width:16px;height:16px;color:#ff4466;vertical-align:-2px;"><use href="#icon-ban"/></svg>' : '<svg class="mini-svg" style="width:16px;height:16px;color:#f59e0b;vertical-align:-2px;"><use href="#icon-mute"/></svg>'}</span>
             <strong>${safeUser}</strong>
             <span class="admin-badge ${isBan ? 'badge-ban' : 'badge-mute'}">
               ${isBan ? 'БАН АККАУНТА' : 'МУТ ЧАТА'}
             </span>
           </div>
-          <span class="punish-remaining-pill">⏳ ${info.remainingFormatted}</span>
+          <span class="punish-remaining-pill"><svg class="mini-svg" style="width:12px;height:12px;vertical-align:-1px;margin-right:4px;"><use href="#icon-clock"/></svg>${info.remainingFormatted}</span>
         </div>
 
         <div class="punish-body">
@@ -534,7 +534,7 @@ function handleBannedUserKickout(username) {
   const banInfo = getBanInfo(username);
   if (!banInfo) return;
 
-  console.warn('⛔ Обнаружена активная блокировка аккаунта. Выполняется перенаправление на Welcome.');
+  console.warn('[Lobbivo Guard] Обнаружена активная блокировка аккаунта. Выполняется перенаправление на Welcome.');
 
   // Завершение сессии
   AppState.currentUser = null;
@@ -579,7 +579,7 @@ function renderWelcomeBanNotice(banInfo) {
       if (welcomeBanTimer) clearInterval(welcomeBanTimer);
       card.innerHTML = `
         <div class="ban-notice-header success">
-          <span class="ban-icon">✅</span>
+          <span class="ban-icon success"><svg style="width:28px;height:28px;color:#34d399;"><use href="#icon-check"/></svg></span>
           <div>
             <h3>Срок блокировки истёк!</h3>
             <p>Ваш аккаунт снова доступен. Нажмите «Войти», чтобы продолжить.</p>
@@ -592,7 +592,7 @@ function renderWelcomeBanNotice(banInfo) {
     card.innerHTML = `
       <div class="ban-notice-glow"></div>
       <div class="ban-notice-header">
-        <span class="ban-icon">🚫</span>
+        <span class="ban-icon danger"><svg style="width:28px;height:28px;color:#ff4466;"><use href="#icon-ban"/></svg></span>
         <div>
           <h3 class="ban-title">ВАШ АККАУНТ ЗАБЛОКИРОВАН</h3>
           <p class="ban-sub">Доступ к платформе Lobbivo временно или полностью ограничен</p>

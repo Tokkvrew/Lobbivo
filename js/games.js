@@ -220,7 +220,7 @@ function renderMySquads() {
                 <span>${game.name}</span>
               </div>
               <div class="my-squad-status-badges">
-                ${isBoosted ? '<span class="badge-squad-vip"><svg><use href="#icon-badge-vip"/></svg> VIP Закреп</span>' : '<span class="badge-squad-active">🟢 Опубликована</span>'}
+                ${isBoosted ? '<span class="badge-squad-vip"><svg><use href="#icon-badge-vip"/></svg> VIP Закреп</span>' : '<span class="badge-squad-active"><span class="pulse-dot active" style="width:6px;height:6px;background:#34d399;border-radius:50%;display:inline-block;margin-right:5px;box-shadow:0 0 6px #34d399;"></span>Опубликована</span>'}
               </div>
             </div>
 
@@ -302,7 +302,7 @@ function toggleSquadPinInChat(squadId, isPinned) {
   }
 
   showNotification(
-    isPinned ? '📌 Закреплено в чате' : '📌 Закрепление снято',
+    isPinned ? 'Закреплено в чате' : 'Закрепление снято',
     isPinned ? 'Ваша анкета теперь закреплена в шапке мирового чата!' : 'Анкета откреплена из шапки чата'
   );
 }
@@ -589,12 +589,12 @@ function showUserProfileModal(username) {
           </div>
           <div class="admin-actions-grid">
             ${isTargetBanned 
-              ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnbanBtn">✅ Снять бан</button>`
-              : `<button type="button" class="btn btn-sm btn-danger" id="modalAdminBanBtn">🔨 Забанить игрока</button>`
+              ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnbanBtn"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-check"/></svg>Снять бан</button>`
+              : `<button type="button" class="btn btn-sm btn-danger" id="modalAdminBanBtn"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-ban"/></svg>Забанить игрока</button>`
             }
             ${isTargetMuted 
-              ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnmuteBtn">🔊 Снять мут</button>`
-              : `<button type="button" class="btn btn-sm btn-warning" id="modalAdminMuteBtn">🔇 Замьютить в чате</button>`
+              ? `<button type="button" class="btn btn-sm btn-outline" id="modalAdminUnmuteBtn"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-volume"/></svg>Снять мут</button>`
+              : `<button type="button" class="btn btn-sm btn-warning" id="modalAdminMuteBtn"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;"><use href="#icon-mute"/></svg>Замьютить в чате</button>`
             }
           </div>
         </div>

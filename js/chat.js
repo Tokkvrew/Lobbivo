@@ -22,7 +22,7 @@ function formatChatMessage(rawText) {
 
   const gayRegex = /(^|[^\p{L}\p{N}_])(гей|геи|геем|геев|гейский|гейская|гейское|гейские|гейству|геями|геях|gay|gays)(?=[^\p{L}\p{N}_]|$)/giu;
   safe = safe.replace(gayRegex, (match, prefix) => {
-    return `${prefix}<span class="rainbow-gay-tag" title="✨ Pride Rainbow">Gay</span>`;
+    return `${prefix}<span class="rainbow-gay-tag" title="Pride Rainbow">Gay</span>`;
   });
   return safe;
 }
@@ -238,7 +238,7 @@ function switchChatTab(tab) {
     }
     if (chatBackBtn) chatBackBtn.style.display = 'none';
     if (chatUserName) chatUserName.textContent = 'Мировой чат';
-    if (chatAvatar) chatAvatar.textContent = '🌐';
+    if (chatAvatar) chatAvatar.innerHTML = '<svg class="mini-svg" style="width:20px;height:20px;color:var(--brand-start);"><use href="#icon-globe"/></svg>';
     if (chatUserStatus) chatUserStatus.style.display = 'none';
 
     renderWorldChat();
@@ -553,7 +553,7 @@ function renderWorldChat() {
               ${adminBadgeHtml}
               <span class="world-msg-time">${timeStr}</span>
             </div>
-            <div class="world-msg-text">🚫 Сообщение от заблокированного пользователя</div>
+            <div class="world-msg-text blocked-msg-notice"><svg class="mini-svg" style="width:14px;height:14px;color:#ff4466;"><use href="#icon-ban"/></svg> Сообщение от заблокированного пользователя</div>
           </div>
         </div>
       `;
@@ -742,7 +742,7 @@ function openUserQuickPopover(username) {
       tagHtml += `<span class="world-msg-tag">Discord: ${escapeHtml(data.discord)}</span>`;
     }
     if (areFriends(AppState.currentUser, username)) {
-      tagHtml += `<span class="world-msg-tag" style="border-color:#34d399;color:#34d399;">🤝 В друзьях</span>`;
+      tagHtml += `<span class="world-msg-tag" style="border-color:#34d399;color:#34d399;"><svg class="mini-svg" style="width:12px;height:12px;margin-right:4px;vertical-align:-1px;"><use href="#icon-users"/></svg>В друзьях</span>`;
     }
     
     const userCustomTags = typeof getUserCustomTags === 'function' ? getUserCustomTags(username) : [];
@@ -813,10 +813,10 @@ function showDirectChatList() {
 
   if (chatList) chatList.classList.add('open');
   if (directRoom) directRoom.style.display = 'none';
-  if (chatBackBtn) chatBackBtn.style.display = 'none';
-  if (chatUserName) chatUserName.textContent = 'Личные диалоги';
-  if (chatAvatar) chatAvatar.textContent = '💬';
-  if (chatUserStatus) chatUserStatus.style.display = 'none';
+    if (chatBackBtn) chatBackBtn.style.display = 'flex';
+    if (chatUserName) chatUserName.textContent = 'Личные сообщения';
+    if (chatAvatar) chatAvatar.innerHTML = '<svg class="mini-svg" style="width:20px;height:20px;color:var(--brand-start);"><use href="#icon-chat"/></svg>';
+    if (chatUserStatus) chatUserStatus.style.display = 'none';
 
   updateChatList();
   updateChatBadge();
@@ -911,7 +911,7 @@ function updateChatList() {
     if (isBlocked) {
       lastText = 'Пользователь в чёрном списке';
     } else if (isTyping) {
-      lastText = '<span style="color:#00e5ff;font-weight:600;">💬 печатает...</span>';
+      lastText = '<span style="color:#00e5ff;font-weight:600;"><svg class="mini-svg" style="width:12px;height:12px;vertical-align:-1px;margin-right:4px;"><use href="#icon-chat"/></svg>печатает...</span>';
     } else if (last) {
       const isOut = last.from === currentUser;
       const ticks = isOut ? `<span class="list-ticks ${last.read ? 'read' : 'sent'}">${last.read ? '✓✓' : '✓'}</span> ` : '';
@@ -926,7 +926,7 @@ function updateChatList() {
         </div>
         <div class="chat-item-body">
           <div class="name">
-            <span>${safePartner} ${isBlocked ? '🚫' : ''}</span>
+            <span>${safePartner} ${isBlocked ? '<svg class="mini-svg" style="width:13px;height:13px;color:#ff4466;vertical-align:-2px;"><use href="#icon-ban"/></svg>' : ''}</span>
             ${last ? `<span class="chat-list-time">${new Date(last.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>` : ''}
           </div>
           <div class="last-msg">${lastText}</div>
@@ -997,7 +997,7 @@ function openFirstContactModal(username) {
   const input = document.getElementById('firstContactMessageInput');
 
   if (sub) sub.textContent = `Отправка первого сообщения и заявки в друзья пользователю ${username}`;
-  if (input) input.value = 'Привет! Давай затимимся 🎮';
+    if (input) input.value = 'Привет! Давай сыграем вместе';
 
   if (modal) {
     modal.classList.add('show', 'open');
@@ -1168,7 +1168,7 @@ function checkFriendBannerStatus(partner) {
     banner.style.display = 'none';
     inputArea.style.display = 'none';
     lockedNotice.style.display = 'block';
-    if (lockedText) lockedText.textContent = '🚫 Переписка заблокирована';
+    if (lockedText) lockedText.innerHTML = '<svg class="mini-svg" style="width:14px;height:14px;color:#ff4466;vertical-align:-2px;margin-right:4px;"><use href="#icon-ban"/></svg> Переписка заблокирована';
     return;
   }
 
@@ -1196,7 +1196,7 @@ function checkFriendBannerStatus(partner) {
     banner.style.display = 'none';
     inputArea.style.display = 'none';
     lockedNotice.style.display = 'block';
-    if (lockedText) lockedText.textContent = '⏳ Заявка отправлена. Ожидание подтверждения от игрока...';
+    if (lockedText) lockedText.innerHTML = '<svg class="mini-svg" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"><use href="#icon-clock"/></svg> Заявка отправлена. Ожидание подтверждения...';
     return;
   }
 
@@ -1242,7 +1242,7 @@ function renderChatMessages() {
   if (msgs.length === 0) {
     container.innerHTML = `
       <div class="chat-greeting">
-        👋 Это начало вашей переписки с <strong>${escapeHtml(AppState.chatPartner)}</strong>.<br>
+        Это начало вашей переписки с <strong>${escapeHtml(AppState.chatPartner)}</strong>.<br>
         Предложите сыграть вместе или созвониться в войсе!
       </div>
     `;
@@ -1452,22 +1452,22 @@ function updateChatMuteUI() {
   if (isMuted && muteInfo) {
     if (worldInput) {
       worldInput.disabled = true;
-      worldInput.placeholder = '🚫 Чат заблокирован';
+      worldInput.placeholder = 'Чат заблокирован';
     }
     if (worldSendBtn) worldSendBtn.disabled = true;
 
     if (directInput) {
       directInput.disabled = true;
-      directInput.placeholder = '🚫 Чат заблокирован';
+      directInput.placeholder = 'Чат заблокирован';
     }
     if (directSendBtn) directSendBtn.disabled = true;
 
     const bannerHtml = `
       <div class="chat-mute-banner">
-        <span class="mute-banner-icon">🔇</span>
+        <span class="mute-banner-icon"><svg class="mini-svg" style="width:16px;height:16px;color:#f59e0b;"><use href="#icon-mute"/></svg></span>
         <div class="mute-banner-text">
           <span class="mute-banner-title">Блокировка чата:</span> ${escapeHtml(muteInfo.muteReason)}
-          <span class="mute-banner-timer">⏳ Осталось: <strong class="mute-timer-val">${muteInfo.remainingFormatted}</strong></span>
+          <span class="mute-banner-timer"><svg class="mini-svg" style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;"><use href="#icon-clock"/></svg>Осталось: <strong class="mute-timer-val">${muteInfo.remainingFormatted}</strong></span>
         </div>
       </div>
     `;
@@ -1589,18 +1589,18 @@ function updatePushSettingsUI() {
     if (statusDot) statusDot.className = 'push-status-dot granted';
     if (statusText) {
       statusText.textContent = enabled 
-        ? 'Уведомления активны 🟢 (Разрешено в браузере)' 
-        : 'Уведомления отключены в настройках Lobbivo ⚪';
+        ? 'Уведомления активны (Разрешено в браузере)' 
+        : 'Уведомления отключены в настройках Lobbivo';
     }
   } else if (perm === 'denied') {
     if (statusDot) statusDot.className = 'push-status-dot denied';
     if (statusText) {
-      statusText.textContent = 'Доступ запрещён в браузере 🔴 (Включите в настройках сайта)';
+      statusText.textContent = 'Доступ запрещён в браузере (Включите в настройках сайта)';
     }
   } else {
     if (statusDot) statusDot.className = 'push-status-dot default';
     if (statusText) {
-      statusText.textContent = 'Требуется разрешение браузера 🟡';
+      statusText.textContent = 'Требуется разрешение браузера';
     }
   }
 }
@@ -1743,7 +1743,7 @@ function renderBlacklistSettings() {
     return `
       <div class="blacklist-item">
         <div class="blacklist-user-info">
-          <div class="blacklist-avatar">🚫</div>
+          <div class="blacklist-avatar"><svg class="mini-svg" style="width:16px;height:16px;color:#ff4466;"><use href="#icon-ban"/></svg></div>
           <div class="blacklist-name">${safeName}</div>
         </div>
         <button type="button" class="btn-unblock" data-unblock="${safeName}">Разблокировать</button>

@@ -607,18 +607,18 @@ function deleteAccount() {
 // ============================================================
 
 const PRESET_PROFILE_TAGS = [
-  '🎯 Снайпер',
-  '🛡️ Саппорт',
-  '👑 Капитан / IGL',
-  '⚡ Рифлер / Fragger',
-  '😎 Chill / Без токсика',
-  '🔞 18+',
-  '🎙️ Микрофон ON',
-  '🔥 Tryhard / Only Win',
-  '🏆 Турниры / FastCup',
-  '🌙 Ночной прайм',
-  '🎮 Full-time',
-  '🔰 Новичок'
+  'Снайпер / Sniper',
+  'Саппорт / Support',
+  'Капитан / IGL',
+  'Рифлер / Fragger',
+  'Chill / Без токсика',
+  '18+ Mature',
+  'Voice / Микрофон ON',
+  'Tryhard / Only Win',
+  'Турниры / FastCup',
+  'Ночной прайм',
+  'Full-time Gamer',
+  'Новичок / Rookie'
 ];
 
 let currentProfileEditingTags = [];

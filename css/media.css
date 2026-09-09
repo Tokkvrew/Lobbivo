@@ -715,6 +715,51 @@
     gap: 8px !important;
   }
 
+  /* Админ-панель на смартфонах */
+  .admin-modal-glass {
+    max-height: 92vh !important;
+    padding: 20px 14px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .admin-stats-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .admin-nav-tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    padding-bottom: 6px !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .admin-tab-btn {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    padding: 7px 10px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .admin-tab-content {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    min-height: 0 !important;
+  }
+
+  .admin-badge-settings-wrap {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 24px !important;
+  }
+
+  .admin-badge-presets-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
   /* Welcome Landing Gateway */
   .welcome-hero-card {
     padding: 26px 14px 22px;
