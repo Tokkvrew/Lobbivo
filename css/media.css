@@ -523,12 +523,21 @@
   }
 
   .coin-modal-tabs {
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 4px;
+    padding: 3px;
   }
 
   .coin-tab-btn {
-    padding: 9px 10px;
-    font-size: 0.85rem;
+    padding: 6px 4px;
+    font-size: 0.76rem;
+    gap: 4px;
+    height: 36px;
+  }
+
+  .coin-tab-btn svg {
+    width: 13px;
+    height: 13px;
   }
 
   .coin-task-card {
@@ -579,21 +588,28 @@
     transform: rotate(90deg);
   }
 
-  /* Профиль игрока */
+  /* Профиль игрока и кастомизация */
   .profile-container {
     max-width: 100%;
   }
 
   .profile-hero-card {
-    padding: 20px 14px;
+    padding: 18px 14px;
     border-radius: 20px;
   }
 
-  .profile-header {
+  .profile-hero-top {
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 14px;
+  }
+
+  .profile-hero-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .profile-name-row {
@@ -604,17 +620,69 @@
     justify-content: center;
   }
 
-  .profile-info-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+  .profile-hero-coins-box {
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .profile-buttons {
+  .profile-nav-tabs {
+    flex-direction: row;
+    gap: 6px;
+    padding: 4px;
+  }
+
+  .profile-tab-btn {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    gap: 4px;
+  }
+
+  .profile-tab-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .profile-overview-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .premium-showcase-content {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .custom-avatar-stage-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px 14px;
+    gap: 14px;
+  }
+
+  .stage-frame-name {
+    justify-content: center;
+  }
+
+  .custom-frames-grid,
+  .custom-themes-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .edit-avatar-upload-row {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .edit-clean-footer-actions {
     flex-direction: column;
     gap: 8px;
   }
 
-  .profile-buttons .btn {
+  .edit-clean-footer-actions .btn {
     width: 100%;
     justify-content: center;
   }
@@ -905,5 +973,62 @@
   .complaint-actions-row button {
     width: 100%;
     justify-content: center;
+  }
+
+  /* Адаптив магазина Lobbivo на смартфонах */
+  .premium-plans-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .premium-perks-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .shop-frames-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .shop-themes-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .shop-boost-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .boost-card-actions {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  .btn-buy-boost {
+    flex: 1 !important;
+    text-align: center !important;
+  }
+
+  .vip-pinned-capsule {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 8px 10px !important;
+  }
+
+  .vip-pinned-left {
+    width: 100% !important;
+  }
+
+  .vip-pinned-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .btn-vip-join {
+    flex: 1 !important;
+    justify-content: center !important;
   }
 }

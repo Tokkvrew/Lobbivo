@@ -1,5 +1,5 @@
 // ============================================================
-//  ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (PROFILE MANAGEMENT)
+//  ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (PROFILE DASHBOARD & CUSTOMIZATION)
 // ============================================================
 
 function updateHeaderAvatar() {
@@ -13,29 +13,43 @@ function updateHeaderAvatar() {
 
   const current = AppState.currentUser;
   const data = current ? AppState.users[current] : null;
+  const isPremium = current ? isUserPremium(current) : false;
+  const frameId = current ? getUserEquippedFrame(current) : 'none';
 
+  let avatarInner = '';
   if (data && data.avatar) {
-    if (el) el.innerHTML = `<img src="${data.avatar}" alt="${escapeHtml(current)}">`;
-    if (dropdownAvatar) dropdownAvatar.innerHTML = `<img src="${data.avatar}" alt="${escapeHtml(current)}">`;
+    avatarInner = `<img src="${data.avatar}" alt="${escapeHtml(current)}">`;
   } else if (current) {
     const initials = current.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    if (el) el.innerHTML = `<span id="headerAvatarText">${escapeHtml(initials || '?')}</span>`;
-    if (dropdownAvatar) dropdownAvatar.innerHTML = `<span>${escapeHtml(initials || '?')}</span>`;
+    avatarInner = `<span id="headerAvatarText">${escapeHtml(initials || '?')}</span>`;
   } else {
-    if (el) el.innerHTML = `<span id="headerAvatarText">?</span>`;
-    if (dropdownAvatar) dropdownAvatar.innerHTML = `<span>?</span>`;
+    avatarInner = `<span id="headerAvatarText">?</span>`;
   }
+
+  let framedAvatarHtml = avatarInner;
+  if (frameId && frameId !== 'none') {
+    framedAvatarHtml = `<div class="avatar-frame-wrap frame-${frameId}">${avatarInner}</div>`;
+  }
+
+  if (el) el.innerHTML = framedAvatarHtml;
+  if (dropdownAvatar) dropdownAvatar.innerHTML = framedAvatarHtml;
 
   const isAdmin = current && typeof isUserAdmin === 'function' && isUserAdmin(current);
 
   if (dropdownUsername) {
-    dropdownUsername.textContent = current || 'Гость';
+    dropdownUsername.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(current || 'Гость')}</span>${isPremium ? ' <span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : ''}`;
   }
   if (dropdownStatusText) {
-    dropdownStatusText.textContent = isAdmin ? '👑 Администратор' : (current ? 'В сети' : 'Не авторизован');
+    if (isAdmin) {
+      dropdownStatusText.innerHTML = `<svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#icon-admin-shield"/></svg> Администратор`;
+    } else if (isPremium) {
+      dropdownStatusText.innerHTML = `<svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#icon-crown"/></svg> Lobbivo Premium`;
+    } else {
+      dropdownStatusText.textContent = current ? 'В сети' : 'Не авторизован';
+    }
   }
   if (dropdownStatusDot) {
-    dropdownStatusDot.className = isAdmin ? 'online-glow-dot admin' : (current ? 'online-glow-dot active' : 'online-glow-dot guest');
+    dropdownStatusDot.className = isAdmin ? 'online-glow-dot admin' : (isPremium ? 'online-glow-dot premium' : (current ? 'online-glow-dot active' : 'online-glow-dot guest'));
   }
   if (capsuleLabel) {
     capsuleLabel.textContent = current || 'Профиль';
@@ -58,39 +72,38 @@ function updateHeaderAvatar() {
     dropdownCoinEl.style.display = current ? 'inline-block' : 'none';
   }
 
-  // Динамический рендеринг меню: для гостей и пользователей
+  // Динамический рендеринг меню: для гостей и авторизованных пользователей
   if (menuList) {
     if (current) {
       menuList.innerHTML = `
         ${isAdmin ? `
           <button class="profile-menu-item admin-menu-item" data-action="admin">
-            <span style="color:#ff3366; font-weight:700;">🛡️ Админ Панель</span>
+            <span style="color:#ff3366; font-weight:700;"><svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-admin-shield"/></svg>Админ Панель</span>
           </button>
           <div class="menu-divider-line"></div>
         ` : ''}
         <button class="profile-menu-item" data-action="profile">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-profile"/></svg>
           <span>Мой профиль</span>
         </button>
-        <button class="profile-menu-item" data-action="settings">
-          <span>Настройки интерфейса</span>
-        </button>
         <button class="profile-menu-item" data-action="about">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-about"/></svg>
           <span>О платформе</span>
         </button>
         <div class="menu-divider-line"></div>
         <button class="profile-menu-item logout-item" data-action="logout">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-logout"/></svg>
           <span>Выйти из аккаунта</span>
         </button>
       `;
     } else {
       menuList.innerHTML = `
         <button class="profile-menu-item" data-action="login">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-profile"/></svg>
           <span>Войти в аккаунт</span>
         </button>
-        <button class="profile-menu-item" data-action="settings">
-          <span>Настройки интерфейса</span>
-        </button>
         <button class="profile-menu-item" data-action="about">
+          <svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-about"/></svg>
           <span>О платформе</span>
         </button>
       `;
@@ -107,16 +120,56 @@ function showProfile() {
   renderProfile();
 }
 
+function switchProfileTab(tabName = 'overview') {
+  // Для обратной совместимости: всё находится на единой странице профиля
+  renderProfile();
+}
+
 function renderProfile() {
   if (!AppState.currentUser) return;
   const current = AppState.currentUser;
   const data = AppState.users[current];
   if (!data) return;
 
-  const nameEl = document.getElementById('profileName');
-  if (nameEl) nameEl.textContent = current;
-
+  const isPremium = isUserPremium(current);
+  const frameId = getUserEquippedFrame(current) || 'none';
   const gameObj = GAMES.find(g => g.id === data.game) || GAMES[0];
+  const userCoins = typeof data.coins === 'number' ? data.coins : 0;
+
+  // 1. Имя и ID
+  const nameEl = document.getElementById('profileName');
+  if (nameEl) {
+    nameEl.textContent = current;
+    if (isPremium) nameEl.classList.add('premium-author');
+    else nameEl.classList.remove('premium-author');
+  }
+
+  const crownEl = document.getElementById('profilePremiumCrown');
+  if (crownEl) {
+    crownEl.style.display = isPremium ? 'inline-flex' : 'none';
+  }
+
+  const idEl = document.getElementById('profileId');
+  if (idEl) idEl.textContent = `ID: ${data.id || '---'}`;
+
+  // 2. Аватар в шапке профиля с рамкой
+  const avatarEl = document.getElementById('profileAvatar');
+  const avatarWrap = document.getElementById('profileAvatarFrameWrap');
+
+  if (avatarWrap) {
+    avatarWrap.className = 'avatar-frame-wrap' + (frameId !== 'none' ? ` frame-${frameId}` : '');
+  }
+
+  if (avatarEl) {
+    if (data.avatar) {
+      avatarEl.innerHTML = `<img src="${data.avatar}" alt="${escapeHtml(current)}">`;
+    } else {
+      const initials = current.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      avatarEl.innerHTML = `<span id="profileAvatarText">${escapeHtml(initials || '?')}</span>`;
+    }
+  }
+
+  // 3. Теги шапки (Игра, Платформа, Статус)
   const profileGameEl = document.getElementById('profileGame');
   if (profileGameEl) {
     const iconUse = profileGameEl.querySelector('svg use');
@@ -125,52 +178,13 @@ function renderProfile() {
     if (span) span.textContent = gameObj.name;
   }
 
-  const avatarEl = document.getElementById('profileAvatar');
-  if (avatarEl) {
-    if (data.avatar) {
-      avatarEl.innerHTML = `
-        <img src="${data.avatar}" alt="${escapeHtml(current)}">
-        <span class="online-dot"></span>
-        <div class="avatar-edit-btn" id="avatarEditBtn">
-          <svg style="width:13px;height:13px;stroke:currentColor;fill:none;display:inline-block;vertical-align:middle;margin-right:2px;"><use href="#icon-sparkles"/></svg>
-          Фото
-        </div>
-      `;
-    } else {
-      const initials = current.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-      avatarEl.innerHTML = `
-        <span id="profileAvatarText">${escapeHtml(initials || '?')}</span>
-        <span class="online-dot"></span>
-        <div class="avatar-edit-btn" id="avatarEditBtn">
-          <svg style="width:13px;height:13px;stroke:currentColor;fill:none;display:inline-block;vertical-align:middle;margin-right:2px;"><use href="#icon-sparkles"/></svg>
-          Фото
-        </div>
-      `;
-    }
-    // Повторное подключение клика для загрузки фото
-    document.getElementById('avatarEditBtn')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.getElementById('editAvatarFile')?.click();
-    });
+  const profileDevicePill = document.getElementById('profileDevicePill');
+  const profileDeviceText = document.getElementById('profileDeviceText');
+  if (profileDeviceText) profileDeviceText.textContent = data.device || 'PC';
+  if (profileDevicePill) {
+    const devIconUse = profileDevicePill.querySelector('svg use');
+    if (devIconUse) devIconUse.setAttribute('href', '#' + getDeviceIconSVG(data.device || 'PC'));
   }
-
-  const descEl = document.getElementById('profileDesc');
-  if (descEl) {
-    descEl.innerHTML = data.desc 
-      ? `<div class="desc-text">${escapeHtml(data.desc)}</div>` 
-      : '<span class="empty">Информация о себе не заполнена. Расскажите о любимых ролях и времени игры в настройках профиля.</span>';
-  }
-
-  const deviceIconSVG = getDeviceIconSVG(data.device || 'PC');
-  const deviceEl = document.getElementById('profileDevice');
-  if (deviceEl) {
-    deviceEl.innerHTML = data.device 
-      ? `<div class="device-pill-view"><svg class="device-icon device-icon-sm"><use href="#${escapeHtml(deviceIconSVG)}"/></svg><span>${escapeHtml(data.device)}</span></div>`
-      : '<span class="empty">Не указано</span>';
-  }
-
-  const idEl = document.getElementById('profileId');
-  if (idEl) idEl.textContent = `ID: ${data.id || '---'}`;
 
   const sinceEl = document.getElementById('profileMemberSince');
   if (sinceEl) {
@@ -178,7 +192,13 @@ function renderProfile() {
     sinceEl.textContent = `· с ${since}`;
   }
 
-  // Заполнение формы редактирования
+  // 4. Баланс монет в шапке профиля
+  const coinNumEl = document.getElementById('profileCoinBalanceNum');
+  if (coinNumEl) {
+    coinNumEl.textContent = `${userCoins.toLocaleString('ru-RU')} LC`;
+  }
+
+  // 5. Заполнение формы редактирования анкеты
   const editUsername = document.getElementById('editUsername');
   const editGame = document.getElementById('editGame');
   const editDesc = document.getElementById('editDesc');
@@ -194,24 +214,177 @@ function renderProfile() {
   }
   if (editDesc) editDesc.value = data.desc || '';
 
-  const editForm = document.getElementById('profileEditForm');
-  const editProfileBtn = document.getElementById('editProfileBtn');
+  // 6. Обновление кастомизации (рамок и тем)
+  renderProfileCustomization();
 
-  if (AppState.isEditing) {
-    if (editForm) editForm.classList.add('open');
-    if (editProfileBtn) {
-      editProfileBtn.classList.add('active');
-      editProfileBtn.innerHTML = '<svg><use href="#icon-close"/></svg> <span>Закрыть настройки</span>';
+  // 7. Обновление настроек приватности, Push и черного списка
+  if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
+  if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
+
+  // 8. Обновление аватара в шапке
+  updateHeaderAvatar();
+}
+
+function renderProfileCustomization() {
+  const current = AppState.currentUser;
+  const user = current ? AppState.users[current] : null;
+  const equippedFrame = current ? getUserEquippedFrame(current) : 'none';
+  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], boosts: 0 };
+  const currentTheme = AppState.currentTheme || 'default';
+
+  // 1. Обновление стенда живого предпросмотра
+  const stageWrap = document.getElementById('customStageFrameWrap');
+  const stageAvatar = document.getElementById('customStageLiveAvatar');
+  const stageFrameName = document.getElementById('customStageFrameName');
+
+  if (stageWrap && stageAvatar && stageFrameName) {
+    stageWrap.className = 'avatar-frame-wrap' + (equippedFrame !== 'none' ? ` frame-${equippedFrame}` : '');
+    
+    if (user && user.avatar) {
+      stageAvatar.innerHTML = `<img src="${user.avatar}" alt="${escapeHtml(current)}">`;
+    } else {
+      const initials = current ? current.slice(0, 2).toUpperCase() : '?';
+      stageAvatar.innerHTML = `<span>${initials}</span>`;
     }
-  } else {
-    if (editForm) editForm.classList.remove('open');
-    if (editProfileBtn) {
-      editProfileBtn.classList.remove('active');
-      editProfileBtn.innerHTML = '<svg><use href="#icon-settings"/></svg> <span>Редактировать профиль</span>';
-    }
+
+    const currentFrameDef = FRAME_DEFINITIONS.find(f => f.id === equippedFrame) || FRAME_DEFINITIONS[0];
+    stageFrameName.innerHTML = `<svg class="item-title-icon ${currentFrameDef.id}-icon"><use href="#${currentFrameDef.icon}"/></svg> <span>${currentFrameDef.name}</span>`;
   }
 
-  updateHeaderAvatar();
+  // 2. Сетка рамок
+  const framesGrid = document.getElementById('profileFramesGrid');
+  if (framesGrid) {
+    let html = '';
+    FRAME_DEFINITIONS.forEach(frame => {
+      const isEquipped = equippedFrame === frame.id;
+      const isOwned = frame.id === 'none' || inventory.frames.includes(frame.id);
+      const activeClass = isEquipped ? ' active' : '';
+
+      let btnHtml = '';
+      if (isEquipped) {
+        btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
+      } else if (isOwned) {
+        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipFrameFromProfile('${frame.id}')"><span>Надеть</span></button>`;
+      } else {
+        btnHtml = `<button type="button" class="btn-custom-action btn-buy-link" onclick="openShopForCustomization('shop')"><svg><use href="#icon-shop"/></svg> <span>В магазине (${frame.cost} LC)</span></button>`;
+      }
+
+      const avatarContent = (user && user.avatar) ? `<img src="${user.avatar}" alt="${escapeHtml(current)}">` : `<span>${current ? current.slice(0, 2).toUpperCase() : '?'}</span>`;
+      const frameWrapClass = frame.id !== 'none' ? ` frame-${frame.id}` : '';
+
+      html += `
+        <div class="custom-frame-card${activeClass}" data-frame-id="${frame.id}">
+          <div class="frame-preview-box">
+            <div class="avatar-frame-wrap${frameWrapClass}">
+              <div class="frame-preview-avatar">${avatarContent}</div>
+            </div>
+          </div>
+          <div class="frame-card-info">
+            <div class="frame-name">
+              <svg class="item-title-icon ${frame.id}-icon"><use href="#${frame.icon}"/></svg>
+              <span>${frame.name}</span>
+            </div>
+            <div class="frame-desc">${frame.desc}</div>
+          </div>
+          ${btnHtml}
+        </div>
+      `;
+    });
+    framesGrid.innerHTML = html;
+  }
+
+  // 3. Сетка тем
+  const themesGrid = document.getElementById('profileThemesGrid');
+  if (themesGrid) {
+    let html = '';
+    THEME_DEFINITIONS.forEach(theme => {
+      const isActive = currentTheme === theme.id;
+      const isOwned = theme.id === 'default' || theme.id === 'lobbivo' || inventory.themes.includes(theme.id);
+      const activeClass = isActive ? ' active' : '';
+
+      let btnHtml = '';
+      if (isActive) {
+        btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Активна</span></div>`;
+      } else if (isOwned) {
+        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="applyThemeFromProfile('${theme.id}')"><span>Применить</span></button>`;
+      } else {
+        btnHtml = `<button type="button" class="btn-custom-action btn-buy-link" onclick="openShopForCustomization('shop')"><svg><use href="#icon-shop"/></svg> <span>В магазине (${theme.cost} LC)</span></button>`;
+      }
+
+      html += `
+        <div class="custom-theme-card${activeClass}" data-theme-id="${theme.id}" onclick="if('${isOwned}' === 'true') applyThemeFromProfile('${theme.id}')">
+          <div class="theme-palette-preview ${theme.previewClass}">
+            ${theme.id === 'lobbivo' ? '<span class="preview-l-glyph">L</span>' : ''}
+          </div>
+          <div class="theme-card-info">
+            <div class="theme-name">
+              <svg class="item-title-icon ${theme.id}-icon"><use href="#${theme.icon}"/></svg>
+              <span>${theme.name}</span>
+            </div>
+            <div class="theme-desc">${theme.desc}</div>
+          </div>
+          ${btnHtml}
+        </div>
+      `;
+    });
+    themesGrid.innerHTML = html;
+  }
+}
+
+// Алиас для обратной совместимости
+function renderSettingsCustomization() {
+  renderProfileCustomization();
+}
+
+function equipFrameFromProfile(frameId) {
+  const current = AppState.currentUser;
+  if (!current || !AppState.users[current]) {
+    showNotification('Требуется вход', 'Войдите в аккаунт, чтобы надеть рамку');
+    showAuthModal('login');
+    return;
+  }
+
+  const user = AppState.users[current];
+  user.equippedFrame = frameId;
+  saveUsers(current);
+
+  renderProfile();
+  if (typeof renderWorldChat === 'function') renderWorldChat();
+  if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
+  if (typeof updateUI === 'function') updateUI();
+
+  const frameDef = FRAME_DEFINITIONS.find(f => f.id === frameId);
+  showNotification('Рамка установлена', frameId === 'none' ? 'Установлен стандартный аватар без рамки' : `Надета рамка: ${frameDef?.name || frameId}`);
+}
+
+function applyThemeFromProfile(themeId) {
+  const current = AppState.currentUser;
+  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], boosts: 0 };
+  const isFree = (themeId === 'default' || themeId === 'lobbivo');
+  const isOwned = isFree || inventory.themes.includes(themeId);
+
+  if (!isOwned) {
+    showNotification('Тема не куплена', 'Откройте магазин, чтобы приобрести данную тему оформления');
+    openCoinModal('shop');
+    return;
+  }
+
+  const themeDef = THEME_DEFINITIONS.find(t => t.id === themeId);
+  const themeName = themeDef?.name || themeId;
+
+  showSystemLoader('Применяю тему...', 500, () => {
+    saveTheme(themeId);
+    renderProfile();
+    showNotification('Тема изменена', `Активирована тема: ${themeName}`);
+  });
+}
+
+function equipFrameFromSettings(frameId) {
+  equipFrameFromProfile(frameId);
+}
+
+function applyThemeFromSettings(themeId) {
+  applyThemeFromProfile(themeId);
 }
 
 async function saveProfile() {
@@ -233,6 +406,14 @@ async function saveProfile() {
   const fileInput = document.getElementById('editAvatarFile');
   if (fileInput && fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0];
+    const isGif = file.type === 'image/gif' || (file.name && file.name.toLowerCase().endsWith('.gif'));
+
+    if (isGif && !isUserPremium(current)) {
+      showNotification('Lobbivo Premium', 'Для установки GIF-аватарок необходим статус Lobbivo Premium! Перейдите во вкладку Магазин.');
+      if (typeof openCoinModal === 'function') openCoinModal('shop');
+      return;
+    }
+
     if (file.size > 5 * 1024 * 1024) {
       showNotification('Ошибка', 'Размер изображения не должен превышать 5 МБ');
       return;
@@ -265,9 +446,9 @@ function finishProfileSave(oldUsername, newUsername, game, device, desc) {
     renameUser(oldUsername, newUsername);
   } else {
     saveUsers();
-    AppState.isEditing = false;
     renderProfile();
     updateGameCounts();
+    switchProfileTab('overview');
     showNotification('Успешно', 'Профиль обновлен!');
   }
 }
@@ -276,7 +457,7 @@ function renameUser(oldName, newName) {
   AppState.users[newName] = { ...AppState.users[oldName] };
   delete AppState.users[oldName];
 
-  // Миграция истории сообщений с поддержкой нового и старого формата ключей
+  // Миграция истории сообщений
   const updatedMessages = {};
   for (const [key, msgs] of Object.entries(AppState.messages)) {
     let newKey = key;
@@ -332,11 +513,11 @@ function renameUser(oldName, newName) {
 
   saveUsers();
   saveMessages();
-  AppState.isEditing = false;
   
   updateUI();
   renderProfile();
   updateGameCounts();
+  switchProfileTab('overview');
   showNotification('Профиль обновлен', `Ник успешно изменен на ${newName}`);
 }
 
@@ -392,7 +573,6 @@ function deleteAccount() {
 
   AppState.currentUser = null;
   AppState.chatPartner = null;
-  AppState.isEditing = false;
   localStorage.removeItem('squad_session');
 
   updateUI();

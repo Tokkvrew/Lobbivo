@@ -47,3 +47,20 @@ const DEVICE_ICONS = {
   'Mobile': 'icon-device-mobile',
   'Other': 'icon-device-other'
 };
+
+const FRAME_DEFINITIONS = [
+  { id: 'none', name: 'Без рамки', icon: 'icon-ban', desc: 'Стандартный профиль без эффектов', cost: 0 },
+  { id: 'fire', name: 'Flame Fury', icon: 'icon-flame', desc: 'Пылающий неоновый огонь', cost: 120 },
+  { id: 'cyber', name: 'Cyber Neon', icon: 'icon-cyber', desc: 'Киберпанковое свечение', cost: 140 },
+  { id: 'gold', name: 'Imperial Gold', icon: 'icon-crown', desc: 'Золотой ореол императора', cost: 180 },
+  { id: 'ice', name: 'Glacier Ice', icon: 'icon-ice', desc: 'Ледяное мерцание кристалла', cost: 120 },
+  { id: 'ghost', name: 'Ghost Void', icon: 'icon-ghost', desc: 'Мистическая фиолетовая бездна', cost: 130 }
+];
+
+const THEME_DEFINITIONS = [
+  { id: 'default', name: 'Neon Cyber', previewClass: 'theme-default-preview', icon: 'icon-sparkles', desc: 'Классический неоново-голубой стиль', cost: 0 },
+  { id: 'lobbivo', name: 'Liquid Glass', previewClass: 'theme-lobbivo-preview', icon: 'icon-palette-shop', desc: 'Фирменный фиолетовый кибер-интерфейс', cost: 0 },
+  { id: 'nebula', name: 'Deep Nebula', previewClass: 'theme-nebula-preview', icon: 'icon-palette-shop', desc: 'Космический ультра-фиолет и звезды', cost: 80 },
+  { id: 'crimson', name: 'Crimson Red', previewClass: 'theme-crimson-preview', icon: 'icon-flame', desc: 'Огненно-бордовый с искрами', cost: 80 },
+  { id: 'matrix', name: 'Matrix Emerald', previewClass: 'theme-matrix-preview', icon: 'icon-nodes-menu', desc: 'Изумрудный кибернетический код', cost: 80 }
+];

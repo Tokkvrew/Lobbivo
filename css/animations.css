@@ -424,3 +424,96 @@
     transform: scale(1) translateY(0);
   }
 }
+
+/* ============================================================
+   АНИМАЦИИ МАГАЗИНА, РАМОК И ПРЕМИУМ-ЭФФЕКТОВ
+   ============================================================ */
+
+/* 1. Переливающийся градиентный никнейм */
+@keyframes rainbowAuthorShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 2. Вращение конического градиента для рамок */
+@keyframes rotateConicFrame {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 3. Огненная ярость (Flame) */
+@keyframes flameBorderGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 68, 0, 0.7), 0 0 20px rgba(255, 170, 0, 0.4);
+    filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 30, 0, 0.95), 0 0 28px rgba(255, 200, 0, 0.6);
+    filter: drop-shadow(0 0 10px rgba(255, 120, 0, 1));
+  }
+}
+
+/* 4. Киберпанк неон (Cyber) */
+@keyframes cyberNeonPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.7), inset 0 0 8px rgba(255, 0, 128, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 0, 128, 0.85), inset 0 0 12px rgba(0, 240, 255, 0.6);
+  }
+}
+
+/* 5. Золото 24k (Gold Imperial) */
+@keyframes goldImperialGleam {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(255, 200, 50, 0.65), 0 0 22px rgba(255, 170, 0, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 225, 100, 0.95), 0 0 32px rgba(255, 190, 30, 0.6);
+  }
+}
+
+/* 6. Ледяной шторм (Glacier Ice) */
+@keyframes glacierIcePulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(100, 220, 255, 0.6), 0 0 20px rgba(0, 150, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(180, 245, 255, 0.9), 0 0 26px rgba(0, 200, 255, 0.5);
+  }
+}
+
+/* 7. Фиолетовый фантом (Ghost Void) */
+@keyframes ghostVoidMist {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(180, 50, 255, 0.6), inset 0 0 6px rgba(120, 0, 255, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(210, 80, 255, 0.9), inset 0 0 10px rgba(180, 0, 255, 0.7);
+    transform: scale(1.02);
+  }
+}
+
+/* 8. VIP Pinned Capsule Pulse */
+@keyframes vipCapsulePulse {
+  0%, 100% {
+    border-color: rgba(255, 190, 30, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(255, 190, 30, 0.15);
+  }
+  50% {
+    border-color: rgba(255, 215, 0, 0.85);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 215, 0, 0.3);
+  }
+}

@@ -30,7 +30,6 @@ const FirebaseSync = {
       
       this.rtdb = firebase.database();
       this.initialized = true;
-      console.log('⚡ Firebase Realtime Cloud Sync успешно подключен:', firebaseConfig.databaseURL);
 
       this.initListeners();
       this.pruneWorldMessages(500);
@@ -340,7 +339,6 @@ const FirebaseSync = {
             });
             if (Object.keys(updates).length > 0) {
               this.rtdb.ref('worldMessages').update(updates)
-                .then(() => console.log(`🧹 Автоочистка хоста: удалено ${deleted} старых сообщений из мирового чата (лимит ${maxLimit})`))
                 .catch(err => console.warn('World messages prune error:', err.message));
             }
           }
@@ -395,7 +393,6 @@ const FirebaseSync = {
     if (!this.initialized || !this.rtdb || !msgId) return;
     try {
       this.rtdb.ref('worldMessages/' + msgId).remove()
-        .then(() => console.log('🗑️ Сообщение удалено из мирового чата:', msgId))
         .catch(err => console.warn('Cloud delete world msg error:', err.message));
     } catch (err) {
       console.warn('Cloud delete world msg exception:', err);
@@ -407,7 +404,6 @@ const FirebaseSync = {
     if (!this.initialized || !this.rtdb || !complaintId) return;
     try {
       this.rtdb.ref('complaints/' + complaintId).remove()
-        .then(() => console.log('🗑️ Жалоба закрыта/удалена:', complaintId))
         .catch(err => console.warn('Cloud delete complaint error:', err.message));
     } catch (err) {
       console.warn('Cloud delete complaint exception:', err);

@@ -278,9 +278,152 @@ function getChatPartnerFromKey(key, currentUser) {
 //  5. МИРОВОЙ ЧАТ (WORLD CHAT STREAM)
 // ============================================================
 
+function renderVipSquadPinnedBar() {
+  const bar = document.getElementById('vipSquadPinnedBar');
+  if (!bar) return;
+
+  const current = AppState.currentUser;
+  const now = Date.now();
+  
+  // Ищем пользователей с активным VIP-бустом анкеты
+  let vipCandidate = null;
+  let highestBoostTime = 0;
+
+  for (const [name, data] of Object.entries(AppState.users)) {
+    if (!data.lookingForTeam) continue;
+    if (data.vipBoostUntil && Number(data.vipBoostUntil) > now) {
+      if (Number(data.vipBoostUntil) > highestBoostTime) {
+        highestBoostTime = Number(data.vipBoostUntil);
+        vipCandidate = { username: name, data: data, isBoosted: true };
+      }
+    }
+  }
+
+  // Если нет бустнутых, берем премиум-игрока с активной анкетой
+  if (!vipCandidate) {
+    for (const [name, data] of Object.entries(AppState.users)) {
+      if (!data.lookingForTeam) continue;
+      if (isUserPremium(name)) {
+        vipCandidate = { username: name, data: data, isBoosted: false };
+        break;
+      }
+    }
+  }
+
+  if (!vipCandidate) {
+    bar.style.display = 'none';
+    bar.innerHTML = '';
+    return;
+  }
+
+  const { username, data, isBoosted } = vipCandidate;
+
+  // Проверка скрытия объявления пользователем в localStorage
+  const dismissKey = `lobbivo_dismissed_vip_${username}`;
+  if (localStorage.getItem(dismissKey) === 'true') {
+    bar.style.display = 'none';
+    bar.innerHTML = '';
+    return;
+  }
+
+  const safeName = escapeHtml(username);
+  const gameObj = GAMES.find(g => g.id === data.game) || GAMES[0];
+  const frameId = getUserEquippedFrame(username);
+  const safeDesc = escapeHtml(data.desc || 'Ищу тиммейтов для совместной игры и побед!');
+  const isMe = current === username;
+
+  let avatarHtml;
+  if (data.avatar) {
+    avatarHtml = `<img src="${data.avatar}" alt="${safeName}">`;
+  } else {
+    const initials = safeName.slice(0, 2).toUpperCase();
+    avatarHtml = `<span>${initials || '?'}</span>`;
+  }
+
+  if (frameId && frameId !== 'none') {
+    avatarHtml = `<div class="avatar-frame-wrap frame-${frameId}">${avatarHtml}</div>`;
+  }
+
+  bar.innerHTML = `
+    <div class="vip-pinned-capsule ${isBoosted ? 'boosted' : 'premium'}">
+      <div class="vip-pinned-left">
+        <div class="vip-pinned-badge">
+          <svg><use href="#icon-badge-vip"/></svg>
+          <span>VIP СБОР</span>
+        </div>
+        <div class="vip-pinned-avatar" data-username="${safeName}">
+          ${avatarHtml}
+        </div>
+        <div class="vip-pinned-info">
+          <div class="vip-pinned-header">
+            <span class="vip-pinned-name ${isUserPremium(username) ? 'premium-author' : ''}" data-username="${safeName}">
+              ${safeName}
+            </span>
+            ${isUserPremium(username) ? '<span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : ''}
+            <span class="vip-pinned-game">
+              <svg><use href="#${escapeHtml(gameObj.icon)}"/></svg>
+              <span>${escapeHtml(gameObj.name)}</span>
+            </span>
+            ${data.rank ? `<span class="vip-pinned-rank">${escapeHtml(data.rank)}</span>` : ''}
+          </div>
+          <div class="vip-pinned-desc">${safeDesc}</div>
+        </div>
+      </div>
+      <div class="vip-pinned-actions">
+        ${!isMe ? `
+          <button type="button" class="btn-vip-join" data-username="${safeName}" title="Написать игроку">
+            <svg><use href="#icon-chat"/></svg>
+            <span>Вступить</span>
+          </button>
+        ` : `
+          <span class="vip-my-squad-tag">Ваш закреп</span>
+        `}
+        <button type="button" class="btn-vip-dismiss" data-dismiss-user="${safeName}" title="Скрыть это объявление навсегда">
+          <svg><use href="#icon-close-sm"/></svg>
+        </button>
+      </div>
+    </div>
+  `;
+
+  bar.style.display = 'block';
+
+  // Обработчики кликов
+  bar.querySelectorAll('[data-username]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      openUserQuickPopover(el.dataset.username);
+    };
+  });
+
+  const joinBtn = bar.querySelector('.btn-vip-join');
+  if (joinBtn) {
+    joinBtn.onclick = (e) => {
+      e.stopPropagation();
+      initiateChatWith(joinBtn.dataset.username);
+    };
+  }
+
+  const dismissBtn = bar.querySelector('.btn-vip-dismiss');
+  if (dismissBtn) {
+    dismissBtn.onclick = (e) => {
+      e.stopPropagation();
+      const targetUser = dismissBtn.dataset.dismissUser;
+      localStorage.setItem(`lobbivo_dismissed_vip_${targetUser}`, 'true');
+      bar.classList.add('dismissing');
+      setTimeout(() => {
+        bar.style.display = 'none';
+        bar.classList.remove('dismissing');
+        bar.innerHTML = '';
+      }, 240);
+    };
+  }
+}
+
 function renderWorldChat() {
   const container = document.getElementById('worldChatMessages');
   if (!container) return;
+
+  renderVipSquadPinnedBar();
 
   loadWorldMessages();
   const msgs = AppState.worldMessages || [];
@@ -307,6 +450,8 @@ function renderWorldChat() {
     const msgId = escapeHtml(msg.id || '');
     const timeStr = new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const gameObj = GAMES.find(g => g.id === (authorData ? authorData.game : msg.game)) || GAMES[0];
+    const isAuthorPremium = isUserPremium(msg.from);
+    const authorFrame = getUserEquippedFrame(msg.from);
 
     let avatarHtml;
     if (authorData && authorData.avatar) {
@@ -315,6 +460,13 @@ function renderWorldChat() {
       const initials = safeAuthor.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
       avatarHtml = initials || '?';
     }
+
+    if (authorFrame && authorFrame !== 'none') {
+      avatarHtml = `<div class="avatar-frame-wrap frame-${authorFrame}">${avatarHtml}</div>`;
+    }
+
+    const premiumBadgeHtml = isAuthorPremium ? `<span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>` : '';
+    const authorClass = isAuthorPremium ? 'world-msg-author premium-author' : 'world-msg-author';
 
     // Рендеринг цитаты ответа (если есть)
     let replyQuoteHtml = '';
@@ -353,7 +505,8 @@ function renderWorldChat() {
           <div class="world-msg-avatar">${avatarHtml}</div>
           <div class="world-msg-body">
             <div class="world-msg-header">
-              <span class="world-msg-author" data-username="${safeAuthor}">${safeAuthor}</span>
+              <span class="${authorClass}" data-username="${safeAuthor}">${safeAuthor}</span>
+              ${premiumBadgeHtml}
               <span class="world-msg-time">${timeStr}</span>
               ${actionsHtml}
             </div>
@@ -367,7 +520,8 @@ function renderWorldChat() {
           <div class="world-msg-avatar" data-username="${safeAuthor}" title="Открыть профиль">${avatarHtml}</div>
           <div class="world-msg-body">
             <div class="world-msg-header">
-              <span class="world-msg-author" data-username="${safeAuthor}" title="Открыть профиль">${safeAuthor}</span>
+              <span class="${authorClass}" data-username="${safeAuthor}" title="Открыть профиль">${safeAuthor}</span>
+              ${premiumBadgeHtml}
               <span class="world-msg-tag">${escapeHtml(gameObj.name)}</span>
               <span class="world-msg-time">${timeStr}</span>
               ${actionsHtml}
@@ -496,14 +650,25 @@ function openUserQuickPopover(username) {
   const blockBtn = document.getElementById('popoverBlockBtn');
   const blockText = document.getElementById('popoverBlockText');
 
-  if (nameEl) nameEl.textContent = username;
+  const isPremium = isUserPremium(username);
+  const frameId = getUserEquippedFrame(username);
 
+  if (nameEl) {
+    nameEl.innerHTML = `<span class="${isPremium ? 'premium-author' : ''}">${escapeHtml(username)}</span>${isPremium ? ' <span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : ''}`;
+  }
+
+  let avatarContent;
   if (data && data.avatar) {
-    if (avatarEl) avatarEl.innerHTML = `<img src="${data.avatar}" alt="${escapeHtml(username)}">`;
+    avatarContent = `<img src="${data.avatar}" alt="${escapeHtml(username)}">`;
   } else {
     const initials = username.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    if (avatarEl) avatarEl.textContent = initials || '?';
+    avatarContent = `<span>${initials || '?'}</span>`;
   }
+
+  if (frameId && frameId !== 'none') {
+    avatarContent = `<div class="avatar-frame-wrap frame-${frameId}">${avatarContent}</div>`;
+  }
+  if (avatarEl) avatarEl.innerHTML = avatarContent;
 
   const gameObj = data ? (GAMES.find(g => g.id === data.game) || GAMES[0]) : GAMES[0];
   const rankStr = data && data.rank ? ` • ${data.rank}` : '';

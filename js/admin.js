@@ -134,11 +134,11 @@ function renderAdminComplaints() {
         <div class="complaint-card-header">
           <div class="complaint-users-flow">
             <span class="complaint-user from" title="Отправитель жалобы">
-              👤 <strong>${safeFrom}</strong>
+              <svg class="admin-icon-sm" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;"><use href="#icon-user-round"/></svg> <strong>${safeFrom}</strong>
             </span>
-            <span class="complaint-arrow">➡️</span>
+            <span class="complaint-arrow"><svg class="admin-icon-sm" style="width:12px;height:12px;display:inline-block;vertical-align:-1px;"><use href="#icon-arrow-right"/></svg></span>
             <span class="complaint-user target" title="Нарушитель">
-              🎯 <strong>${safeTarget}</strong>
+              <svg class="admin-icon-sm" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;color:var(--neon-pink);"><use href="#icon-badge-vip"/></svg> <strong>${safeTarget}</strong>
               ${isTargetBanned ? '<span class="admin-badge badge-ban">БАН</span>' : ''}
               ${isTargetMuted ? '<span class="admin-badge badge-mute">МУТ</span>' : ''}
             </span>
@@ -240,10 +240,10 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
     const isOnline = isUserOnline(name);
 
     let badgesHtml = '';
-    if (isAdmin) badgesHtml += '<span class="admin-badge badge-admin">👑 АДМИН</span> ';
-    if (isBanned) badgesHtml += '<span class="admin-badge badge-ban">🚫 БАН</span> ';
-    if (isMuted) badgesHtml += '<span class="admin-badge badge-mute">🔇 МУТ</span> ';
-    if (isOnline) badgesHtml += '<span class="admin-badge badge-online">🟢 ONLINE</span> ';
+    if (isAdmin) badgesHtml += '<span class="admin-badge badge-admin"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-crown"/></svg> АДМИН</span> ';
+    if (isBanned) badgesHtml += '<span class="admin-badge badge-ban"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-ban"/></svg> БАН</span> ';
+    if (isMuted) badgesHtml += '<span class="admin-badge badge-mute"><svg style="width:12px;height:12px;vertical-align:-2px;display:inline-block;"><use href="#icon-mute"/></svg> МУТ</span> ';
+    if (isOnline) badgesHtml += '<span class="admin-badge badge-online"><span class="status-dot online" style="width:8px;height:8px;display:inline-block;border-radius:50%;background:var(--neon-green);box-shadow:0 0 8px var(--neon-green);"></span> ONLINE</span> ';
 
     return `
       <tr>
@@ -261,14 +261,14 @@ function renderAdminUsers(searchQuery = '', statusFilter = 'all') {
         <td>${badgesHtml || '<span style="color:var(--text-muted);font-size:0.75rem;">Обычный</span>'}</td>
         <td>
           <div class="admin-row-actions">
-            <button class="admin-mini-btn" onclick="showUserProfileModal('${safeName}')" title="Профиль">👁️</button>
+            <button class="admin-mini-btn" onclick="showUserProfileModal('${safeName}')" title="Профиль"><svg style="width:14px;height:14px;"><use href="#icon-eye"/></svg></button>
             ${isBanned 
-              ? `<button class="admin-mini-btn btn-unban" onclick="adminUnbanUser('${safeName}')" title="Снять бан">✅</button>`
-              : `<button class="admin-mini-btn btn-ban" onclick="openBanModal('${safeName}')" title="Забанить">🔨</button>`
+              ? `<button class="admin-mini-btn btn-unban" onclick="adminUnbanUser('${safeName}')" title="Снять бан"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`
+              : `<button class="admin-mini-btn btn-ban" onclick="openBanModal('${safeName}')" title="Забанить"><svg style="width:14px;height:14px;"><use href="#icon-ban"/></svg></button>`
             }
             ${isMuted 
-              ? `<button class="admin-mini-btn btn-unmute" onclick="adminUnmuteUser('${safeName}')" title="Снять мут">🔊</button>`
-              : `<button class="admin-mini-btn btn-mute" onclick="openMuteModal('${safeName}')" title="Замьютить">🔇</button>`
+              ? `<button class="admin-mini-btn btn-unmute" onclick="adminUnmuteUser('${safeName}')" title="Снять мут"><svg style="width:14px;height:14px;"><use href="#icon-check"/></svg></button>`
+              : `<button class="admin-mini-btn btn-mute" onclick="openMuteModal('${safeName}')" title="Замьютить"><svg style="width:14px;height:14px;"><use href="#icon-mute"/></svg></button>`
             }
           </div>
         </td>
@@ -333,10 +333,10 @@ function renderAdminPunishments() {
 
         <div class="punish-footer">
           ${isBan 
-            ? `<button class="btn btn-sm btn-outline" onclick="adminUnbanUser('${safeUser}')">✅ Разбанить досрочно</button>`
-            : `<button class="btn btn-sm btn-outline" onclick="adminUnmuteUser('${safeUser}')">🔊 Снять мут досрочно</button>`
+            ? `<button class="btn btn-sm btn-outline" onclick="adminUnbanUser('${safeUser}')"><svg style="width:12px;height:12px;display:inline-block;vertical-align:-1px;"><use href="#icon-check"/></svg> Разбанить досрочно</button>`
+            : `<button class="btn btn-sm btn-outline" onclick="adminUnmuteUser('${safeUser}')"><svg style="width:12px;height:12px;display:inline-block;vertical-align:-1px;"><use href="#icon-check"/></svg> Снять мут досрочно</button>`
           }
-          <button class="btn btn-sm btn-ghost" onclick="showUserProfileModal('${safeUser}')">👁️ Профиль</button>
+          <button class="btn btn-sm btn-ghost" onclick="showUserProfileModal('${safeUser}')"><svg style="width:12px;height:12px;display:inline-block;vertical-align:-1px;"><use href="#icon-eye"/></svg> Профиль</button>
         </div>
       </div>
     `;
