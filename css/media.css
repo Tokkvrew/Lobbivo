@@ -36,18 +36,31 @@
     --header-height: 48px;
   }
 
-  /* Оптимизация производительности для Android и мобильных GPU */
+  /* 1. Глобальная оптимизация производительности для мобильных Android / iOS GPU */
   * {
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   body {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
+    background: #060a14 !important;
+    background-image: radial-gradient(circle at 50% 0%, #0d1a36 0%, #050811 100%) !important;
   }
 
-  /* Облегченный быстрый блюр вместо тяжелого 40px для 60/120 FPS на смартфонах */
+  /* Отключаем тяжелые многослойные звездные поля, туманности и летающие шары на мобильных */
+  .space-background,
+  .star-field,
+  .space-nebula,
+  .welcome-glow-orb,
+  .particles-container {
+    display: none !important;
+  }
+
+  /* Полное отключение тяжелого backdrop-filter и лишних 3D-слоев на мобильных (устраняет фризы и лаги) */
   .game-poster-card,
+  .game-card,
   .capsule-header,
   .modal-cyber-body,
   .profile-hero-card,
@@ -55,11 +68,26 @@
   .custom-theme-card,
   .world-msg-item,
   .chat-container,
-  .dialog-item {
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+  .dialog-item,
+  .welcome-hero-card,
+  .edit-clean-card,
+  .players-card,
+  .profile-unified-section,
+  .custom-wardrobe-block {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    background: rgba(10, 18, 36, 0.95) !important;
+  }
+
+  /* Отключение бесконечных фоновых анимаций на мобильных */
+  .welcome-glow-1,
+  .welcome-glow-2,
+  .welcome-glow-3 {
+    animation: none !important;
+    display: none !important;
   }
 
   .game-poster-card {
