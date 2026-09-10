@@ -853,16 +853,6 @@ function acceptFriendRequest(viewer, sender) {
   if (!uViewer.friends.includes(sender)) uViewer.friends.push(sender);
   if (!uSender.friends.includes(viewer)) uSender.friends.push(viewer);
 
-  // При принятии заявки в друзья диалог навсегда разблокируется бесплатно
-  if (!Array.isArray(uViewer.paidDmUsers)) uViewer.paidDmUsers = [];
-  if (!uViewer.paidDmUsers.includes(sender)) uViewer.paidDmUsers.push(sender);
-  if (!Array.isArray(uSender.unlockedDms)) uSender.unlockedDms = [];
-  if (!uSender.unlockedDms.includes(viewer)) uSender.unlockedDms.push(viewer);
-  if (!Array.isArray(uSender.paidDmUsers)) uSender.paidDmUsers = [];
-  if (!uSender.paidDmUsers.includes(viewer)) uSender.paidDmUsers.push(viewer);
-  if (!Array.isArray(uViewer.unlockedDms)) uViewer.unlockedDms = [];
-  if (!uViewer.unlockedDms.includes(sender)) uViewer.unlockedDms.push(sender);
-
   const updateStatus = (userObj) => {
     if (Array.isArray(userObj.friendRequests)) {
       userObj.friendRequests.forEach(r => {
@@ -911,6 +901,20 @@ function removeFriend(user1, user2) {
   }
   if (u2 && Array.isArray(u2.friends)) {
     u2.friends = u2.friends.filter(f => f !== user1);
+  }
+
+  // Очищаем списки платного доступа при удалении из друзей
+  if (u1 && Array.isArray(u1.paidDmUsers)) {
+    u1.paidDmUsers = u1.paidDmUsers.filter(u => u !== user2);
+  }
+  if (u2 && Array.isArray(u2.paidDmUsers)) {
+    u2.paidDmUsers = u2.paidDmUsers.filter(u => u !== user1);
+  }
+  if (u1 && Array.isArray(u1.unlockedDms)) {
+    u1.unlockedDms = u1.unlockedDms.filter(u => u !== user2);
+  }
+  if (u2 && Array.isArray(u2.unlockedDms)) {
+    u2.unlockedDms = u2.unlockedDms.filter(u => u !== user1);
   }
 
   const cleanRequests = (userObj) => {
@@ -1042,33 +1046,6 @@ function addMessage(from, to, text, replyTo = null) {
   AppState.messages[key].push(msg);
   saveMessages();
 
-  // Если отправитель — персонал (CEO/модератор) или имеет платный ЛС,
-  // при ответе собеседнику диалог становится навсегда бесплатным для получателя
-  const uFrom = AppState.users[from];
-  const uTo = AppState.users[to];
-  if (uFrom && uTo) {
-    let usersUpdated = false;
-    if (uFrom.privacy?.dmAccess === 'coins' || (typeof isUserAdmin === 'function' && isUserAdmin(from))) {
-      if (!Array.isArray(uFrom.paidDmUsers)) uFrom.paidDmUsers = [];
-      if (!uFrom.paidDmUsers.includes(to)) {
-        uFrom.paidDmUsers.push(to);
-        usersUpdated = true;
-      }
-      if (!Array.isArray(uTo.unlockedDms)) uTo.unlockedDms = [];
-      if (!uTo.unlockedDms.includes(from)) {
-        uTo.unlockedDms.push(from);
-        usersUpdated = true;
-      }
-    }
-    if (usersUpdated) {
-      saveUsers();
-      if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
-        FirebaseSync.saveUser(from, uFrom);
-        FirebaseSync.saveUser(to, uTo);
-      }
-    }
-  }
-
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     FirebaseSync.saveDirectChat(key);
   }
@@ -1144,12 +1121,27 @@ function deleteChatForBoth(user1, user2) {
   // Очищаем метки удаления для себя у обоих участников
   if (AppState.users[user1]?.chatDeletedTimestamps?.[user2]) {
     delete AppState.users[user1].chatDeletedTimestamps[user2];
-    saveUsers(user1);
   }
   if (AppState.users[user2]?.chatDeletedTimestamps?.[user1]) {
     delete AppState.users[user2].chatDeletedTimestamps[user1];
-    saveUsers(user2);
   }
+
+  // Очищаем платный доступ и разблокировки при полном удалении переписки
+  if (AppState.users[user1]?.paidDmUsers) {
+    AppState.users[user1].paidDmUsers = AppState.users[user1].paidDmUsers.filter(u => u !== user2);
+  }
+  if (AppState.users[user2]?.paidDmUsers) {
+    AppState.users[user2].paidDmUsers = AppState.users[user2].paidDmUsers.filter(u => u !== user1);
+  }
+  if (AppState.users[user1]?.unlockedDms) {
+    AppState.users[user1].unlockedDms = AppState.users[user1].unlockedDms.filter(u => u !== user2);
+  }
+  if (AppState.users[user2]?.unlockedDms) {
+    AppState.users[user2].unlockedDms = AppState.users[user2].unlockedDms.filter(u => u !== user1);
+  }
+
+  saveUsers(user1);
+  saveUsers(user2);
 
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     FirebaseSync.deleteDirectChat(key);

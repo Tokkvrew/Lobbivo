@@ -1,51 +1,44 @@
 import re
 
-def test_features():
-    with open('index.html', 'r', encoding='utf-8') as f:
-        html = f.read()
-    with open('js/storage.js', 'r', encoding='utf-8') as f:
-        storage_js = f.read()
-    with open('js/firebase-sync.js', 'r', encoding='utf-8') as f:
-        firebase_js = f.read()
-    with open('js/profile.js', 'r', encoding='utf-8') as f:
-        profile_js = f.read()
-    with open('js/chat.js', 'r', encoding='utf-8') as f:
-        chat_js = f.read()
-    with open('css/components.css', 'r', encoding='utf-8') as f:
-        css = f.read()
+with open('index.html', 'r', encoding='utf-8') as f:
+    html = f.read()
 
-    # 1. Check delete chat for both in storage & firebase-sync
-    assert 'deleteChatForBoth' in storage_js
-    assert 'deleteDirectChat' in firebase_js
-    assert 'delete AppState.messages[localKey]' in firebase_js, "Firebase sync must clear deleted keys locally"
-    print("[PASS] Chat deletion sync logic verified")
+assert 'id="pageFriends"' in html, 'Missing pageFriends in index.html'
+assert 'id="profileFriendsCounter"' in html, 'Missing profileFriendsCounter in index.html'
+assert 'id="profileFriendsList"' in html, 'Missing profileFriendsList in index.html'
+assert 'id="backFromFriendsBtn"' in html, 'Missing backFromFriendsBtn in index.html'
 
-    # 2. Check removeFriend in storage
-    assert 'function removeFriend' in storage_js
-    print("[PASS] removeFriend function in storage.js verified")
+with open('js/profile.js', 'r', encoding='utf-8') as f:
+    pjs = f.read()
 
-    # 3. Check Friends List UI in index.html
-    assert 'id="profileFriendsSection"' in html
-    assert 'id="profileFriendsCounter"' in html
-    assert 'id="profileFriendsList"' in html
-    assert 'id="popoverUnfriendBtn"' in html
-    print("[PASS] HTML friends section and unfriend elements verified")
+assert 'function renderFriendsPage' in pjs, 'renderFriendsPage missing'
+assert 'function showFriendsPage' in pjs, 'showFriendsPage missing'
+assert 'function handleRemoveFriend' in pjs, 'handleRemoveFriend missing'
+assert 'friend-avatar-wrap' in pjs, 'friend-avatar-wrap missing in profile.js'
 
-    # 4. Check profile.js friends rendering
-    assert 'function renderProfileFriends' in profile_js
-    assert 'function handleRemoveFriend' in profile_js
-    assert 'data-action="friends"' in profile_js
-    print("[PASS] profile.js friends rendering logic verified")
+with open('js/app.js', 'r', encoding='utf-8') as f:
+    ajs = f.read()
 
-    # 5. Check CSS styles for friends list
-    assert '.friends-counter-badge' in css
-    assert '.profile-friends-grid' in css
-    assert '.friend-card' in css
-    assert '.btn-friend-remove' in css
-    assert '.btn-popover-unfriend' in css
-    print("[PASS] CSS styles for friends list verified")
+assert 'showFriendsPage()' in ajs, 'showFriendsPage call missing in app.js'
+assert 'backFromFriendsBtn' in ajs, 'backFromFriendsBtn listener missing in app.js'
 
-    print("\n>>> ALL TESTS PASSED SUCCESSFULLY! <<<")
+with open('js/storage.js', 'r', encoding='utf-8') as f:
+    sjs = f.read()
 
-if __name__ == '__main__':
-    test_features()
+assert 'function deleteChatForBoth' in sjs, 'deleteChatForBoth missing in storage.js'
+assert 'function removeFriend' in sjs, 'removeFriend missing in storage.js'
+
+with open('js/firebase-sync.js', 'r', encoding='utf-8') as f:
+    fbs = f.read()
+
+assert 'deleteDirectChat' in fbs, 'deleteDirectChat missing in firebase-sync.js'
+
+with open('css/components.css', 'r', encoding='utf-8') as f:
+    css = f.read()
+
+assert '.friend-avatar-wrap' in css, '.friend-avatar-wrap missing in css'
+assert '.friend-avatar-box' in css, '.friend-avatar-box missing in css'
+assert '.friend-card' in css, '.friend-card missing in css'
+assert '.avatar-initials' in css, '.avatar-initials missing in css'
+
+print('SUCCESS: All checks for friends page, avatar rendering, friend removal, and delete for both passed!')

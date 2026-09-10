@@ -252,14 +252,11 @@ function renderProfile() {
   // 8. Обновление секции «Мои анкеты»
   if (typeof renderMySquads === 'function') renderMySquads();
 
-  // 9. Обновление списка друзей
-  renderProfileFriends();
-
-  // 10. Обновление настроек приватности, Push и черного списка
+  // 9. Обновление настроек приватности, Push и черного списка
   if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
   if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
 
-  // 11. Обновление аватара в шапке
+  // 10. Обновление аватара в шапке
   updateHeaderAvatar();
 }
 
@@ -879,16 +876,16 @@ function initProfileCustomTagsControls() {
 document.addEventListener('DOMContentLoaded', initProfileCustomTagsControls);
 
 // ============================================================
-//  СПИСОК ДРУЗЕЙ (FRIENDS LIST MANAGEMENT)
+//  СТРАНИЦА «МОИ ДРУЗЬЯ» (FRIENDS LIST MANAGEMENT)
 // ============================================================
 
-function renderProfileFriends() {
+function renderFriendsPage() {
   const container = document.getElementById('profileFriendsList');
   const counterEl = document.getElementById('profileFriendsCounter');
   if (!container) return;
 
   if (!AppState.currentUser) {
-    container.innerHTML = `<div class="friends-empty-box">Войдите в аккаунт, чтобы просматривать список друзей.</div>`;
+    container.innerHTML = `<div class="friends-empty-box"><div class="friends-empty-title">Требуется вход</div><div class="friends-empty-sub">Войдите в аккаунт, чтобы просматривать список друзей.</div></div>`;
     if (counterEl) counterEl.textContent = '0';
     return;
   }
@@ -911,11 +908,11 @@ function renderProfileFriends() {
     container.innerHTML = `
       <div class="friends-empty-box">
         <div class="friends-empty-icon">
-          <svg style="width:36px;height:36px;color:var(--text-muted);"><use href="#icon-users"/></svg>
+          <svg style="width:44px;height:44px;color:var(--text-muted);"><use href="#icon-users"/></svg>
         </div>
         <div class="friends-empty-title">Список друзей пуст</div>
         <div class="friends-empty-sub">
-          Находите тиммейтов в карточках игр, отправляйте заявки в друзья или принимайте предложения в чате!
+          Находите тиммейтов во вкладках игр, отправляйте заявки в друзья или принимайте предложения в чате!
         </div>
       </div>
     `;
@@ -925,12 +922,12 @@ function renderProfileFriends() {
   let html = '<div class="profile-friends-grid">';
   friends.forEach(friendUsername => {
     const fData = AppState.users[friendUsername] || {};
-    const avatarSrc = fData.avatar || 'img/avatars/user-default.png';
     const frameId = typeof getUserEquippedFrame === 'function' ? getUserEquippedFrame(friendUsername) : 'none';
-    const isOnline = !!fData.isOnline;
-    const gameObj = (typeof GAMES !== 'undefined' && GAMES.find(g => g.id === fData.game)) || { name: 'CS 2', icon: 'icon-csgo' };
+    const isOnline = typeof isUserOnline === 'function' ? isUserOnline(friendUsername) : !!fData.isOnline;
+    const gameObj = (typeof GAMES !== 'undefined' && GAMES.find(g => g.id === fData.game)) || { name: 'Игра не выбрана', icon: 'icon-default' };
     const isCEO = typeof isUserCEO === 'function' && isUserCEO(friendUsername);
     const isMod = typeof isUserModerator === 'function' && isUserModerator(friendUsername);
+    const isPremium = typeof isUserPremium === 'function' && isUserPremium(friendUsername);
     const safeFriend = escapeHtml(friendUsername);
 
     let roleBadge = '';
@@ -940,20 +937,35 @@ function renderProfileFriends() {
       roleBadge = `<span class="profile-mod-badge mini" title="Модератор"><svg class="mini-svg" style="width:10px;height:10px;margin-right:2px;"><use href="#icon-admin-shield"/></svg>Модератор</span>`;
     }
 
+    let avatarInner = '';
+    if (fData.avatar) {
+      avatarInner = `<img src="${fData.avatar}" alt="${safeFriend}" class="friend-avatar-img">`;
+    } else {
+      const initials = safeFriend.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      avatarInner = `<span class="avatar-initials">${escapeHtml(initials || '?')}</span>`;
+    }
+
+    if (frameId && frameId !== 'none') {
+      avatarInner = `<div class="avatar-frame-wrap frame-${frameId}">${avatarInner}</div>`;
+    }
+
+    const nameClass = typeof getUserNameClass === 'function' ? getUserNameClass(friendUsername) : '';
+
     html += `
       <div class="friend-card" data-friend-username="${safeFriend}">
         <div class="friend-card-main" onclick="if(typeof openUserQuickPopover==='function') openUserQuickPopover('${safeFriend}', event)">
-          <div class="avatar-frame-wrap ${frameId !== 'none' ? 'frame-' + frameId : ''} friend-avatar-wrap">
-            <img src="${avatarSrc}" alt="${safeFriend}" class="friend-avatar-img">
+          <div class="friend-avatar-wrap">
+            ${avatarInner}
             <span class="friend-online-dot ${isOnline ? 'online' : 'offline'}"></span>
           </div>
           <div class="friend-info">
             <div class="friend-name-row">
-              <span class="friend-name ${typeof getUserNameClass === 'function' ? getUserNameClass(friendUsername) : ''}">${safeFriend}</span>
+              <span class="friend-name ${nameClass}">${safeFriend}</span>
+              ${isPremium ? '<span class="premium-crown-badge mini" title="Lobbivo Premium"><svg style="width:11px;height:11px;"><use href="#icon-crown"/></svg></span>' : ''}
               ${roleBadge}
             </div>
             <div class="friend-game-pill">
-              <svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><use href="#${gameObj.icon || 'icon-game'}"/></svg>
+              <svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#${gameObj.icon || 'icon-game'}"/></svg>
               <span>${escapeHtml(gameObj.name)}</span>
             </div>
           </div>
@@ -975,6 +987,15 @@ function renderProfileFriends() {
   container.innerHTML = html;
 }
 
+function showFriendsPage() {
+  if (!AppState.currentUser) {
+    showAuthModal('login');
+    return;
+  }
+  switchPage('pageFriends');
+  renderFriendsPage();
+}
+
 function handleRemoveFriend(targetUsername) {
   if (!AppState.currentUser || !targetUsername) return;
   if (!confirm(`Вы действительно хотите удалить ${targetUsername} из списка друзей?`)) return;
@@ -982,11 +1003,14 @@ function handleRemoveFriend(targetUsername) {
   removeFriend(AppState.currentUser, targetUsername);
   showNotification('Друг удалён', `Пользователь ${targetUsername} удален из списка друзей`);
 
-  renderProfileFriends();
+  renderFriendsPage();
   if (AppState.chatPartner === targetUsername && typeof checkFriendBannerStatus === 'function') {
     checkFriendBannerStatus(targetUsername);
   }
 }
 
+const renderProfileFriends = renderFriendsPage;
 window.renderProfileFriends = renderProfileFriends;
+window.renderFriendsPage = renderFriendsPage;
+window.showFriendsPage = showFriendsPage;
 window.handleRemoveFriend = handleRemoveFriend;

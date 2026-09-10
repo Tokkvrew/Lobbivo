@@ -976,35 +976,29 @@ function isDmUnlockedForUser(targetUser, currentUsername) {
   if (targetUser === currentUsername) return true;
   // Персонал (CEO/модераторы) пишут друг другу свободно
   if (typeof isUserAdmin === 'function' && isUserAdmin(currentUsername)) return true;
+  if (typeof isUserCEO === 'function' && isUserCEO(currentUsername)) return true;
+  if (typeof isUserModerator === 'function' && isUserModerator(currentUsername)) return true;
   // Друзьям писать бесплатно
   if (typeof areFriends === 'function' && areFriends(currentUsername, targetUser)) return true;
 
   const targetData = AppState.users ? AppState.users[targetUser] : null;
   if (!targetData) return true;
 
+  // Платный ЛС доступен ТОЛЬКО для персонала (CEO / Модераторы)
+  const isTargetStaff = (typeof isUserCEO === 'function' && isUserCEO(targetUser)) || 
+                        (typeof isUserModerator === 'function' && isUserModerator(targetUser)) ||
+                        (typeof isUserAdmin === 'function' && isUserAdmin(targetUser));
+  if (!isTargetStaff) return true;
+
   const dmAccess = targetData.privacy?.dmAccess || 'all';
-  if (dmAccess !== 'coins') return true;
+  if (dmAccess !== 'coins' && dmAccess !== 'paid') return true;
 
-  // Проверка: целевой пользователь добавил в список оплативших / разрешенных
-  if (Array.isArray(targetData.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername)) {
-    return true;
-  }
-
-  // Проверка: текущий пользователь имеет запись о разблокировке этого стаффа
+  // Проверка: текущий пользователь оплатил доступ к этому стаффу
   const currentUserData = AppState.users ? AppState.users[currentUsername] : null;
-  if (currentUserData && Array.isArray(currentUserData.unlockedDms) && currentUserData.unlockedDms.includes(targetUser)) {
-    return true;
-  }
+  const hasPaid = Array.isArray(targetData.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername) &&
+                  Array.isArray(currentUserData?.unlockedDms) && currentUserData.unlockedDms.includes(targetUser);
 
-  // Проверка: стафф уже ответил в диалоге хотя бы одним сообщением
-  if (typeof getChatMessages === 'function') {
-    const msgs = getChatMessages(currentUsername, targetUser);
-    if (msgs && msgs.some(m => m.from === targetUser)) {
-      return true;
-    }
-  }
-
-  return false;
+  return !!hasPaid;
 }
 
 let pendingPaidDmUser = null;
@@ -1297,12 +1291,12 @@ function openChatWith(username) {
   const isOnline = isUserOnline(username);
   const isPremium = isUserPremium(username);
   const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
-  const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" style="margin-left:5px;font-size:0.65rem;padding:2px 6px;"><svg style="width:11px;height:11px;"><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
-  const crownHtml = isPremium ? ' <span class="premium-crown-badge"><svg><use href="#icon-crown"/></svg></span>' : '';
+  const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style} chat-header-admin-badge" title="Сотрудник Lobbivo: ${escapeHtml(adminBadge.text)}"><svg style="width:10px;height:10px;"><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
+  const crownHtml = isPremium ? '<span class="premium-crown-badge mini" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : '';
   const frameId = getUserEquippedFrame(username);
 
   if (chatUserName) {
-    chatUserName.innerHTML = `<span class="${getUserNameClass(username)}">${escapeHtml(username)}</span>${crownHtml}${adminBadgeHtml}`;
+    chatUserName.innerHTML = `<span class="${getUserNameClass(username)} chat-username-text">${escapeHtml(username)}</span>${crownHtml}${adminBadgeHtml}`;
   }
 
   if (chatUserStatus) {
@@ -1738,7 +1732,23 @@ function renderPrivacySettings() {
   const user = AppState.users[AppState.currentUser];
   if (!user) return;
 
-  const access = user.privacy?.dmAccess || 'all';
+  const isStaff = (typeof isUserCEO === 'function' && isUserCEO(AppState.currentUser)) ||
+                  (typeof isUserModerator === 'function' && isUserModerator(AppState.currentUser)) ||
+                  (typeof isUserAdmin === 'function' && isUserAdmin(AppState.currentUser));
+
+  let access = user.privacy?.dmAccess || 'all';
+
+  // Если у обычного пользователя или VIP стояло 'coins', сбрасываем на 'all'
+  if (!isStaff && access === 'coins') {
+    access = 'all';
+    if (!user.privacy) user.privacy = {};
+    user.privacy.dmAccess = 'all';
+    saveUsers();
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+      FirebaseSync.saveUser(AppState.currentUser, user);
+    }
+  }
+
   const radioAll = document.getElementById('privacyDmAll');
   const radioFriends = document.getElementById('privacyDmFriends');
   const radioCoins = document.getElementById('privacyDmCoins');
@@ -1750,7 +1760,6 @@ function renderPrivacySettings() {
   if (radioFriends) radioFriends.checked = access === 'friends';
   if (radioCoins) radioCoins.checked = access === 'coins';
 
-  const isStaff = typeof isUserAdmin === 'function' && isUserAdmin(AppState.currentUser);
   if (coinsItem) {
     coinsItem.style.display = isStaff ? 'flex' : 'none';
   }

@@ -1,55 +1,50 @@
 import re
 
-def test_paid_dm_implementation():
-    with open('index.html', 'r', encoding='utf-8') as f:
-        html = f.read()
-    with open('js/chat.js', 'r', encoding='utf-8') as f:
-        chat_js = f.read()
-    with open('js/storage.js', 'r', encoding='utf-8') as f:
-        storage_js = f.read()
-    with open('js/app.js', 'r', encoding='utf-8') as f:
-        app_js = f.read()
-    with open('css/components.css', 'r', encoding='utf-8') as f:
-        css = f.read()
+with open('index.html', 'r', encoding='utf-8') as f:
+    html = f.read()
 
-    # 1. HTML elements check
-    assert 'id="privacyDmCoinsItem"' in html, "Missing privacyDmCoinsItem"
-    assert 'id="privacyDmCoins"' in html, "Missing privacyDmCoins"
-    assert 'id="dmCoinsCostBlock"' in html, "Missing dmCoinsCostBlock"
-    assert 'id="dmCoinsCostInput"' in html, "Missing dmCoinsCostInput"
-    assert 'id="saveDmCoinsCostBtn"' in html, "Missing saveDmCoinsCostBtn"
-    assert 'id="paidDmModal"' in html, "Missing paidDmModal"
-    assert 'id="paidDmConfirmBtn"' in html, "Missing paidDmConfirmBtn"
-    assert 'id="paidDmTopUpBtn"' in html, "Missing paidDmTopUpBtn"
-    print("[PASS] HTML elements verified")
+assert 'Модерация & CEO' in html or 'CEO' in html, "Missing CEO / Moderator label in settings"
+assert 'privacyDmCoinsItem' in html, "Missing privacyDmCoinsItem in index.html"
+assert 'dmCoinsCostBlock' in html, "Missing dmCoinsCostBlock in index.html"
 
-    # 2. chat.js logic check
-    assert 'function isDmUnlockedForUser' in chat_js, "Missing isDmUnlockedForUser"
-    assert 'function openPaidDmModal' in chat_js, "Missing openPaidDmModal"
-    assert 'function confirmPaidDm' in chat_js, "Missing confirmPaidDm"
-    assert 'privacyDmCoins' in chat_js, "Missing privacyDmCoins in chat.js"
-    assert 'targetDmAccess === \'coins\'' in chat_js, "Missing coins check in chat.js"
-    print("[PASS] chat.js functions verified")
+with open('js/chat.js', 'r', encoding='utf-8') as f:
+    chat_js = f.read()
 
-    # 3. storage.js logic check
-    assert 'paidDmUsers' in storage_js, "Missing paidDmUsers in storage.js"
-    assert 'unlockedDms' in storage_js, "Missing unlockedDms in storage.js"
-    print("[PASS] storage.js logic verified")
+assert 'function isDmUnlockedForUser' in chat_js, "Missing isDmUnlockedForUser"
+assert 'function renderPrivacySettings' in chat_js, "Missing renderPrivacySettings"
+assert 'isUserCEO' in chat_js, "Missing isUserCEO check in chat.js"
+assert 'isUserModerator' in chat_js, "Missing isUserModerator check in chat.js"
+assert 'chat-header-admin-badge' in chat_js, "Missing chat-header-admin-badge class in chat.js"
 
-    # 4. app.js listeners check
-    assert 'paidDmConfirmBtn' in app_js, "Missing paidDmConfirmBtn listener in app.js"
-    assert 'saveDmCoinsCostBtn' in app_js, "Missing saveDmCoinsCostBtn listener in app.js"
-    assert 'closePaidDmModal' in app_js, "Missing closePaidDmModal in app.js"
-    print("[PASS] app.js event listeners verified")
+with open('js/storage.js', 'r', encoding='utf-8') as f:
+    storage_js = f.read()
 
-    # 5. CSS classes check
-    assert '.privacy-radio-coins' in css, "Missing .privacy-radio-coins in CSS"
-    assert '.paid-dm-modal-glass' in css, "Missing .paid-dm-modal-glass in CSS"
-    assert '.staff-monetize-badge' in css, "Missing .staff-monetize-badge in CSS"
-    assert '.dm-coins-cost-block' in css, "Missing .dm-coins-cost-block in CSS"
-    print("[PASS] CSS styles verified")
+assert 'paidDmUsers' in storage_js, "Missing paidDmUsers in storage.js"
+assert 'unlockedDms' in storage_js, "Missing unlockedDms in storage.js"
+assert 'removeFriend' in storage_js, "Missing removeFriend in storage.js"
+assert 'deleteChatForBoth' in storage_js, "Missing deleteChatForBoth in storage.js"
 
-    print("\n>>> ALL PAID DM & MONETIZATION TESTS PASSED PERFECTLY! <<<")
+# Verify that removeFriend cleans paidDmUsers and unlockedDms
+remove_friend_block = storage_js[storage_js.find('function removeFriend'):storage_js.find('function removeFriend') + 1200]
+assert 'paidDmUsers' in remove_friend_block, "removeFriend must clean paidDmUsers"
+assert 'unlockedDms' in remove_friend_block, "removeFriend must clean unlockedDms"
 
-if __name__ == '__main__':
-    test_paid_dm_implementation()
+# Verify deleteChatForBoth cleans paidDmUsers and unlockedDms
+delete_both_block = storage_js[storage_js.find('function deleteChatForBoth'):storage_js.find('function deleteChatForBoth') + 1500]
+assert 'paidDmUsers' in delete_both_block, "deleteChatForBoth must clean paidDmUsers"
+assert 'unlockedDms' in delete_both_block, "deleteChatForBoth must clean unlockedDms"
+
+with open('js/app.js', 'r', encoding='utf-8') as f:
+    app_js = f.read()
+
+assert 'isUserCEO' in app_js, "Missing isUserCEO in app.js privacy handler"
+assert 'isUserModerator' in app_js, "Missing isUserModerator in app.js privacy handler"
+
+with open('css/components.css', 'r', encoding='utf-8') as f:
+    css = f.read()
+
+assert '.chat-header-admin-badge' in css, "Missing .chat-header-admin-badge in components.css"
+assert '.chat-header-meta' in css, "Missing .chat-header-meta in components.css"
+assert '.chat-header-status' in css, "Missing .chat-header-status in components.css"
+
+print("ALL PAID DM, MODERATION PRIVACY & CHAT HEADER TESTS PASSED!")

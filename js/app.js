@@ -63,6 +63,8 @@ function switchPage(pageId) {
     if (typeof renderProfile === 'function') renderProfile();
     if (typeof renderProfileCustomization === 'function') renderProfileCustomization();
     if (typeof renderMySquads === 'function') renderMySquads();
+  } else if (pageId === 'pageFriends') {
+    if (typeof renderFriendsPage === 'function') renderFriendsPage();
   } else if (pageId === 'pageSettings') {
     if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
     if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
@@ -1442,11 +1444,11 @@ function init() {
       } else if (action === 'profile' || action === 'customization') {
         showProfile();
       } else if (action === 'friends') {
-        showProfile();
-        setTimeout(() => {
-          const el = document.getElementById('profileFriendsSection');
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 120);
+        if (typeof showFriendsPage === 'function') {
+          showFriendsPage();
+        } else {
+          switchPage('pageFriends');
+        }
       } else if (action === 'settings') {
         if (typeof showSettings === 'function') {
           showSettings();
@@ -1556,6 +1558,9 @@ function init() {
     switchPage('pageGames');
   });
   document.getElementById('backFromProfileBtn')?.addEventListener('click', () => {
+    switchPage(AppState.currentUser ? 'pageGames' : 'pageWelcome');
+  });
+  document.getElementById('backFromFriendsBtn')?.addEventListener('click', () => {
     switchPage(AppState.currentUser ? 'pageGames' : 'pageWelcome');
   });
   document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => {
@@ -1709,12 +1714,23 @@ function init() {
         if (!AppState.users[AppState.currentUser].privacy) {
           AppState.users[AppState.currentUser].privacy = {};
         }
-        AppState.users[AppState.currentUser].privacy.dmAccess = this.value;
+        const isStaff = (typeof isUserCEO === 'function' && isUserCEO(AppState.currentUser)) ||
+                        (typeof isUserModerator === 'function' && isUserModerator(AppState.currentUser)) ||
+                        (typeof isUserAdmin === 'function' && isUserAdmin(AppState.currentUser));
+
+        let chosenValue = this.value;
+        if (chosenValue === 'coins' && !isStaff) {
+          chosenValue = 'all';
+          const radioAll = document.getElementById('privacyDmAll');
+          if (radioAll) radioAll.checked = true;
+          showNotification('Ограничение роли', 'Платный доступ к сообщениям доступен только Модераторам и CEO');
+        }
+
+        AppState.users[AppState.currentUser].privacy.dmAccess = chosenValue;
 
         const costBlock = document.getElementById('dmCoinsCostBlock');
         if (costBlock) {
-          const isStaff = typeof isUserAdmin === 'function' && isUserAdmin(AppState.currentUser);
-          costBlock.style.display = (isStaff && this.value === 'coins') ? 'block' : 'none';
+          costBlock.style.display = (isStaff && chosenValue === 'coins') ? 'block' : 'none';
         }
 
         saveUsers();
@@ -1723,9 +1739,9 @@ function init() {
         }
 
         let msg = 'Теперь вам могут писать все пользователи';
-        if (this.value === 'friends') {
+        if (chosenValue === 'friends') {
           msg = 'Теперь писать в ЛС могут только друзья';
-        } else if (this.value === 'coins') {
+        } else if (chosenValue === 'coins') {
           const cost = AppState.users[AppState.currentUser].privacy.dmCost || 50;
           msg = `Включен платный доступ: ${cost} LC за первое обращение`;
         }
@@ -2050,10 +2066,10 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.9.4', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.9.12', { updateViaCache: 'none' })
         .then((reg) => {
           reg.update().catch(() => {});
-          console.log('[Lobbivo SW] Service Worker v2.9.4 активен:', reg.scope);
+          console.log('[Lobbivo SW] Service Worker v2.9.12 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку
           document.addEventListener('visibilitychange', () => {

@@ -157,6 +157,9 @@ const FirebaseSync = {
               if (typeof renderProfile === 'function' && AppState.currentUser && document.getElementById('pageProfile')?.classList.contains('active')) {
                 renderProfile();
               }
+              if (typeof renderFriendsPage === 'function' && AppState.currentUser && document.getElementById('pageFriends')?.classList.contains('active')) {
+                renderFriendsPage();
+              }
               if (typeof updateAdminBadges === 'function') updateAdminBadges();
             }, 180);
           }
