@@ -359,10 +359,7 @@ const RetentionEngine = (function() {
         }
         
         AppState.currentUser = tgUsername;
-        saveUsers();
-        if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
-          FirebaseSync.saveUser(tgUsername, AppState.users[tgUsername]);
-        }
+        saveUsers(tgUsername, true);
         if (typeof updateUI === 'function') updateUI();
         if (typeof renderProfile === 'function') renderProfile();
         showNotification('Вход через Telegram', `Добро пожаловать, ${escapeHtml(AppState.users[tgUsername].name)}!`);

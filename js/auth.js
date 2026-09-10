@@ -192,7 +192,7 @@ function registerUser(username, password, game, device) {
     contactedTeammates: []
   };
 
-  saveUsers();
+  saveUsers(trimmedUser, true);
   hideAuthModal();
   showSystemLoader('Создание профиля...', 700, () => {
     AppState.currentUser = trimmedUser;

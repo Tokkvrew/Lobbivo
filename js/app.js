@@ -1793,10 +1793,7 @@ function init() {
         const compressedBase64 = await compressImage(file, 256, 0.85);
         if (AppState.currentUser && AppState.users[AppState.currentUser]) {
           AppState.users[AppState.currentUser].avatar = compressedBase64;
-          saveUsers();
-          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
-            FirebaseSync.saveUser(AppState.currentUser, AppState.users[AppState.currentUser]);
-          }
+          saveUsers(AppState.currentUser, true);
           renderProfile();
           if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
           showNotification('Фото обновлено', 'Новый аватар успешно сохранен!');

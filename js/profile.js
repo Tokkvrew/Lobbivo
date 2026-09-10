@@ -566,7 +566,7 @@ function finishProfileSave(oldUsername, newUsername, game, device, desc) {
     }
     renameUser(oldUsername, newUsername);
   } else {
-    saveUsers();
+    saveUsers(oldUsername, true);
     renderProfile();
     updateGameCounts();
     switchProfileTab('overview');
