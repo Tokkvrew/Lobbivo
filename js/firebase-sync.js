@@ -103,31 +103,63 @@ const FirebaseSync = {
                 cloudUser.hasCreatedSquad = true;
               }
 
-              if (cloudUser.friends) {
-                cloudUser.friends = Array.isArray(cloudUser.friends) ? cloudUser.friends : Object.values(cloudUser.friends);
-              }
-              if (cloudUser.blockedUsers) {
-                cloudUser.blockedUsers = Array.isArray(cloudUser.blockedUsers) ? cloudUser.blockedUsers : Object.values(cloudUser.blockedUsers);
-              }
-              if (cloudUser.friendRequests) {
-                cloudUser.friendRequests = Array.isArray(cloudUser.friendRequests) ? cloudUser.friendRequests : Object.values(cloudUser.friendRequests);
-              }
-              if (cloudUser.customTags) {
-                cloudUser.customTags = Array.isArray(cloudUser.customTags) ? cloudUser.customTags : Object.values(cloudUser.customTags);
-              }
+              cloudUser.friends = cloudUser.friends ? (Array.isArray(cloudUser.friends) ? cloudUser.friends : Object.values(cloudUser.friends)) : [];
+              cloudUser.blockedUsers = cloudUser.blockedUsers ? (Array.isArray(cloudUser.blockedUsers) ? cloudUser.blockedUsers : Object.values(cloudUser.blockedUsers)) : [];
+              cloudUser.friendRequests = cloudUser.friendRequests ? (Array.isArray(cloudUser.friendRequests) ? cloudUser.friendRequests : Object.values(cloudUser.friendRequests)) : [];
+              cloudUser.customTags = cloudUser.customTags ? (Array.isArray(cloudUser.customTags) ? cloudUser.customTags : Object.values(cloudUser.customTags)) : [];
+              cloudUser.paidDmUsers = cloudUser.paidDmUsers ? (Array.isArray(cloudUser.paidDmUsers) ? cloudUser.paidDmUsers : Object.values(cloudUser.paidDmUsers)) : [];
+              cloudUser.unlockedDms = cloudUser.unlockedDms ? (Array.isArray(cloudUser.unlockedDms) ? cloudUser.unlockedDms : Object.values(cloudUser.unlockedDms)) : [];
+
               if (cloudUser.inventory) {
-                if (cloudUser.inventory.frames) {
-                  cloudUser.inventory.frames = Array.isArray(cloudUser.inventory.frames) ? cloudUser.inventory.frames : Object.values(cloudUser.inventory.frames);
-                }
-                if (cloudUser.inventory.themes) {
-                  cloudUser.inventory.themes = Array.isArray(cloudUser.inventory.themes) ? cloudUser.inventory.themes : Object.values(cloudUser.inventory.themes);
-                }
+                cloudUser.inventory.frames = cloudUser.inventory.frames ? (Array.isArray(cloudUser.inventory.frames) ? cloudUser.inventory.frames : Object.values(cloudUser.inventory.frames)) : [];
+                cloudUser.inventory.themes = cloudUser.inventory.themes ? (Array.isArray(cloudUser.inventory.themes) ? cloudUser.inventory.themes : Object.values(cloudUser.inventory.themes)) : [];
+              } else {
+                cloudUser.inventory = { frames: [], themes: [] };
               }
 
-              AppState.users[username] = {
-                ...AppState.users[username],
-                ...cloudUser
-              };
+              if (!cloudUser.privacy && localUser?.privacy) {
+                cloudUser.privacy = localUser.privacy;
+              }
+
+              // Защита локального аватара и данных активного пользователя от отката назад старыми пакетами
+              const localUser = AppState.users[username];
+              if (localUser && username === AppState.currentUser) {
+                const localAvatarTs = Number(localUser.avatarUpdatedAt || localUser.updatedAt || 0);
+                const cloudAvatarTs = Number(cloudUser.avatarUpdatedAt || cloudUser.updatedAt || 0);
+
+                let resolvedAvatar = cloudUser.avatar;
+                let resolvedAvatarTs = cloudAvatarTs;
+
+                // Если у нас локально есть аватар и он новее или в облаке пусто/старо
+                if (localUser.avatar && (!cloudUser.avatar || localAvatarTs >= cloudAvatarTs)) {
+                  resolvedAvatar = localUser.avatar;
+                  resolvedAvatarTs = Math.max(localAvatarTs, cloudAvatarTs);
+                }
+
+                AppState.users[username] = {
+                  ...localUser,
+                  ...cloudUser,
+                  friends: cloudUser.friends,
+                  blockedUsers: cloudUser.blockedUsers,
+                  friendRequests: cloudUser.friendRequests,
+                  customTags: cloudUser.customTags,
+                  paidDmUsers: cloudUser.paidDmUsers,
+                  unlockedDms: cloudUser.unlockedDms,
+                  avatar: resolvedAvatar,
+                  avatarUpdatedAt: resolvedAvatarTs
+                };
+              } else {
+                AppState.users[username] = {
+                  ...localUser,
+                  ...cloudUser,
+                  friends: cloudUser.friends,
+                  blockedUsers: cloudUser.blockedUsers,
+                  friendRequests: cloudUser.friendRequests,
+                  customTags: cloudUser.customTags,
+                  paidDmUsers: cloudUser.paidDmUsers,
+                  unlockedDms: cloudUser.unlockedDms
+                };
+              }
             }
           }
 
@@ -161,6 +193,9 @@ const FirebaseSync = {
                 renderFriendsPage();
               }
               if (typeof updateAdminBadges === 'function') updateAdminBadges();
+              if (AppState.chatPartner && typeof checkFriendBannerStatus === 'function') {
+                checkFriendBannerStatus(AppState.chatPartner);
+              }
             }, 180);
           }
         }
@@ -403,6 +438,10 @@ const FirebaseSync = {
 
     const executeSave = () => {
       try {
+        userData.updatedAt = Date.now();
+        if (userData.avatar && !userData.avatarUpdatedAt) {
+          userData.avatarUpdatedAt = Date.now();
+        }
         const payload = JSON.parse(JSON.stringify(userData));
         if (payload.squads && !Array.isArray(payload.squads) && typeof payload.squads === 'object') {
           payload.squads = Object.values(payload.squads);
@@ -428,11 +467,11 @@ const FirebaseSync = {
     }
   },
 
-  // Сохранение всех пользователей в облако
+  // Сохранение пользователя в облако (только для активного аккаунта, не перезаписывает чужие)
   saveAllUsers() {
     if (!this.initialized || !this.rtdb) return;
-    for (const username of Object.keys(AppState.users)) {
-      this.saveUser(username);
+    if (AppState.currentUser) {
+      this.saveUser(AppState.currentUser);
     }
   },
 

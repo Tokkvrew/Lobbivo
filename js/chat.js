@@ -978,7 +978,7 @@ function isDmUnlockedForUser(targetUser, currentUsername) {
   if (typeof isUserAdmin === 'function' && isUserAdmin(currentUsername)) return true;
   if (typeof isUserCEO === 'function' && isUserCEO(currentUsername)) return true;
   if (typeof isUserModerator === 'function' && isUserModerator(currentUsername)) return true;
-  // Друзьям писать бесплатно
+  // Друзьям писать бесплатно (обоюдная дружба)
   if (typeof areFriends === 'function' && areFriends(currentUsername, targetUser)) return true;
 
   const targetData = AppState.users ? AppState.users[targetUser] : null;
@@ -993,10 +993,8 @@ function isDmUnlockedForUser(targetUser, currentUsername) {
   const dmAccess = targetData.privacy?.dmAccess || 'all';
   if (dmAccess !== 'coins' && dmAccess !== 'paid') return true;
 
-  // Проверка: текущий пользователь оплатил доступ к этому стаффу
-  const currentUserData = AppState.users ? AppState.users[currentUsername] : null;
-  const hasPaid = Array.isArray(targetData.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername) &&
-                  Array.isArray(currentUserData?.unlockedDms) && currentUserData.unlockedDms.includes(targetUser);
+  // Проверка: оплачен ли доступ пользователем в профиле целевого стаффа
+  const hasPaid = Array.isArray(targetData.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername);
 
   return !!hasPaid;
 }
@@ -1103,8 +1101,8 @@ function confirmPaidDm() {
   saveUsers();
 
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
-    FirebaseSync.saveUser(AppState.currentUser, currentUserData);
-    FirebaseSync.saveUser(targetUser, targetData);
+    FirebaseSync.saveUser(AppState.currentUser, true);
+    FirebaseSync.saveUser(targetUser, true);
   }
 
   if (typeof updateCoinDisplay === 'function') {
@@ -1115,7 +1113,7 @@ function confirmPaidDm() {
   }
 
   closePaidDmModal();
-  showNotification('Диалог открыт! 💎', `Списано ${cost} LC. Все дальнейшие сообщения с ${targetUser} навсегда бесплатны.`);
+  showNotification('Диалог открыт! 💎', `Списано ${cost} LC. Доступ к переписке с ${targetUser} открыт.`);
 
   const isFriends = areFriends(AppState.currentUser, targetUser);
   const msgs = getChatMessages(AppState.currentUser, targetUser);
@@ -1155,7 +1153,7 @@ function initiateChatWith(targetUser) {
   const isFriends = areFriends(AppState.currentUser, targetUser);
 
   // ПЛАТНЫЙ ДОСТУП В ЛС ДЛЯ CEO И МОДЕРАЦИИ
-  if (targetDmAccess === 'coins' && !isDmUnlockedForUser(targetUser, AppState.currentUser)) {
+  if (targetDmAccess === 'coins' && typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(targetUser, AppState.currentUser)) {
     const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || 50);
     openPaidDmModal(targetUser, cost);
     return;
@@ -1207,6 +1205,17 @@ function closeFirstContactModal() {
 function submitFirstContact() {
   if (!pendingFirstContactUser || !AppState.currentUser) return;
 
+  const target = pendingFirstContactUser;
+  const targetData = AppState.users ? AppState.users[target] : null;
+  const targetDmAccess = targetData?.privacy?.dmAccess || 'all';
+
+  if (targetDmAccess === 'coins' && typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(target, AppState.currentUser)) {
+    const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || 50);
+    closeFirstContactModal();
+    openPaidDmModal(target, cost);
+    return;
+  }
+
   if (typeof SecurityShield !== 'undefined' && !SecurityShield.checkRateLimit('chat')) {
     return;
   }
@@ -1215,18 +1224,19 @@ function submitFirstContact() {
   const rawText = input ? input.value.trim() : 'Привет! Давай затимимся!';
   const text = typeof SecurityShield !== 'undefined' ? SecurityShield.sanitizeText(rawText, 500) : rawText;
 
-  const target = pendingFirstContactUser;
   closeFirstContactModal();
 
-  // Отправляем первое сообщение в ЛС
-  addMessage(AppState.currentUser, target, text);
-  // Отправляем заявку в друзья
-  sendFriendRequest(AppState.currentUser, target, text);
-
-  showNotification('Заявка отправлена', `Сообщение и заявка в друзья отправлены ${target}`);
-
-  // Открываем комнату чата
-  openChatWith(target);
+  try {
+    // Отправляем первое сообщение в ЛС
+    addMessage(AppState.currentUser, target, text);
+    // Отправляем заявку в друзья
+    sendFriendRequest(AppState.currentUser, target, text);
+    showNotification('Заявка отправлена', `Сообщение и заявка в друзья отправлены ${target}`);
+    // Открываем комнату чата
+    openChatWith(target);
+  } catch (err) {
+    showNotification('Ошибка отправки', err.message || 'Не удалось отправить сообщение');
+  }
 }
 
 // ============================================================
@@ -1328,7 +1338,7 @@ function openChatWith(username) {
   // Мгновенно помечаем сообщения как прочитанные (исправление бага со счетчиком)
   markMessagesAsRead(AppState.currentUser, username);
   
-  // Проверяем статус заявки в друзья
+  // Проверяем статус заявки в друзья и блокировки
   checkFriendBannerStatus(username);
 
   // Отрисовываем историю сообщений
@@ -1371,6 +1381,21 @@ function checkFriendBannerStatus(partner) {
     inputArea.style.display = 'none';
     lockedNotice.style.display = 'block';
     if (lockedText) lockedText.innerHTML = '<svg class="mini-svg" style="width:14px;height:14px;color:#ff4466;vertical-align:-2px;margin-right:4px;"><use href="#icon-ban"/></svg> Переписка заблокирована';
+    return;
+  }
+
+  const targetData = AppState.users ? AppState.users[partner] : null;
+  const targetDmAccess = targetData?.privacy?.dmAccess || 'all';
+
+  // ПЛАТНЫЙ ДОСТУП К ДИАЛОГУ (ДЛЯ CEO / МОДЕРАТОРОВ)
+  if (targetDmAccess === 'coins' && typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(partner, AppState.currentUser)) {
+    const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || 50);
+    banner.style.display = 'none';
+    inputArea.style.display = 'none';
+    lockedNotice.style.display = 'block';
+    if (lockedText) {
+      lockedText.innerHTML = `<svg class="mini-svg" style="width:14px;height:14px;color:#ffd700;vertical-align:-2px;margin-right:4px;"><use href="#icon-coins"/></svg> Платный доступ к диалогу (${cost} LC). <a href="javascript:void(0)" onclick="openPaidDmModal('${escapeHtml(partner)}', ${cost})" style="color:#7289da;text-decoration:underline;font-weight:600;margin-left:4px;">Оплатить</a>`;
+    }
     return;
   }
 
@@ -1586,7 +1611,7 @@ function sendMessage() {
 
   if (typeof isUserMuted === 'function' && isUserMuted(AppState.currentUser)) {
     const muteInfo = getMuteInfo(AppState.currentUser);
-    showNotification('Чат заблокирован', `Вы не можете отправлять сообщения: ${muteInfo?.muteReason || 'Мут'} (осталось ${muteInfo?.remainingFormatted || ''})`);
+    showNotification('Чат заблокирован', `Вы не можете отправлять сообщения: ${muteInfo?.muteReason || 'Мут'} (${muteInfo?.remainingFormatted || ''})`);
     return;
   }
 
@@ -1606,10 +1631,26 @@ function sendMessage() {
     return;
   }
 
+  // ПЛАТНЫЙ ДОСТУП В ЛС ДЛЯ CEO И МОДЕРАЦИИ
+  const targetData = AppState.users ? AppState.users[partner] : null;
+  const targetDmAccess = targetData?.privacy?.dmAccess || 'all';
+  if (targetDmAccess === 'coins' && typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(partner, AppState.currentUser)) {
+    const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || 50);
+    showNotification('Платный доступ', `Для отправки сообщений необходимо оплатить доступ (${cost} LC)`);
+    openPaidDmModal(partner, cost);
+    return;
+  }
+
   const replyTo = (AppState.activeReply && AppState.activeReply.chatType === 'direct') ? AppState.activeReply : null;
   const text = typeof SecurityShield !== 'undefined' ? SecurityShield.sanitizeText(rawText, 500) : rawText;
 
-  addMessage(AppState.currentUser, partner, text, replyTo);
+  try {
+    addMessage(AppState.currentUser, partner, text, replyTo);
+  } catch (err) {
+    showNotification('Ошибка отправки', err.message || 'Не удалось отправить сообщение');
+    return;
+  }
+
   input.value = '';
   cancelReply('direct');
 

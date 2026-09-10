@@ -659,8 +659,8 @@ function saveUsers(specificUser = null, immediate = false) {
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     if (specificUser) {
       FirebaseSync.saveUser(specificUser, immediate);
-    } else {
-      FirebaseSync.saveAllUsers();
+    } else if (AppState.currentUser) {
+      FirebaseSync.saveUser(AppState.currentUser, immediate);
     }
   }
 }
@@ -796,7 +796,10 @@ function unblockUser(viewer, target) {
 function areFriends(user1, user2) {
   if (!user1 || !user2) return false;
   const u1 = AppState.users[user1];
-  return u1 && Array.isArray(u1.friends) && u1.friends.includes(user2);
+  const u2 = AppState.users[user2];
+  if (!u1 || !Array.isArray(u1.friends) || !u1.friends.includes(user2)) return false;
+  if (!u2 || !Array.isArray(u2.friends) || !u2.friends.includes(user1)) return false;
+  return true;
 }
 
 function getFriendRequest(user1, user2) {
@@ -839,6 +842,10 @@ function sendFriendRequest(from, to, initialMessage = '') {
   }
 
   saveUsers();
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    if (uFrom) FirebaseSync.saveUser(from, true);
+    if (uTo) FirebaseSync.saveUser(to, true);
+  }
   return req;
 }
 
@@ -866,6 +873,10 @@ function acceptFriendRequest(viewer, sender) {
   updateStatus(uSender);
 
   saveUsers();
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    if (uViewer) FirebaseSync.saveUser(viewer, true);
+    if (uSender) FirebaseSync.saveUser(sender, true);
+  }
   return true;
 }
 
@@ -887,6 +898,10 @@ function declineFriendRequest(viewer, sender) {
   updateStatus(uSender);
 
   saveUsers();
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    if (uViewer) FirebaseSync.saveUser(viewer, true);
+    if (uSender) FirebaseSync.saveUser(sender, true);
+  }
   return true;
 }
 
@@ -929,8 +944,8 @@ function removeFriend(user1, user2) {
 
   saveUsers();
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
-    if (u1) FirebaseSync.saveUser(user1);
-    if (u2) FirebaseSync.saveUser(user2);
+    if (u1) FirebaseSync.saveUser(user1, true);
+    if (u2) FirebaseSync.saveUser(user2, true);
   }
   return true;
 }
@@ -1017,6 +1032,9 @@ function addMessage(from, to, text, replyTo = null) {
   if (isUserMuted(from)) {
     const info = getMuteInfo(from);
     throw new Error(`Вам ограничен доступ к чату: ${info?.muteReason || 'Блокировка'} (${info?.remainingFormatted || ''})`);
+  }
+  if (typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(to, from)) {
+    throw new Error('Требуется оплата за отправку личного сообщения');
   }
   const key = getMessagesKey(from, to);
   const oldKey = [String(from), String(to)].sort().join('_');
@@ -1150,8 +1168,8 @@ function deleteChatForBoth(user1, user2) {
     }
     FirebaseSync.deleteDirectChat(directKey1);
     FirebaseSync.deleteDirectChat(directKey2);
-    FirebaseSync.saveUser(user1);
-    FirebaseSync.saveUser(user2);
+    FirebaseSync.saveUser(user1, true);
+    FirebaseSync.saveUser(user2, true);
   }
   return true;
 }

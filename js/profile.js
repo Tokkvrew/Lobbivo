@@ -545,6 +545,8 @@ async function saveProfile() {
     }
     try {
       data.avatar = await compressImage(file, 256, 0.85);
+      data.avatarUpdatedAt = Date.now();
+      data.updatedAt = Date.now();
     } catch (err) {
       showNotification('Ошибка загрузки фото', err.message || 'Не удалось обработать изображение');
       return;
@@ -562,6 +564,7 @@ function finishProfileSave(oldUsername, newUsername, game, device, desc) {
   data.game = game;
   data.device = device;
   data.desc = desc;
+  data.updatedAt = Date.now();
   data.tags = Array.isArray(currentProfileEditingTags) ? [...currentProfileEditingTags] : [];
 
   if (newUsername && newUsername !== oldUsername) {
@@ -573,6 +576,7 @@ function finishProfileSave(oldUsername, newUsername, game, device, desc) {
   } else {
     saveUsers(oldUsername, true);
     renderProfile();
+    if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
     updateGameCounts();
     switchProfileTab('overview');
     showNotification('Успешно', 'Профиль обновлен!');

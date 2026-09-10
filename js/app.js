@@ -1856,6 +1856,8 @@ function init() {
         const compressedBase64 = await compressImage(file, 256, 0.85);
         if (AppState.currentUser && AppState.users[AppState.currentUser]) {
           AppState.users[AppState.currentUser].avatar = compressedBase64;
+          AppState.users[AppState.currentUser].avatarUpdatedAt = Date.now();
+          AppState.users[AppState.currentUser].updatedAt = Date.now();
           saveUsers(AppState.currentUser, true);
           renderProfile();
           if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
@@ -2066,10 +2068,10 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.9.12', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.9.14', { updateViaCache: 'none' })
         .then((reg) => {
           reg.update().catch(() => {});
-          console.log('[Lobbivo SW] Service Worker v2.9.12 активен:', reg.scope);
+          console.log('[Lobbivo SW] Service Worker v2.9.14 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку
           document.addEventListener('visibilitychange', () => {
