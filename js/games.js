@@ -209,11 +209,17 @@ function getUserSquads(username) {
   const u = AppState.users[username];
   if (!u) return [];
 
-  if (Array.isArray(u.squads)) {
-    return u.squads.filter(s => s && s.active !== false);
+  let squads = u.squads;
+  if (!Array.isArray(squads)) {
+    if (squads && typeof squads === 'object') {
+      squads = Object.values(squads);
+      u.squads = squads;
+    } else {
+      squads = [];
+    }
   }
 
-  return [];
+  return squads.filter(s => s && typeof s === 'object' && s.active !== false);
 }
 
 function renderMySquads() {

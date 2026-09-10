@@ -185,7 +185,16 @@ function openCreateSquadModal(defaultGame = null, editSquadId = null) {
   const hiddenGameInput = document.getElementById('squadGame');
 
   const currentUserData = AppState.users[AppState.currentUser];
-  const userSquads = Array.isArray(currentUserData?.squads) ? currentUserData.squads : [];
+  let userSquads = currentUserData?.squads;
+  if (!Array.isArray(userSquads)) {
+    if (userSquads && typeof userSquads === 'object') {
+      userSquads = Object.values(userSquads);
+      if (currentUserData) currentUserData.squads = userSquads;
+    } else {
+      userSquads = [];
+      if (currentUserData) currentUserData.squads = userSquads;
+    }
+  }
 
   // Safely resolve defaultGame parameter (ignore MouseEvent or non-string arguments)
   let initialGame = (typeof defaultGame === 'string' && defaultGame) ? defaultGame : (AppState.selectedGameFilter || 'all');
@@ -303,6 +312,9 @@ function submitSquad() {
   const userData = AppState.users[AppState.currentUser];
   if (!userData) return;
 
+  if (userData.squads && !Array.isArray(userData.squads) && typeof userData.squads === 'object') {
+    userData.squads = Object.values(userData.squads);
+  }
   if (!Array.isArray(userData.squads)) {
     userData.squads = [];
   }

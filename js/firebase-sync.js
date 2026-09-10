@@ -81,9 +81,49 @@ const FirebaseSync = {
           for (const username of Object.keys(data)) {
             if (username && data[username]) {
               const cloudUser = data[username];
-              if (!Array.isArray(cloudUser.squads)) {
-                cloudUser.squads = [];
+              
+              // Преобразуем Firebase-структуры (объекты с числовыми ключами {"0":..,"1":..}) обратно в массивы
+              if (cloudUser.squads) {
+                if (Array.isArray(cloudUser.squads)) {
+                  cloudUser.squads = cloudUser.squads.filter(s => s && typeof s === 'object');
+                } else if (typeof cloudUser.squads === 'object') {
+                  cloudUser.squads = Object.values(cloudUser.squads).filter(s => s && typeof s === 'object');
+                } else {
+                  cloudUser.squads = [];
+                }
+              } else {
+                // Если в облаке нет поля squads, но локально у пользователя были анкеты, сохраняем локальные
+                cloudUser.squads = (AppState.users[username] && Array.isArray(AppState.users[username].squads))
+                  ? AppState.users[username].squads
+                  : [];
               }
+
+              if (cloudUser.squads.length > 0) {
+                cloudUser.lookingForTeam = cloudUser.squads.some(s => s && s.active !== false);
+                cloudUser.hasCreatedSquad = true;
+              }
+
+              if (cloudUser.friends) {
+                cloudUser.friends = Array.isArray(cloudUser.friends) ? cloudUser.friends : Object.values(cloudUser.friends);
+              }
+              if (cloudUser.blockedUsers) {
+                cloudUser.blockedUsers = Array.isArray(cloudUser.blockedUsers) ? cloudUser.blockedUsers : Object.values(cloudUser.blockedUsers);
+              }
+              if (cloudUser.friendRequests) {
+                cloudUser.friendRequests = Array.isArray(cloudUser.friendRequests) ? cloudUser.friendRequests : Object.values(cloudUser.friendRequests);
+              }
+              if (cloudUser.customTags) {
+                cloudUser.customTags = Array.isArray(cloudUser.customTags) ? cloudUser.customTags : Object.values(cloudUser.customTags);
+              }
+              if (cloudUser.inventory) {
+                if (cloudUser.inventory.frames) {
+                  cloudUser.inventory.frames = Array.isArray(cloudUser.inventory.frames) ? cloudUser.inventory.frames : Object.values(cloudUser.inventory.frames);
+                }
+                if (cloudUser.inventory.themes) {
+                  cloudUser.inventory.themes = Array.isArray(cloudUser.inventory.themes) ? cloudUser.inventory.themes : Object.values(cloudUser.inventory.themes);
+                }
+              }
+
               AppState.users[username] = {
                 ...AppState.users[username],
                 ...cloudUser
@@ -112,6 +152,8 @@ const FirebaseSync = {
             this._usersDebounceTimer = setTimeout(() => {
               if (typeof updateUI === 'function') updateUI();
               if (typeof updateGameCounts === 'function') updateGameCounts();
+              if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter || 'all');
+              if (typeof renderMySquads === 'function') renderMySquads();
               if (typeof renderProfile === 'function' && AppState.currentUser && document.getElementById('pageProfile')?.classList.contains('active')) {
                 renderProfile();
               }
@@ -334,10 +376,15 @@ const FirebaseSync = {
     const executeSave = () => {
       try {
         const payload = JSON.parse(JSON.stringify(userData));
-        if (!Array.isArray(payload.squads) || payload.squads.length === 0) {
+        if (payload.squads && !Array.isArray(payload.squads) && typeof payload.squads === 'object') {
+          payload.squads = Object.values(payload.squads);
+        }
+        if (!Array.isArray(payload.squads)) {
           payload.squads = [];
-          payload.lookingForTeam = false;
-          payload.hasCreatedSquad = false;
+        }
+        if (payload.squads.length > 0) {
+          payload.lookingForTeam = payload.squads.some(s => s && s.active !== false);
+          payload.hasCreatedSquad = true;
         }
         this.rtdb.ref('users/' + username).set(payload)
           .catch(err => console.warn('Cloud save user error:', err.message));

@@ -24,9 +24,9 @@ const SecurityShield = {
       label: 'Авторизация'
     },
     squad: {
-      maxRequests: 2,      // Создание анкет
-      windowMs: 15000,     // 15 секунд
-      cooldownMs: 20000,   // Блокировка 20 секунд
+      maxRequests: 6,      // Создание анкет
+      windowMs: 10000,     // 10 секунд
+      cooldownMs: 8000,    // Блокировка 8 секунд
       label: 'Создание анкеты'
     },
     complaint: {

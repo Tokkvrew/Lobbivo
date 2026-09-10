@@ -597,6 +597,26 @@ function loadUsers() {
   // Проверка и инициализация полей у всех пользователей
   for (const name of Object.keys(AppState.users)) {
     const u = AppState.users[name];
+    if (!u || typeof u !== 'object') continue;
+
+    // Нормализация анкет (squads)
+    if (u.squads) {
+      if (Array.isArray(u.squads)) {
+        u.squads = u.squads.filter(s => s && typeof s === 'object');
+      } else if (typeof u.squads === 'object') {
+        u.squads = Object.values(u.squads).filter(s => s && typeof s === 'object');
+      } else {
+        u.squads = [];
+      }
+    } else {
+      u.squads = [];
+    }
+
+    if (u.squads.length > 0) {
+      u.lookingForTeam = u.squads.some(s => s && s.active !== false);
+      u.hasCreatedSquad = true;
+    }
+
     if (typeof u.coins !== 'number') u.coins = 0;
     if (!Array.isArray(u.friends)) u.friends = [];
     if (!Array.isArray(u.blockedUsers)) u.blockedUsers = [];
@@ -611,7 +631,7 @@ function loadUsers() {
       u.contactedTeammates = [];
     }
     if (typeof u.hasCreatedSquad !== 'boolean') {
-      u.hasCreatedSquad = Boolean(u.lookingForTeam);
+      u.hasCreatedSquad = Boolean(u.lookingForTeam || (u.squads && u.squads.length > 0));
     }
     if (typeof u.isPremium !== 'boolean') u.isPremium = false;
     if (typeof u.equippedFrame !== 'string') u.equippedFrame = 'none';
@@ -626,7 +646,6 @@ function loadUsers() {
     }
   }
 
-  saveUsers();
   return AppState.users;
 }
 

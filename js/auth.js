@@ -175,6 +175,7 @@ function registerUser(username, password, game, device) {
     device: device || 'PC',
     created: Date.now(),
     id: generateUserId(),
+    squads: [],
     lookingForTeam: false,
     hasCreatedSquad: false,
     coins: 0,
