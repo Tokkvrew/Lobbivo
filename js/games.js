@@ -18,25 +18,47 @@ function preloadGameImages() {
 
 let _lastRenderedGameQuery = null;
 let _lastRenderedGameAuth = null;
+let _lastRenderedCategory = null;
 
-function renderGames(searchQuery = '', force = false) {
+function renderGames(searchQuery = '', force = false, category = null) {
   const grid = document.getElementById('gamesGrid');
   if (!grid) return;
+
+  const activeCategory = category || AppState.currentCategoryFilter || 'popular';
+  AppState.currentCategoryFilter = activeCategory;
 
   const q = (searchQuery || '').trim().toLowerCase();
   const isAuth = !!AppState.currentUser;
 
-  // Если поисковый запрос и статус входа не менялись и карточки уже на месте — не пересоздаем DOM (устраняет мерцание на смартфонах)
-  if (!force && _lastRenderedGameQuery === q && _lastRenderedGameAuth === isAuth && grid.children.length > 0) {
+  // Обновляем визуальное состояние табов категорий
+  document.querySelectorAll('#gameCategoryTabs .category-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.category === activeCategory);
+  });
+
+  // Если поисковый запрос, статус входа и категория не менялись и карточки уже на месте — не пересоздаем DOM
+  if (!force && _lastRenderedGameQuery === q && _lastRenderedGameAuth === isAuth && _lastRenderedCategory === activeCategory && grid.children.length > 0) {
     return;
   }
 
   _lastRenderedGameQuery = q;
   _lastRenderedGameAuth = isAuth;
+  _lastRenderedCategory = activeCategory;
 
-  const filtered = GAMES.filter(game => {
-    if (!q) return true;
-    return game.name.toLowerCase().includes(q) || game.id.toLowerCase().includes(q);
+  let filtered = GAMES.filter(game => {
+    // Фильтр по категории
+    if (activeCategory === 'popular') {
+      if (!game.featured) return false;
+    } else if (activeCategory !== 'all' && game.category !== activeCategory) {
+      return false;
+    }
+    // Фильтр по поиску
+    if (q) {
+      const matchName = game.name.toLowerCase().includes(q);
+      const matchId = game.id.toLowerCase().includes(q);
+      const matchTag = game.tagLine ? game.tagLine.toLowerCase().includes(q) : false;
+      return matchName || matchId || matchTag;
+    }
+    return true;
   });
 
   if (filtered.length === 0) {
@@ -44,7 +66,7 @@ function renderGames(searchQuery = '', force = false) {
       <div class="empty-state" style="grid-column: 1 / -1; padding: 40px 20px;">
         <svg><use href="#icon-game"/></svg>
         <h3>Игры не найдены</h3>
-        <p>Попробуйте изменить поисковый запрос</p>
+        <p>Попробуйте выбрать другую категорию или изменить поисковый запрос</p>
       </div>
     `;
     return;
@@ -52,9 +74,19 @@ function renderGames(searchQuery = '', force = false) {
 
   grid.innerHTML = filtered.map((game, idx) => {
     const imgSrc = game.image || `assets/images/games/${game.id}.jpg`;
-    const loadStrategy = idx < 6 ? 'eager' : 'lazy';
+    const loadStrategy = idx < 8 ? 'eager' : 'lazy';
+    const isFeatured = Boolean(game.featured);
+    const categoryObj = GAME_CATEGORIES.find(c => c.id === game.category);
+    const tagLine = game.tagLine || 'Поиск тиммейтов';
+
     return `
-      <div class="game-poster-card ${!isAuth ? 'guest-preview' : ''}" data-game="${escapeHtml(game.id)}" style="--card-glow:${escapeHtml(game.glow || '#00d4ff')};">
+      <div class="game-poster-card ${isFeatured ? 'featured-game-card' : ''} ${!isAuth ? 'guest-preview' : ''}" data-game="${escapeHtml(game.id)}" style="--card-glow:${escapeHtml(game.glow || '#00d4ff')};">
+        ${isFeatured ? `
+          <div class="featured-top-ribbon">
+            <svg><use href="#${categoryObj ? categoryObj.icon : 'icon-sparkles'}"/></svg>
+            <span>ТОП ИГРА</span>
+          </div>
+        ` : ''}
         <div class="poster-art-wrapper">
           <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(game.name)}" class="poster-image" decoding="async" loading="${loadStrategy}" onerror="this.onerror=null; this.classList.add('img-fallback-hidden');" />
           <div class="poster-fallback-backdrop">
@@ -64,12 +96,15 @@ function renderGames(searchQuery = '', force = false) {
         </div>
         <div class="poster-info-wrapper">
           <div class="poster-title">${escapeHtml(game.name)}</div>
+          <div class="poster-tagline">${escapeHtml(tagLine)}</div>
           ${isAuth ? `
           <button type="button" class="btn-find-party ${escapeHtml(game.btnTheme || 'cyan')}">
-            НАЙТИ ПАТИ
+            <svg><use href="#icon-users"/></svg>
+            <span>НАЙТИ ПАТИ</span>
           </button>
           ` : `
           <div class="poster-guest-hint">
+            <svg><use href="#icon-users"/></svg>
             <span>25+ Онлайн</span>
           </div>
           `}
@@ -81,11 +116,29 @@ function renderGames(searchQuery = '', force = false) {
   grid.querySelectorAll('.game-poster-card').forEach(card => {
     card.addEventListener('click', function() {
       if (!AppState.currentUser) {
-        // Режим просмотра: клики по карточкам заблокированы
+        showAuthModal('login');
         return;
       }
       const gameId = this.dataset.game;
+      if (typeof RetentionEngine !== 'undefined') RetentionEngine.playSound('click');
       showPlayers(gameId);
+    });
+  });
+}
+
+// Привязка кликов по табам категорий
+function initCategoryTabs() {
+  const container = document.getElementById('gameCategoryTabs');
+  if (!container) return;
+
+  container.querySelectorAll('.category-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const category = this.dataset.category || 'all';
+      if (typeof RetentionEngine !== 'undefined') {
+        RetentionEngine.playSound('click');
+        RetentionEngine.haptic('light');
+      }
+      renderGames(document.getElementById('gameSearchInput')?.value || '', true, category);
     });
   });
 }
@@ -97,6 +150,17 @@ function getRussianPlural(n, forms) {
   if (n1 > 1 && n1 < 5) return forms[1];
   if (n1 === 1) return forms[0];
   return forms[2];
+}
+
+function getPartySizeLabel(size) {
+  switch (size) {
+    case '+1': return '+1 в пати (Дуо)';
+    case '+2': return '+2 в пати (Трио)';
+    case '+3': return '+3 в пати (Сквад)';
+    case '+4': return '+4 (Фулл стак)';
+    case 'solo': return 'Ищу стак (Я один)';
+    default: return size ? `${size}` : '+1 в пати';
+  }
 }
 
 function updateGameCounts() {
@@ -224,6 +288,10 @@ function renderMySquads() {
             </div>
 
             <div class="my-squad-info-row">
+              <div class="squad-info-pill">
+                <span class="info-label">Состав:</span>
+                <span class="info-val">${escapeHtml(getPartySizeLabel(sq.partySize || '+1'))}</span>
+              </div>
               <div class="squad-info-pill">
                 <span class="info-label">Ранг:</span>
                 <span class="info-val">${safeRank}</span>
@@ -410,11 +478,15 @@ function renderPlayers(gameFilter = 'all') {
     }
   }
 
-  // Сортировка: VIP буст -> Моя анкета -> Premium -> Онлайн -> Новые
+  // Сортировка: VIP буст -> Срочный сбор -> Моя анкета -> Premium -> Онлайн -> Новые
   squadCards.sort((a, b) => {
     const boostA = isSquadVipBoosted(a.username) ? 1 : 0;
     const boostB = isSquadVipBoosted(b.username) ? 1 : 0;
     if (boostA !== boostB) return boostB - boostA;
+
+    const urgA = (typeof RetentionEngine !== 'undefined' && RetentionEngine.isUrgent(a.squad, a.username)) ? 1 : 0;
+    const urgB = (typeof RetentionEngine !== 'undefined' && RetentionEngine.isUrgent(b.squad, b.username)) ? 1 : 0;
+    if (urgA !== urgB) return urgB - urgA;
 
     const meA = a.isMe ? 1 : 0;
     const meB = b.isMe ? 1 : 0;
@@ -448,6 +520,8 @@ function renderPlayers(gameFilter = 'all') {
     const deviceIconSVG = getDeviceIconSVG(squad.device || 'PC');
     const isPremium = isUserPremium(username);
     const isBoosted = isSquadVipBoosted(username);
+    const isUrgent = typeof RetentionEngine !== 'undefined' ? RetentionEngine.isUrgent(squad, username) : false;
+    const karma = typeof RetentionEngine !== 'undefined' ? RetentionEngine.getKarma(username) : (userData.karma || 0);
     const frameId = getUserEquippedFrame(username);
     
     let avatarContent;
@@ -464,10 +538,30 @@ function renderPlayers(gameFilter = 'all') {
 
     const premiumCrownHtml = isPremium ? '<span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : '';
     const vipPillHtml = isBoosted ? '<span class="vip-squad-badge"><svg><use href="#icon-badge-vip"/></svg> VIP СБОР</span>' : '';
+    const urgentBadgeHtml = isUrgent ? '<span class="urgent-squad-badge"><svg><use href="#icon-bolt-fast"/></svg> СРОЧНО В КАТКУ</span>' : '';
     const mySquadBadgeHtml = isMe ? '<span class="my-squad-badge"><svg><use href="#icon-sparkles"/></svg> Ваша анкета</span>' : '';
     const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
     const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" style="font-size:0.62rem;padding:2px 6px;"><svg style="width:11px;height:11px;"><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
     const userTags = typeof getUserCustomTags === 'function' ? getUserCustomTags(username) : [];
+
+    const karmaHtml = `
+      <button type="button" class="karma-pill-btn ${isMe ? 'is-self' : ''}" onclick="event.stopPropagation(); if (typeof RetentionEngine !== 'undefined') RetentionEngine.giveKarma('${safeName}');" title="${isMe ? 'Ваша репутация' : 'Поставить лайк за адекватность (+1 к карме)'}">
+        <svg><use href="#icon-thumbs-up"/></svg>
+        <span>${karma}</span>
+      </button>
+    `;
+
+    // 1-Click Connect Chips
+    let connectChipsHtml = '';
+    if (userData.discord || userData.telegram || userData.steam) {
+      connectChipsHtml = `
+        <div class="player-connect-chips-row">
+          ${userData.discord ? `<button type="button" class="connect-chip-btn discord" onclick="RetentionEngine.copyDiscord('${escapeHtml(userData.discord)}', event)" title="Скопировать Discord"><svg><use href="#icon-discord-simple"/></svg><span>${escapeHtml(userData.discord)}</span></button>` : ''}
+          ${userData.telegram ? `<button type="button" class="connect-chip-btn telegram" onclick="RetentionEngine.openTelegram('${escapeHtml(userData.telegram)}', event)" title="Открыть в Telegram"><svg><use href="#icon-telegram-plane"/></svg><span>${escapeHtml(userData.telegram)}</span></button>` : ''}
+          ${userData.steam ? `<button type="button" class="connect-chip-btn steam" onclick="event.stopPropagation(); window.open('${escapeHtml(userData.steam)}', '_blank');" title="Открыть Steam"><svg><use href="#icon-steam-simple"/></svg><span>Steam</span></button>` : ''}
+        </div>
+      `;
+    }
 
     let actionsHtml = '';
     if (isMe) {
@@ -494,25 +588,36 @@ function renderPlayers(gameFilter = 'all') {
       `;
     }
 
+    const partySizeStr = squad.partySize || '+1';
+    const partySizeLabel = getPartySizeLabel(partySizeStr);
+    const partySizeBadgeHtml = `<span class="party-size-pill" title="Ищет тиммейтов"><svg><use href="#icon-users"/></svg><span>${escapeHtml(partySizeLabel)}</span></span>`;
+
     return `
-      <div class="player-card ${isMe ? 'my-squad-card' : ''} ${isBoosted ? 'vip-boosted-card' : ''} ${isPremium ? 'premium-user-card' : ''}" data-username="${safeName}" data-game="${escapeHtml(squad.game || 'csgo')}" data-squad-id="${escapeHtml(squad.id || '')}">
+      <div class="player-card ${isMe ? 'my-squad-card' : ''} ${isUrgent ? 'urgent-fast-match-card' : ''} ${isBoosted ? 'vip-boosted-card' : ''} ${isPremium ? 'premium-user-card' : ''}" data-username="${safeName}" data-game="${escapeHtml(squad.game || 'csgo')}" data-squad-id="${escapeHtml(squad.id || '')}">
         <div class="player-top">
           <div class="player-avatar">${avatarContent}</div>
           <div class="player-info">
-            <div class="player-name">
-              <span class="${getUserNameClass(username)}">${safeName}</span>
-              ${mySquadBadgeHtml}
+            <div class="player-header-row">
+              <span class="player-name-text ${getUserNameClass(username)}">${safeName}</span>
               ${premiumCrownHtml}
               ${adminBadgeHtml}
+              ${mySquadBadgeHtml}
               ${vipPillHtml}
+              ${urgentBadgeHtml}
             </div>
-            <div class="player-game">
-              <svg><use href="#${escapeHtml(game.icon)}"/></svg>
-              <span>${escapeHtml(game.name)}</span>
+            <div class="player-game-row">
+              <div class="player-game">
+                <svg><use href="#${escapeHtml(game.icon)}"/></svg>
+                <span>${escapeHtml(game.name)}</span>
+              </div>
+              ${karmaHtml}
             </div>
           </div>
         </div>
-        ${safeRank ? `<div class="player-rank">${safeRank}</div>` : ''}
+        <div class="player-rank-row">
+          ${partySizeBadgeHtml}
+          ${safeRank ? `<div class="player-rank">${safeRank}</div>` : ''}
+        </div>
         ${userTags.length > 0 ? `
           <div class="player-custom-tags-row">
             ${userTags.slice(0, 3).map(t => `<span class="player-custom-tag-chip">${escapeHtml(t)}</span>`).join('')}
@@ -520,6 +625,9 @@ function renderPlayers(gameFilter = 'all') {
           </div>
         ` : ''}
         ${safeDesc ? `<div class="player-desc">${safeDesc}</div>` : '<div class="player-desc empty-desc">Описание не заполнено</div>'}
+        
+        ${connectChipsHtml}
+
         <div class="player-device">
           <svg class="device-icon device-icon-sm"><use href="#${escapeHtml(deviceIconSVG)}"/></svg>
           <span>${safeDevice}</span>
@@ -643,6 +751,9 @@ function showUserProfileModal(username) {
     }
   }
 
+  const isMe = AppState.currentUser === username;
+  const karma = typeof RetentionEngine !== 'undefined' ? RetentionEngine.getKarma(username) : (data.karma || 0);
+
   const existing = document.getElementById('userProfileModalOverlay');
   if (existing) existing.remove();
 
@@ -676,9 +787,9 @@ function showUserProfileModal(username) {
           </div>
           <div class="modal-user-meta">
             <svg class="device-icon device-icon-sm"><use href="#${escapeHtml(deviceIconSVG)}"/></svg>
-            ${safeDevice} · ID: ${data.id || '---'}${((typeof isUserCEO === 'function' ? isUserCEO(username) : (typeof isUserGA === 'function' && isUserGA(username)))) ? ' <span class="profile-ceo-badge" title="CEO & Founder"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>' : ''}
+            <span>${safeDevice}</span> · <span>ID: ${data.id || '---'}</span>${((typeof isUserCEO === 'function' ? isUserCEO(username) : (typeof isUserGA === 'function' && isUserGA(username)))) ? ' · <span class="profile-ceo-badge" title="CEO & Founder"><svg class="mini-svg" style="width:11px;height:11px;margin-right:3px;"><use href="#icon-crown"/></svg>CEO</span>' : ''} · <span class="modal-user-karma-badge" title="Репутация игрока" style="display:inline-flex;align-items:center;gap:3px;color:#34d399;font-weight:700;"><svg class="mini-svg" style="width:12px;height:12px;stroke:#34d399;fill:none;vertical-align:-1px;"><use href="#icon-thumbs-up"/></svg><span id="modalKarmaNumVal">${karma}</span></span>
           </div>
-          <div class="modal-user-status" style="margin-top: 4px; font-size: 0.8rem; font-weight: 600; color: ${isUserOnline(username) ? '#00ff9d' : 'var(--text-muted)'};">
+          <div class="modal-user-status" style="margin-top: 5px; font-size: 0.8rem; font-weight: 600; color: ${isUserOnline(username) ? '#00ff9d' : 'var(--text-muted)'};">
             <span class="online-dot ${isUserOnline(username) ? 'online' : 'offline'}" style="display:inline-block; vertical-align:middle; margin-right:4px;"></span>
             ${formatLastSeen(data.lastSeen, username)}
           </div>
@@ -700,15 +811,31 @@ function showUserProfileModal(username) {
         <label>О себе</label>
         <div class="value">${safeDesc}</div>
       </div>
+      ${(data.discord || data.telegram || data.steam) ? `
+        <div class="profile-field">
+          <label>Быстрая связь (1-Click Connect)</label>
+          <div class="player-connect-chips-row" style="margin-top:4px;">
+            ${data.discord ? `<button type="button" class="connect-chip-btn discord" onclick="RetentionEngine.copyDiscord('${escapeHtml(data.discord)}', event)" title="Скопировать Discord"><svg><use href="#icon-discord-simple"/></svg><span>Discord: ${escapeHtml(data.discord)}</span></button>` : ''}
+            ${data.telegram ? `<button type="button" class="connect-chip-btn telegram" onclick="RetentionEngine.openTelegram('${escapeHtml(data.telegram)}', event)" title="Открыть в Telegram"><svg><use href="#icon-telegram-plane"/></svg><span>Telegram: ${escapeHtml(data.telegram)}</span></button>` : ''}
+            ${data.steam ? `<button type="button" class="connect-chip-btn steam" onclick="event.stopPropagation(); window.open('${escapeHtml(data.steam)}', '_blank');" title="Открыть Steam"><svg><use href="#icon-steam-simple"/></svg><span>Steam Профиль</span></button>` : ''}
+          </div>
+        </div>
+      ` : ''}
       ${adminActionsHtml}
       <div class="modal-user-actions">
+        ${!isMe ? `
+          <button class="btn btn-outline modal-karma-action-btn" id="modalKarmaActionBtn" title="Поставить лайк за адекватность (+1 к карме)">
+            <svg><use href="#icon-thumbs-up"/></svg>
+            <span>Похвалить (+1)</span>
+          </button>
+        ` : ''}
         <button class="btn" id="modalChatBtn">
           <svg><use href="#icon-chat"/></svg>
-          Написать сообщение
+          <span>Написать</span>
         </button>
         <button class="btn btn-outline modal-report-btn" id="modalReportBtn">
           <svg><use href="#icon-flag"/></svg>
-          Пожаловаться
+          <span>Жалоба</span>
         </button>
       </div>
     </div>
@@ -720,6 +847,24 @@ function showUserProfileModal(username) {
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });
+
+  const handleModalKarma = () => {
+    if (typeof RetentionEngine !== 'undefined') {
+      RetentionEngine.giveKarma(username);
+      const updatedKarma = RetentionEngine.getKarma(username);
+      const numEl = overlay.querySelector('#modalKarmaNumVal');
+      if (numEl) numEl.textContent = updatedKarma;
+      const karmaActionBtn = overlay.querySelector('#modalKarmaActionBtn');
+      if (karmaActionBtn) {
+        karmaActionBtn.classList.add('voted');
+        karmaActionBtn.innerHTML = `<svg class="mini-svg" style="width:13px;height:13px;"><use href="#icon-check"/></svg><span>Похвалено!</span>`;
+      }
+    }
+  };
+
+  if (!isMe) {
+    overlay.querySelector('#modalKarmaActionBtn')?.addEventListener('click', handleModalKarma);
+  }
 
   overlay.querySelector('#modalChatBtn').addEventListener('click', () => {
     overlay.remove();

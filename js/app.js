@@ -206,6 +206,12 @@ function openCreateSquadModal(defaultGame = null, editSquadId = null) {
     if (typeof setDevicePickerValue === 'function') {
       setDevicePickerValue('squadDevicePicker', squadToEdit.device || currentUserData?.device || 'PC');
     }
+    const currentPartySize = squadToEdit.partySize || '+1';
+    const partySizeInput = document.getElementById('squadPartySize');
+    if (partySizeInput) partySizeInput.value = currentPartySize;
+    document.querySelectorAll('#squadPartySizeSelector .party-size-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.size === currentPartySize);
+    });
     initialGame = squadToEdit.game || initialGame;
   } else {
     if (editIdInput) editIdInput.value = '';
@@ -214,6 +220,11 @@ function openCreateSquadModal(defaultGame = null, editSquadId = null) {
     if (typeof setDevicePickerValue === 'function') {
       setDevicePickerValue('squadDevicePicker', currentUserData?.device || 'PC');
     }
+    const partySizeInput = document.getElementById('squadPartySize');
+    if (partySizeInput) partySizeInput.value = '+1';
+    document.querySelectorAll('#squadPartySizeSelector .party-size-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.size === '+1');
+    });
     if (submitBtnText) submitBtnText.textContent = 'Опубликовать анкету';
   }
 
@@ -278,6 +289,7 @@ function submitSquad() {
 
   const game = document.getElementById('squadGame')?.value || 'csgo';
   const rank = (document.getElementById('squadRank')?.value || '').trim();
+  const partySize = document.getElementById('squadPartySize')?.value || '+1';
   const device = document.getElementById('squadDevice')?.value || 'PC';
   const rawDescription = (document.getElementById('squadDescription')?.value || '').trim();
 
@@ -302,6 +314,7 @@ function submitSquad() {
         ...userData.squads[existingIndex],
         game,
         rank: rank || 'Не указан',
+        partySize,
         device,
         desc: description,
         updatedAt: Date.now()
@@ -315,6 +328,7 @@ function submitSquad() {
       userData.squads[duplicateIndex] = {
         ...userData.squads[duplicateIndex],
         rank: rank || userData.squads[duplicateIndex].rank || 'Не указан',
+        partySize,
         device,
         desc: description,
         updatedAt: Date.now()
@@ -325,6 +339,7 @@ function submitSquad() {
         id: 'sq_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
         game,
         rank: rank || 'Не указан',
+        partySize,
         device,
         desc: description,
         createdAt: Date.now(),
@@ -356,8 +371,9 @@ function createParticles(theme) {
   if (!container) return;
   container.innerHTML = '';
 
-  // Оптимизация производительности: на мобильных устройствах отключаем тяжелые DOM-частицы во избежание нагрева телефона и расхода батареи
-  const isMobile = window.innerWidth <= 768 || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1);
+  // Оптимизация производительности: на Android и мобильных отключаем тяжелые DOM-частицы во избежание нагрева и расхода батареи
+  const isAndroid = (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent)) || document.documentElement.classList.contains('android-device');
+  const isMobile = isAndroid || window.innerWidth <= 768 || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1);
   if (isMobile) {
     return;
   }
@@ -1299,12 +1315,13 @@ function setGamePickerValue(pickerId, gameId) {
 // ============================================================
 
 function init() {
-  const isMobile = window.innerWidth <= 768 || (typeof navigator !== 'undefined' && (/android|iphone|ipad|ipod/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1));
+  const isAndroid = typeof navigator !== 'undefined' && (/android/i.test(navigator.userAgent) || (navigator.platform && /android/i.test(navigator.platform)));
+  const isMobile = isAndroid || window.innerWidth <= 768 || (typeof navigator !== 'undefined' && (/android|iphone|ipad|ipod/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1));
+  if (isAndroid) {
+    document.documentElement.classList.add('android-device', 'is-android');
+  }
   if (isMobile) {
     document.documentElement.classList.add('mobile-device');
-    if (/android/i.test(navigator.userAgent)) {
-      document.documentElement.classList.add('android-device');
-    }
   }
 
   if (typeof preloadGameImages === 'function') {
@@ -1539,6 +1556,18 @@ function init() {
     if (e.target === this) closeCreateSquadModal();
   });
   document.getElementById('submitSquadBtn')?.addEventListener('click', submitSquad);
+
+  // Выбор размера пати (Сколько человек ищет)
+  document.querySelectorAll('#squadPartySizeSelector .party-size-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const size = this.dataset.size || '+1';
+      const input = document.getElementById('squadPartySize');
+      if (input) input.value = size;
+      document.querySelectorAll('#squadPartySizeSelector .party-size-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      if (typeof RetentionEngine !== 'undefined') RetentionEngine.playSound('click');
+    });
+  });
 
   // Жалобы
   document.getElementById('complaintModalClose')?.addEventListener('click', closeComplaintModal);
@@ -1961,10 +1990,10 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.8.9', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.9.4', { updateViaCache: 'none' })
         .then((reg) => {
           reg.update().catch(() => {});
-          console.log('[Lobbivo SW] Service Worker v2.8.9 активен:', reg.scope);
+          console.log('[Lobbivo SW] Service Worker v2.9.4 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку
           document.addEventListener('visibilitychange', () => {
@@ -2003,6 +2032,13 @@ function init() {
       if (typeof openChat === 'function') openChat();
       if (typeof openDirectChat === 'function') openDirectChat(chatPartnerFromUrl);
     }, 600);
+  }
+
+  if (typeof initCategoryTabs === 'function') {
+    initCategoryTabs();
+  }
+  if (typeof RetentionEngine !== 'undefined') {
+    RetentionEngine.init();
   }
 
   updateUI();

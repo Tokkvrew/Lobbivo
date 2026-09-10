@@ -2,29 +2,31 @@
 //  LOBBIVO SERVICE WORKER (ULTRA-RESILIENT MOBILE & PWA CACHE)
 // ============================================================
 
-const CACHE_NAME = 'lobbivo-cache-v2.9.0';
+const CACHE_NAME = 'lobbivo-cache-v2.9.6';
 const OFFLINE_URL = './index.html';
 
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/variables.css?v=2.9.0',
-  './css/base.css?v=2.9.0',
-  './css/components.css?v=2.9.0',
-  './css/animations.css?v=2.9.0',
-  './css/media.css?v=2.9.0',
-  './js/data.js?v=2.9.0',
-  './js/security-shield.js?v=2.9.0',
-  './js/firebase-sync.js?v=2.9.0',
-  './js/storage.js?v=2.9.0',
-  './js/auth.js?v=2.9.0',
-  './js/games.js?v=2.9.0',
-  './js/chat.js?v=2.9.0',
-  './js/profile.js?v=2.9.0',
-  './js/admin.js?v=2.9.0',
-  './js/app.js?v=2.9.0',
-  './assets/icons/sprite.svg'
+  './css/variables.css?v=2.9.3',
+  './css/base.css?v=2.9.3',
+  './css/components.css?v=2.9.3',
+  './css/animations.css?v=2.9.3',
+  './css/media.css?v=2.9.3',
+  './js/data.js?v=2.9.3',
+  './js/security-shield.js?v=2.9.3',
+  './js/firebase-sync.js?v=2.9.3',
+  './js/storage.js?v=2.9.3',
+  './js/retention.js?v=2.9.3',
+  './js/auth.js?v=2.9.3',
+  './js/games.js?v=2.9.3',
+  './js/chat.js?v=2.9.3',
+  './js/profile.js?v=2.9.3',
+  './js/admin.js?v=2.9.3',
+  './js/app.js?v=2.9.3',
+  './assets/icons/sprite.svg',
+  './assets/images/games/roblox.jpg'
 ];
 
 // Установка: Мгновенный предзагруз всех критических файлов в кэш

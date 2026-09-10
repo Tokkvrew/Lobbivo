@@ -208,10 +208,16 @@ function renderProfile() {
     sinceEl.textContent = `· с ${since}`;
   }
 
-  // 4. Баланс монет в шапке профиля
+  // 4. Баланс монет и карма/лайки в шапке профиля
   const coinNumEl = document.getElementById('profileCoinBalanceNum');
   if (coinNumEl) {
     coinNumEl.textContent = `${userCoins.toLocaleString('ru-RU')} LC`;
+  }
+
+  const karmaValEl = document.getElementById('profileKarmaVal');
+  if (karmaValEl) {
+    const userKarma = typeof RetentionEngine !== 'undefined' ? RetentionEngine.getKarma(current) : (data.karma || 0);
+    karmaValEl.textContent = `${userKarma}`;
   }
 
   // 5. Заполнение формы редактирования анкеты

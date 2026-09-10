@@ -253,6 +253,10 @@
 }
 
 .btn-find-party {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-family: 'Orbitron', 'Rajdhani', sans-serif;
   font-size: 0.68rem;
   font-weight: 800;
@@ -267,6 +271,17 @@
   transition: all 0.22s ease;
   user-select: none;
   white-space: nowrap;
+}
+
+.btn-find-party svg {
+  width: 14px;
+  height: 14px;
+  max-width: 14px;
+  max-height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
 }
 
 /* ТЕМЫ КНОПОК ПОСТЕРА */
@@ -540,16 +555,49 @@
 }
 
 .player-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: visible;
+}
+
+.player-header-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
   overflow: hidden;
 }
 
-.player-name {
+.player-name-text {
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.player-name {
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-game-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  position: relative;
 }
 
 .player-game {
@@ -559,16 +607,27 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 2px;
+  margin-top: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-game-row .karma-pill-btn {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .player-game svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   color: var(--game-color);
   stroke: var(--game-color);
   fill: var(--game-color);
   fill-opacity: 0.25;
+  flex-shrink: 0;
 }
 
 .player-rank {
@@ -5380,19 +5439,66 @@ select:-webkit-autofill {
 
 .modal-user-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  width: 100%;
+}
+
+.modal-user-actions .btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 12px;
+  gap: 5px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  justify-content: center;
+  text-align: center;
+  box-shadow: none;
+}
+
+.modal-user-actions .btn svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.modal-user-actions .modal-karma-action-btn {
+  border: 1px solid rgba(52, 211, 153, 0.45) !important;
+  color: #34d399 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.modal-user-actions .modal-karma-action-btn:hover {
+  background: rgba(16, 185, 129, 0.25) !important;
+  border-color: #34d399 !important;
+  color: #6ee7b7 !important;
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.45) !important;
+  transform: translateY(-1px);
+}
+
+.modal-user-actions .modal-karma-action-btn.voted {
+  border-color: rgba(52, 211, 153, 0.7) !important;
+  background: rgba(16, 185, 129, 0.3) !important;
+  color: #6ee7b7 !important;
+  pointer-events: none;
 }
 
 .modal-user-actions .modal-report-btn {
-  border-color: rgba(255, 68, 102, 0.4);
+  border: 1px solid rgba(255, 68, 102, 0.4);
   color: var(--neon-red);
+  background: rgba(255, 68, 102, 0.08);
 }
 
 .modal-user-actions .modal-report-btn:hover {
-  background: var(--neon-red);
-  color: #fff;
+  background: rgba(255, 68, 102, 0.22);
+  color: #ff6b8b;
   border-color: var(--neon-red);
+  box-shadow: 0 0 14px rgba(255, 68, 102, 0.4);
+  transform: translateY(-1px);
 }
 
 /* 10. УВЕДОМЛЕНИЯ (TOAST NOTIFICATIONS) */
@@ -6537,6 +6643,7 @@ select:-webkit-autofill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   padding: 4px 14px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.06);
@@ -6547,6 +6654,17 @@ select:-webkit-autofill {
   font-weight: 600;
   letter-spacing: 0.4px;
   user-select: none;
+}
+
+.poster-guest-hint svg {
+  width: 14px;
+  height: 14px;
+  max-width: 14px;
+  max-height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
 }
 
 [data-theme="lobbivo"],
@@ -10672,4 +10790,608 @@ select:-webkit-autofill {
   font-size: 0.78rem;
   color: var(--text-muted);
   line-height: 1.4;
+}
+
+/* ============================================================
+   LOBBIVO RETENTION, FAST MATCH & CATEGORY HUBS (v2.9.0)
+   ============================================================ */
+
+/* 1. Fast Match Hero Bar */
+.fast-match-hero-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(255, 170, 0, 0.12) 0%, rgba(255, 68, 68, 0.08) 100%);
+  border: 1px solid rgba(255, 170, 0, 0.35);
+  border-radius: 18px;
+  padding: 16px 22px;
+  margin: 0 0 22px 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(255, 170, 0, 0.12);
+}
+
+.fast-match-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fast-match-icon-pulse {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffaa00, #ff4444);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(255, 170, 0, 0.6);
+  animation: fastMatchPulse 2s infinite ease-in-out;
+}
+
+@keyframes fastMatchPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(255, 170, 0, 0.6); }
+  50% { transform: scale(1.06); box-shadow: 0 0 25px rgba(255, 68, 68, 0.85); }
+}
+
+.fast-match-icon-pulse svg {
+  width: 24px;
+  height: 24px;
+}
+
+.fast-match-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  letter-spacing: 0.5px;
+}
+
+.fast-match-badge {
+  background: #ffaa00;
+  color: #030a16;
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.fast-match-sub {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 3px;
+}
+
+.fast-match-btn {
+  background: linear-gradient(135deg, #ffaa00, #ff4444) !important;
+  border-color: #ffaa00 !important;
+  color: #fff !important;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 0 18px rgba(255, 170, 0, 0.45) !important;
+}
+
+.fast-match-btn.active {
+  background: linear-gradient(135deg, #34d399, #059669) !important;
+  border-color: #34d399 !important;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.5) !important;
+}
+
+/* 2. Category Tabs */
+.game-category-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -6px 0 18px 0;
+  overflow-x: auto;
+  padding: 12px 6px 14px 6px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.game-category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.category-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(14, 20, 32, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              background 0.25s ease, 
+              border-color 0.25s ease, 
+              color 0.25s ease, 
+              box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.category-tab svg {
+  width: 16px;
+  height: 16px;
+  color: var(--neon-cyan, #00d4ff);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.25s ease, filter 0.25s ease;
+  transform: translateZ(0);
+}
+
+.category-tab:hover {
+  background: rgba(0, 212, 255, 0.14);
+  border-color: rgba(0, 212, 255, 0.6);
+  color: #ffffff;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 22px rgba(0, 212, 255, 0.32), 0 0 12px rgba(0, 212, 255, 0.2);
+}
+
+.category-tab:hover svg {
+  color: #00d4ff;
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.6));
+}
+
+.category-tab:active {
+  transform: translateY(-1px) scale(0.98);
+  transition-duration: 0.1s;
+}
+
+.category-tab.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.25), rgba(180, 77, 255, 0.2));
+  border-color: #00d4ff;
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(0, 212, 255, 0.35);
+}
+
+.category-tab.active:hover {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.35), rgba(180, 77, 255, 0.28));
+  border-color: #55e6ff;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 26px rgba(0, 212, 255, 0.45), 0 0 16px rgba(180, 77, 255, 0.3);
+}
+
+.category-tab.active svg {
+  color: #fff;
+}
+
+/* 3. Featured Game Cards & Taglines */
+.game-poster-card.featured-game-card {
+  border-color: rgba(0, 212, 255, 0.45);
+  background: linear-gradient(145deg, rgba(10, 24, 48, 0.95), rgba(7, 14, 30, 0.98));
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 212, 255, 0.22);
+}
+
+.featured-top-ribbon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #ffaa00, #ff4444);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 8px;
+  letter-spacing: 0.6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.featured-top-ribbon svg {
+  width: 10px;
+  height: 10px;
+}
+
+.poster-tagline {
+  font-size: 0.72rem;
+  color: var(--neon-cyan, #00d4ff);
+  margin-top: 2px;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+/* 4. Karma Button & Badge */
+.karma-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(16, 185, 129, 0.16) !important;
+  border: 1px solid rgba(52, 211, 153, 0.55) !important;
+  color: #34d399 !important;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  vertical-align: middle;
+  position: relative;
+  z-index: 5;
+  user-select: none;
+  white-space: nowrap;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.karma-pill-btn svg {
+  width: 12px;
+  height: 12px;
+  stroke: #34d399 !important;
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, stroke 0.2s ease;
+}
+
+.karma-pill-btn span {
+  color: inherit !important;
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  font-weight: 800;
+}
+
+.karma-pill-btn:hover:not(.is-self) {
+  background: rgba(16, 185, 129, 0.35) !important;
+  color: #6ee7b7 !important;
+  border-color: #34d399 !important;
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.5) !important;
+  transform: translateY(-1px);
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.karma-pill-btn:hover:not(.is-self) svg {
+  stroke: #6ee7b7 !important;
+  transform: scale(1.15);
+}
+
+.karma-pill-btn:active:not(.is-self) {
+  transform: scale(0.95);
+}
+
+.karma-pill-btn.is-self {
+  cursor: default;
+  opacity: 0.85 !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+}
+
+/* Karma in Profile Page & Modal */
+.profile-hero-stats-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-hero-karma-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 14px;
+  padding: 8px 14px;
+}
+
+.hero-karma-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+}
+
+.hero-karma-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #34d399;
+  text-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
+}
+
+.hero-karma-val svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.hero-karma-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 600;
+}
+
+.karma-modal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  color: #34d399;
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+}
+
+.karma-modal-chip svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.karma-modal-chip:hover:not(.is-self) {
+  background: rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+  border-color: #34d399;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
+  transform: translateY(-2px);
+}
+
+.modal-karma-action-btn {
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  color: #34d399 !important;
+}
+
+.modal-karma-action-btn:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #34d399 !important;
+  color: #6ee7b7 !important;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.4) !important;
+}
+
+/* 5. Urgent Squad Cards & Badges */
+.player-card.urgent-fast-match-card {
+  border-color: rgba(255, 170, 0, 0.65) !important;
+  box-shadow: 0 0 25px rgba(255, 170, 0, 0.3) !important;
+  background: linear-gradient(145deg, rgba(32, 20, 8, 0.96) 0%, rgba(14, 10, 6, 0.98) 100%) !important;
+  animation: urgentCardPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes urgentCardPulse {
+  0%, 100% { border-color: rgba(255, 170, 0, 0.65); }
+  50% { border-color: rgba(255, 68, 68, 0.9); box-shadow: 0 0 30px rgba(255, 68, 68, 0.4); }
+}
+
+.urgent-squad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 68, 68, 0.2));
+  border: 1px solid #ffaa00;
+  color: #ffaa00;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 4px;
+}
+
+.urgent-squad-badge svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* 6. 1-Click Connect Chips */
+.player-connect-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.connect-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.connect-chip-btn svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.connect-chip-btn.discord {
+  background: rgba(88, 101, 242, 0.15);
+  border-color: rgba(88, 101, 242, 0.4);
+  color: #7289da;
+}
+
+.connect-chip-btn.discord:hover {
+  background: #5865f2;
+  color: #fff;
+  border-color: #5865f2;
+  box-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
+}
+
+.connect-chip-btn.telegram {
+  background: rgba(0, 136, 204, 0.15);
+  border-color: rgba(0, 136, 204, 0.4);
+  color: #0088cc;
+}
+
+.connect-chip-btn.telegram:hover {
+  background: #0088cc;
+  color: #fff;
+  border-color: #0088cc;
+  box-shadow: 0 0 10px rgba(0, 136, 204, 0.5);
+}
+
+.connect-chip-btn.steam {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #e2e8f0;
+}
+
+.connect-chip-btn.steam:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-color: #fff;
+}
+
+/* 7. Sound Toggle Button */
+.sound-toggle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sound-toggle-btn:hover {
+  background: rgba(0, 212, 255, 0.12);
+  border-color: rgba(0, 212, 255, 0.4);
+  color: #00d4ff;
+}
+
+.sound-toggle-btn.active {
+  color: #00d4ff;
+  border-color: rgba(0, 212, 255, 0.35);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+/* 8. Party Size Selector & Badges */
+.party-size-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.party-size-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary, #94a3b8);
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.party-size-chip svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.party-size-chip:hover {
+  background: rgba(0, 212, 255, 0.14);
+  border-color: rgba(0, 212, 255, 0.45);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.party-size-chip.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.25), rgba(180, 77, 255, 0.2));
+  border-color: #00d4ff;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.3);
+}
+
+.party-size-chip.active svg {
+  color: #00d4ff;
+}
+
+.player-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+.party-size-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-family: var(--font-heading, 'Rajdhani', sans-serif);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  color: #00d4ff;
+  white-space: nowrap;
+}
+
+.party-size-pill svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
 }

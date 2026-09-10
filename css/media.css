@@ -318,8 +318,81 @@
   }
 
   .guest-banner-text {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     line-height: 1.35;
+  }
+
+  /* Звуковая кнопка на мобильных */
+  .sound-toggle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .sound-toggle-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Срочный поиск / Fast Match Hero на мобильных */
+  .fast-match-hero-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 16px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+
+  .fast-match-left {
+    gap: 12px;
+  }
+
+  .fast-match-icon-pulse {
+    width: 38px;
+    height: 38px;
+  }
+
+  .fast-match-icon-pulse svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .fast-match-title {
+    font-size: 0.98rem;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .fast-match-sub {
+    font-size: 0.76rem;
+  }
+
+  .fast-match-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Категории на мобильных */
+  .game-category-tabs {
+    gap: 8px;
+    margin: -4px 0 14px 0;
+    padding: 10px 4px 12px 4px;
+  }
+
+  .category-tab {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    border-radius: 10px;
+  }
+
+  .category-tab:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  .category-tab svg {
+    width: 14px;
+    height: 14px;
   }
 
   /* Сетка постеров игр */
@@ -352,6 +425,21 @@
     padding: 6px 12px;
     letter-spacing: 0.8px;
     border-radius: 10px;
+  }
+
+  .party-size-selector {
+    gap: 6px;
+  }
+
+  .party-size-chip {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    border-radius: 8px;
+  }
+
+  .party-size-chip svg {
+    width: 12px;
+    height: 12px;
   }
 
   /* Сетка тиммейтов / анкет */
@@ -1220,4 +1308,243 @@
     flex: 1 !important;
     justify-content: center !important;
   }
+
+  /* User Profile Modal Compact Actions */
+  .modal-user-actions {
+    gap: 6px !important;
+    margin-top: 14px !important;
+  }
+
+  .modal-user-actions .btn {
+    padding: 7px 6px !important;
+    font-size: 0.72rem !important;
+    gap: 4px !important;
+    border-radius: 10px !important;
+  }
+
+  .modal-user-actions .btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
+/* ============================================================
+   ULTRA ANDROID OPTIMIZATION ENGINE (SOLID 60/120 FPS NO-LAG)
+   Применяется ИСКЛЮЧИТЕЛЬНО на Android устройствах.
+   ПК и iPhone/iOS остаются нетронутыми со всеми эффектами.
+   ============================================================ */
+
+/* 1. Глобальное отключение тяжелого real-time блюра и размытия */
+html.android-device *,
+html.android-device *::before,
+html.android-device *::after,
+html.is-android *,
+html.is-android *::before,
+html.is-android *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* 2. Сплошной непрозрачный фон без тяжелых радиальных градиентов */
+html.android-device body,
+html.is-android body {
+  background: #08090f !important;
+  background-image: none !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* 3. Оптимизированные сплошные карточки и элементы (устраняет GPU Overdraw) */
+html.android-device .header,
+html.is-android .header {
+  background: #0b0d16 !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.android-device .nav-bottom-bar,
+html.is-android .nav-bottom-bar {
+  background: #0b0d16 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.android-device .player-card,
+html.android-device .game-poster-card,
+html.android-device .game-card,
+html.android-device .glass-card,
+html.android-device .profile-stat-box,
+html.android-device .profile-content-card,
+html.android-device .shop-item-card,
+html.android-device .category-tab,
+html.android-device .filter-bar,
+html.android-device .party-size-pill,
+html.android-device .custom-frame-card,
+html.android-device .custom-theme-card,
+html.android-device .welcome-hero-card,
+html.android-device .edit-clean-card,
+html.android-device .profile-hero-card,
+html.android-device .profile-unified-section,
+html.android-device .custom-wardrobe-block,
+html.android-device .world-msg-item,
+html.android-device .dialog-item,
+html.android-device .live-match-banner,
+html.android-device .admin-container,
+html.android-device .badge-pack-card,
+html.android-device .hero-feature-card,
+html.android-device .karma-pill-btn,
+html.is-android .player-card,
+html.is-android .game-poster-card,
+html.is-android .game-card,
+html.is-android .glass-card,
+html.is-android .profile-stat-box,
+html.is-android .profile-content-card,
+html.is-android .shop-item-card,
+html.is-android .category-tab,
+html.is-android .filter-bar,
+html.is-android .party-size-pill,
+html.is-android .custom-frame-card,
+html.is-android .custom-theme-card,
+html.is-android .welcome-hero-card,
+html.is-android .edit-clean-card,
+html.is-android .profile-hero-card,
+html.is-android .profile-unified-section,
+html.is-android .custom-wardrobe-block,
+html.is-android .world-msg-item,
+html.is-android .dialog-item,
+html.is-android .live-match-banner,
+html.is-android .admin-container,
+html.is-android .badge-pack-card,
+html.is-android .hero-feature-card,
+html.is-android .karma-pill-btn {
+  background: #0f121d !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* 4. Модальные окна и оверлей на Android */
+html.android-device .modal,
+html.is-android .modal {
+  background: #0f121e !important;
+  border: 1px solid rgba(0, 212, 255, 0.35) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9) !important;
+}
+
+html.android-device .modal-overlay,
+html.is-android .modal-overlay {
+  background: rgba(4, 6, 12, 0.94) !important;
+}
+
+/* 5. Чат и сообщения на Android */
+html.android-device .chat-container,
+html.is-android .chat-container {
+  background: #090b12 !important;
+}
+
+html.android-device .chat-header,
+html.android-device .chat-footer,
+html.is-android .chat-header,
+html.is-android .chat-footer {
+  background: #0d0f18 !important;
+}
+
+html.android-device .chat-messages,
+html.is-android .chat-messages {
+  background: #07080e !important;
+}
+
+html.android-device .chat-message.me,
+html.is-android .chat-message.me {
+  background: #12283a !important;
+}
+
+html.android-device .chat-message.other,
+html.is-android .chat-message.other {
+  background: #141724 !important;
+}
+
+/* 6. Уведомления */
+html.android-device .notification,
+html.is-android .notification {
+  background: #111422 !important;
+  border: 1px solid rgba(0, 212, 255, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* 7. Отключение тяжелых бесконечных GPU-анимаций на Android */
+html.android-device .space-background,
+html.android-device .star-field,
+html.android-device .space-nebula,
+html.android-device .particles-container,
+html.android-device .welcome-glow-orb,
+html.android-device .welcome-glow-1,
+html.android-device .welcome-glow-2,
+html.android-device .welcome-glow-3,
+html.android-device .glow-orb,
+html.is-android .space-background,
+html.is-android .star-field,
+html.is-android .space-nebula,
+html.is-android .particles-container,
+html.is-android .welcome-glow-orb,
+html.is-android .welcome-glow-1,
+html.is-android .welcome-glow-2,
+html.is-android .welcome-glow-3,
+html.is-android .glow-orb {
+  display: none !important;
+  animation: none !important;
+}
+
+html.android-device .logo-square,
+html.android-device .header::after,
+html.android-device .avatar-frame-wrap::before,
+html.android-device .avatar-frame-wrap::after,
+html.android-device .rainbow-author-name,
+html.android-device .rainbow-gay-tag,
+html.android-device .vip-pinned-capsule,
+html.android-device .featured-game-card,
+html.android-device .badge-style-rainbow,
+html.android-device .badge-style-fire,
+html.is-android .logo-square,
+html.is-android .header::after,
+html.is-android .avatar-frame-wrap::before,
+html.is-android .avatar-frame-wrap::after,
+html.is-android .rainbow-author-name,
+html.is-android .rainbow-gay-tag,
+html.is-android .vip-pinned-capsule,
+html.is-android .featured-game-card,
+html.is-android .badge-style-rainbow,
+html.is-android .badge-style-fire {
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+/* 8. Изоляция отрисовки слоев при скролле списков */
+html.android-device .games-grid,
+html.android-device .players-grid,
+html.is-android .games-grid,
+html.is-android .players-grid {
+  contain: layout style;
+}
+
+html.android-device .player-card,
+html.android-device .game-poster-card,
+html.is-android .player-card,
+html.is-android .game-poster-card {
+  contain: paint layout;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* 9. Мгновенный отклик кнопок */
+html.android-device .btn,
+html.is-android .btn {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  transition: opacity 0.1s ease, background 0.1s ease !important;
+}
+
+html.android-device .btn:active,
+html.is-android .btn:active {
+  transform: scale(0.97) !important;
 }

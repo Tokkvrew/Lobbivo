@@ -649,6 +649,11 @@ function sendWorldMessage() {
   input.value = '';
   cancelReply('world');
 
+  if (typeof RetentionEngine !== 'undefined') {
+    RetentionEngine.playSound('message');
+    RetentionEngine.haptic('light');
+  }
+
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     FirebaseSync.setTyping('world', null, AppState.currentUser, false);
   }
@@ -1419,6 +1424,11 @@ function sendMessage() {
   addMessage(AppState.currentUser, partner, text, replyTo);
   input.value = '';
   cancelReply('direct');
+
+  if (typeof RetentionEngine !== 'undefined') {
+    RetentionEngine.playSound('message');
+    RetentionEngine.haptic('light');
+  }
 
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     const key = getMessagesKey(AppState.currentUser, partner);

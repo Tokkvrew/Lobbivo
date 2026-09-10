@@ -3,6 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+  <script>
+    (function() {
+      try {
+        var ua = navigator.userAgent || '';
+        var isAndroid = /Android/i.test(ua) || (navigator.platform && /android/i.test(navigator.platform));
+        if (isAndroid) {
+          document.documentElement.classList.add('android-device', 'is-android');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <title>LOBBIVO — Поиск тиммейтов и создание пати для 25+ онлайн-игр</title>
   <meta name="description" content="LOBBIVO — современная гейминг-платформа для быстрого поиска тиммейтов, напарников и сквадов в CS 2, Dota 2, Valorant, GTA V, Rust и др. Общайся во встроенном чате и побеждай." />
   <meta name="keywords" content="lobbivo, лоббиво, поиск тиммейтов, найти пати, поиск напарников кс 2, дота 2 тимейты, найти сквад valorant, тиммейты для игр, гейминг платформа" />
@@ -41,6 +52,9 @@
   }
   </script>
 
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <!-- HTTP No-Cache Headers for Immediate GitHub Pages Updates -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -54,12 +68,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" />
   </noscript>
 
-  <!-- CSS Стили (с авто-обновлением кэша v2.9.0) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.9.0" />
-  <link rel="stylesheet" href="css/base.css?v=2.9.0" />
-  <link rel="stylesheet" href="css/components.css?v=2.9.0" />
-  <link rel="stylesheet" href="css/animations.css?v=2.9.0" />
-  <link rel="stylesheet" href="css/media.css?v=2.9.0" />
+  <!-- CSS Стили (с авто-обновлением кэша v2.9.6) -->
+  <link rel="stylesheet" href="css/variables.css?v=2.9.6" />
+  <link rel="stylesheet" href="css/base.css?v=2.9.6" />
+  <link rel="stylesheet" href="css/components.css?v=2.9.6" />
+  <link rel="stylesheet" href="css/animations.css?v=2.9.6" />
+  <link rel="stylesheet" href="css/media.css?v=2.9.6" />
 </head>
 <body>
 
@@ -503,13 +517,47 @@
       <line x1="2.5" y1="12" x2="5.5" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
       <line x1="18.5" y1="12" x2="21.5" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </symbol>
-    <symbol id="icon-zap" viewBox="0 0 24 24">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- 26. Roblox -->
+    <symbol id="icon-roblox" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="3.5" transform="rotate(-15 12 12)" fill="currentColor" fill-opacity="0.25" stroke="currentColor" stroke-width="1.8"/>
+      <rect x="9" y="9" width="6" height="6" rx="1" transform="rotate(-15 12 12)" fill="currentColor"/>
     </symbol>
-    <symbol id="icon-trophy" viewBox="0 0 24 24">
-      <path d="M6 9H4a2 2 0 0 1-2-2V5h4M18 9h2a2 2 0 0 0 2-2V5h-4" stroke="currentColor" stroke-width="1.8" fill="none"/>
-      <path d="M4 5h16v5a8 8 0 0 1-16 0V5z" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2"/>
-      <path d="M12 15v4M8 22h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+
+    <!-- ИКОНКИ ДВИЖКА УДЕРЖАНИЯ (RETENTION ICONS) -->
+    <symbol id="icon-thumbs-up" viewBox="0 0 24 24">
+      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-bolt-fast" viewBox="0 0 24 24">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.3" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-volume-on" viewBox="0 0 24 24">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-volume-off" viewBox="0 0 24 24">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-blocks" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2"/>
+      <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2"/>
+      <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2"/>
+      <rect x="13" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2"/>
+    </symbol>
+    <symbol id="icon-telegram-plane" viewBox="0 0 24 24">
+      <path d="M21.5 2L2 9.5l7 3.5 3.5 7 2-4.5 7-13.5z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+      <path d="M9 13l5-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-discord-simple" viewBox="0 0 24 24">
+      <path d="M19 5.5A16.5 16.5 0 0 0 14.8 4.2a.2.2 0 0 0-.2.1 11.5 11.5 0 0 0-.5 1.1 15.2 15.2 0 0 0-4.2 0 11.5 11.5 0 0 0-.5-1.1.2.2 0 0 0-.2-.1A16.5 16.5 0 0 0 5 5.5a.2.2 0 0 0-.1.1C2.5 9.3 1.8 13 2.1 16.6a.2.2 0 0 0 .1.1 16.6 16.6 0 0 0 5 2.5.2.2 0 0 0 .2-.1 12 12 0 0 0 1-1.7.2.2 0 0 0-.1-.3 11 11 0 0 1-1.6-.8.2.2 0 0 1 0-.3c.1-.1.2-.2.3-.3a12 12 0 0 0 10.4 0l.3.3a.2.2 0 0 1 0 .3 11 11 0 0 1-1.6.8.2.2 0 0 0-.1.3c.3.6.6 1.1 1 1.7a.2.2 0 0 0 .2.1 16.6 16.6 0 0 0 5-2.5.2.2 0 0 0 .1-.1c.4-4.2-.7-7.9-3-11.1a.2.2 0 0 0-.1-.1zM8.5 13.5c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7zm7 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-steam-simple" viewBox="0 0 24 24">
+      <path d="M12 2a10 10 0 0 0-10 9.8l5.6 2.3a3.5 3.5 0 0 1 3.3-1.6l2.5-3.6A4.5 4.5 0 0 1 18 11a4.5 4.5 0 1 1-4.5 4.5l-3.6-2.5a3.5 3.5 0 0 1-4.2 2.6l-3.3 1.4A10 10 0 1 0 12 2z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-clock-fast" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     </symbol>
   </svg>
 
@@ -544,6 +592,10 @@
         </div>
 
         <div class="capsule-right">
+          <button class="sound-toggle-btn active" id="headerSoundToggleBtn" type="button" title="Звуковые уведомления" aria-label="Звук" onclick="RetentionEngine.toggleSound()">
+            <svg style="width:16px;height:16px;"><use href="#icon-volume-on"/></svg>
+          </button>
+
           <button class="search-toggle-btn" id="searchToggleBtn" title="Быстрый поиск" aria-label="Поиск">
             <svg><use href="#icon-search"/></svg>
           </button>
@@ -728,7 +780,7 @@
       </div>
     </section>
 
-    <!-- СТРАНИЦА 1: КАТАЛОГ ИГР (ФОТО 1) -->
+    <!-- СТРАНИЦА 1: КАТАЛОГ ИГР И ХАБЫ (ФОТО 1) -->
     <section class="page" id="pageGames">
       <div class="games-guest-banner" id="gamesGuestBanner" style="display:none;">
         <div class="guest-banner-left">
@@ -746,6 +798,52 @@
           <span>Войти</span>
         </button>
       </div>
+
+      <!-- БЫСТРЫЙ СРОЧНЫЙ СБОР / FAST MATCH HERO BAR -->
+      <div class="fast-match-hero-bar" id="fastMatchHeroBar">
+        <div class="fast-match-left">
+          <div class="fast-match-icon-pulse">
+            <svg><use href="#icon-bolt-fast"/></svg>
+          </div>
+          <div class="fast-match-text">
+            <div class="fast-match-title">
+              <span>Срочный поиск «Ищу пати сейчас»</span>
+              <span class="fast-match-badge" id="fastMatchHeroBadge" style="display:none;">АКТИВЕН 2 ЧАСА</span>
+            </div>
+            <div class="fast-match-sub">Поднимите свою анкету в самый верх с яркой неоновой пульсацией для быстрого сбора на катку</div>
+          </div>
+        </div>
+        <button class="btn btn-primary-glow btn-sm fast-match-btn" id="fastMatchHeroBtn" type="button" onclick="RetentionEngine.toggleFastMatch()">
+          <svg><use href="#icon-bolt-fast"/></svg>
+          <span>Включить срочный сбор</span>
+        </button>
+      </div>
+
+      <!-- ВКЛАДКИ КАТЕГОРИЙ ИГР (ПОПУЛЯРНОЕ / КИБЕРСПОРТ / ПЕСОЧНИЦЫ / ЭКШЕН / ВСЕ) -->
+      <div class="game-category-tabs" id="gameCategoryTabs">
+        <button class="category-tab active" data-category="popular" type="button">
+          <svg><use href="#icon-flame"/></svg>
+          <span>Популярное</span>
+        </button>
+        <button class="category-tab" data-category="competitive" type="button">
+          <svg><use href="#icon-trophy"/></svg>
+          <span>Киберспорт и Рейтинг</span>
+        </button>
+        <button class="category-tab" data-category="sandbox" type="button">
+          <svg><use href="#icon-blocks"/></svg>
+          <span>Песочницы и Кооп</span>
+        </button>
+        <button class="category-tab" data-category="action_rp" type="button">
+          <svg><use href="#icon-bolt-fast"/></svg>
+          <span>Экшен, Баттл-Рояль и RP</span>
+        </button>
+        <button class="category-tab" data-category="all" type="button">
+          <svg><use href="#icon-game"/></svg>
+          <span>Все игры (25+)</span>
+        </button>
+      </div>
+
+      <!-- СЕТКА ИГР -->
       <div class="games-grid" id="gamesGrid"></div>
     </section>
 
@@ -850,17 +948,29 @@
               <div class="profile-hero-custom-tags" id="profileHeroTagsList"></div>
             </div>
 
-            <!-- Баланс Lobbivo Coin в шапке профиля -->
-            <div class="profile-hero-coins-box">
-              <div class="hero-coins-label">Баланс монет</div>
-              <div class="hero-coins-val" id="profileCoinBalanceDisplay" onclick="openCoinModal('shop')">
-                <svg><use href="#icon-shop"/></svg>
-                <span id="profileCoinBalanceNum">0 LC</span>
+            <!-- Статистические блоки шапки: Лайки/Карма и Монеты -->
+            <div class="profile-hero-stats-group">
+              <div class="profile-hero-karma-box" title="Ваша репутация и количество полученных лайков">
+                <div class="hero-karma-label">Похвалы & Лайки</div>
+                <div class="hero-karma-val" id="profileKarmaDisplay">
+                  <svg><use href="#icon-thumbs-up"/></svg>
+                  <span id="profileKarmaVal">0</span>
+                </div>
+                <div class="hero-karma-sub">Репутация</div>
               </div>
-              <button type="button" class="btn-hero-coin-buy" onclick="openCoinModal('shop')">
-                <svg><use href="#icon-sparkles"/></svg>
-                <span>Магазин</span>
-              </button>
+
+              <!-- Баланс Lobbivo Coin в шапке профиля -->
+              <div class="profile-hero-coins-box">
+                <div class="hero-coins-label">Баланс монет</div>
+                <div class="hero-coins-val" id="profileCoinBalanceDisplay" onclick="openCoinModal('shop')">
+                  <svg><use href="#icon-shop"/></svg>
+                  <span id="profileCoinBalanceNum">0 LC</span>
+                </div>
+                <button type="button" class="btn-hero-coin-buy" onclick="openCoinModal('shop')">
+                  <svg><use href="#icon-sparkles"/></svg>
+                  <span>Магазин</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1723,6 +1833,32 @@
         <div class="field">
           <label>Ранг / Уровень / Звание</label>
           <input type="text" id="squadRank" placeholder="Например: Premier 15k, Immortal, Gold Nova, Diamond...">
+        </div>
+        <div class="field">
+          <label>Сколько человек ищет пати (Нужно тиммейтов)</label>
+          <div class="party-size-selector" id="squadPartySizeSelector">
+            <input type="hidden" id="squadPartySize" value="+1" />
+            <button type="button" class="party-size-chip active" data-size="+1">
+              <svg><use href="#icon-users"/></svg>
+              <span>+1 (Дуо)</span>
+            </button>
+            <button type="button" class="party-size-chip" data-size="+2">
+              <svg><use href="#icon-users"/></svg>
+              <span>+2 (Трио)</span>
+            </button>
+            <button type="button" class="party-size-chip" data-size="+3">
+              <svg><use href="#icon-users"/></svg>
+              <span>+3 (Сквад)</span>
+            </button>
+            <button type="button" class="party-size-chip" data-size="+4">
+              <svg><use href="#icon-users"/></svg>
+              <span>+4 (Фулл стак)</span>
+            </button>
+            <button type="button" class="party-size-chip" data-size="solo">
+              <svg><use href="#icon-profile"/></svg>
+              <span>Ищу стак (Я один)</span>
+            </button>
+          </div>
         </div>
         <div class="field">
           <label>Устройство</label>
@@ -2717,16 +2853,17 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (v2.9.0) -->
-  <script src="js/data.js?v=2.9.0"></script>
-  <script src="js/security-shield.js?v=2.9.0"></script>
-  <script src="js/firebase-sync.js?v=2.9.0"></script>
-  <script src="js/storage.js?v=2.9.0"></script>
-  <script src="js/auth.js?v=2.9.0"></script>
-  <script src="js/games.js?v=2.9.0"></script>
-  <script src="js/chat.js?v=2.9.0"></script>
-  <script src="js/profile.js?v=2.9.0"></script>
-  <script src="js/admin.js?v=2.9.0"></script>
-  <script src="js/app.js?v=2.9.0"></script>
+  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (v2.9.4) -->
+  <script src="js/data.js?v=2.9.4"></script>
+  <script src="js/security-shield.js?v=2.9.4"></script>
+  <script src="js/firebase-sync.js?v=2.9.4"></script>
+  <script src="js/storage.js?v=2.9.4"></script>
+  <script src="js/retention.js?v=2.9.4"></script>
+  <script src="js/auth.js?v=2.9.4"></script>
+  <script src="js/games.js?v=2.9.4"></script>
+  <script src="js/chat.js?v=2.9.4"></script>
+  <script src="js/profile.js?v=2.9.4"></script>
+  <script src="js/admin.js?v=2.9.4"></script>
+  <script src="js/app.js?v=2.9.4"></script>
 </body>
 </html>

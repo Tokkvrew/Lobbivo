@@ -144,6 +144,7 @@ const AppState = {
   typingTimeout: null,
   gameSearchQuery: '',
   selectedGameFilter: 'all',
+  currentCategoryFilter: 'popular',
   activeReply: null, // { id, author, text, chatType }
   typingUsers: { world: {}, direct: {} }, // Хранилище статуса набора текста
   vipSquad: null // Активная VIP-анкета
