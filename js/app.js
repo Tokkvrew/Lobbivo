@@ -27,6 +27,12 @@ function showSystemLoader(message = 'Загрузка...', duration = 650, callb
 }
 
 function switchPage(pageId) {
+  if (typeof closeChat === 'function') closeChat();
+  if (typeof closeCoinModal === 'function') closeCoinModal();
+  if (typeof closeShopItemPreview === 'function') closeShopItemPreview();
+  const avatarDropdown = document.getElementById('avatarDropdown');
+  if (avatarDropdown) avatarDropdown.classList.remove('open');
+
   const pages = document.querySelectorAll('.page');
   const targetPage = document.getElementById(pageId);
   if (!targetPage) return;
@@ -506,6 +512,7 @@ function addRipples() {
 // ============================================================
 
 function openCoinModal(tab = 'earn') {
+  if (typeof closeChat === 'function') closeChat();
   const modal = document.getElementById('coinModal');
   if (!modal) return;
 
@@ -548,157 +555,443 @@ function switchCoinTab(tab = 'earn') {
   }
 }
 
+const shopState = {
+  category: 'frames',
+  page: 1,
+  perPage: 6
+};
+
+function switchShopCategory(cat) {
+  shopState.category = cat;
+  shopState.page = 1;
+  renderShopItems();
+}
+window.switchShopCategory = switchShopCategory;
+
+function changeShopPage(delta) {
+  shopState.page += delta;
+  renderShopItems();
+}
+window.changeShopPage = changeShopPage;
+
+function setShopPage(pageNum) {
+  shopState.page = pageNum;
+  renderShopItems();
+}
+window.setShopPage = setShopPage;
+
 function renderShopItems() {
   const current = AppState.currentUser;
   const user = current ? AppState.users[current] : null;
   const isPremium = current ? isUserPremium(current) : false;
-  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], boosts: 0 };
+  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
   const hasVipBoost = current ? isSquadVipBoosted(current) : false;
 
-  // 1. Статус Premium
-  const statusEl = document.getElementById('shopPremiumStatusText');
-  const statusBox = document.getElementById('shopPremiumStatusIndicator');
-  if (statusEl && statusBox) {
-    if (isPremium) {
-      statusBox.className = 'shop-premium-status-indicator active';
-      if (user.premiumUntil && Number(user.premiumUntil) > Date.now()) {
-        const remainingDays = Math.ceil((Number(user.premiumUntil) - Date.now()) / (24 * 60 * 60 * 1000));
-        statusEl.textContent = `Активен (${remainingDays} дн.)`;
-      } else {
-        statusEl.textContent = 'Активен (LIFETIME)';
-      }
-    } else {
-      statusBox.className = 'shop-premium-status-indicator';
-      statusEl.textContent = 'Не активен';
-    }
+  // 1. Обновление кнопок категорий в навигации
+  document.querySelectorAll('.shop-cat-btn').forEach(btn => {
+    const cat = btn.dataset.cat;
+    btn.classList.toggle('active', cat === shopState.category);
+  });
+
+  const discountPill = document.getElementById('shopDiscountPill');
+  if (discountPill) {
+    discountPill.style.display = isPremium ? 'inline-flex' : 'none';
   }
 
-  // Обновление кнопок тарифов Premium
-  document.querySelectorAll('.btn-buy-premium').forEach(btn => {
-    if (isPremium && user?.isPremium === true && !user?.premiumUntil) {
-      btn.disabled = true;
-      btn.className = 'btn-buy-shop-item btn-buy-premium bought-disabled';
-      btn.innerHTML = '<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-check-circle"/></svg><span>Куплено навсегда</span>';
-    } else {
-      btn.disabled = false;
-      const plan = btn.closest('.premium-plan-card')?.dataset.plan;
-      btn.textContent = plan === '9999' ? 'Навсегда' : (plan === '30' ? 'Выбрать' : 'Купить');
-    }
-  });
-
-  // 2. Рамки: аватарки превью и кнопки
-  const frameIds = ['fire', 'cyber', 'gold', 'ice', 'ghost'];
-  frameIds.forEach(id => {
-    const previewEl = document.getElementById(`framePreview_${id}`);
-    if (previewEl) {
-      if (user && user.avatar) {
-        previewEl.innerHTML = `<img src="${user.avatar}" alt="${escapeHtml(current)}">`;
-      } else {
-        const initials = current ? current.slice(0, 2).toUpperCase() : 'VIP';
-        previewEl.innerHTML = `<span>${initials}</span>`;
-      }
-    }
-
-    const btn = document.querySelector(`.btn-frame-action[data-frame-id="${id}"]`);
-    if (btn) {
-      const isOwned = inventory.frames.includes(id);
-
-      if (isOwned) {
-        btn.className = 'btn-shop-action btn-frame-action bought-disabled';
-        btn.disabled = true;
-        btn.innerHTML = '<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-check-circle"/></svg><span>Куплено</span>';
-        btn.onclick = null;
-      } else {
-        btn.disabled = false;
-        btn.className = 'btn-shop-action btn-frame-action';
-        const cost = parseInt(btn.dataset.cost, 10) || 120;
-        const discountCost = isPremium ? Math.round(cost * 0.9) : cost;
-        btn.textContent = isPremium ? `Купить (${discountCost} LC -10%)` : `Купить (${cost} LC)`;
-        btn.onclick = () => buyShopItem('frame', id, cost);
-      }
-    }
-  });
-
-  // 3. VIP-Буст анкеты
-  const boostBtn = document.getElementById('btnBuySquadBoost');
-  if (boostBtn) {
-    if (hasVipBoost && user.vipBoostUntil) {
-      const remainingHours = Math.max(1, Math.ceil((Number(user.vipBoostUntil) - Date.now()) / (60 * 60 * 1000)));
-      boostBtn.className = 'btn-shop-action btn-buy-boost active';
-      boostBtn.textContent = `Закреп активен (ещё ${remainingHours} ч.)`;
-      boostBtn.onclick = () => showNotification('VIP-Закреп', `Ваша анкета закреплена в мировом чате ещё ${remainingHours} ч.`);
-    } else {
-      const cost = isPremium ? 81 : 90;
-      boostBtn.className = 'btn-shop-action btn-buy-boost';
-      boostBtn.textContent = isPremium ? `Закрепить анкету (${cost} LC -10%)` : `Закрепить анкету (${cost} LC)`;
-      boostBtn.onclick = () => buyShopItem('boost', 'vip_squad', 90);
-    }
+  // Обновление счетчика рамок
+  const framesCountEl = document.getElementById('shopFramesCount');
+  if (framesCountEl) {
+    framesCountEl.textContent = `${FRAME_DEFINITIONS.filter(f => !f.gaOnly && f.id !== 'none').length}`;
   }
 
-  // 4. Темы оформления
-  const themeIds = ['nebula', 'crimson', 'matrix'];
-  themeIds.forEach(id => {
-    const btn = document.querySelector(`.btn-theme-action[data-theme-id="${id}"]`);
-    if (btn) {
-      const isOwned = inventory.themes.includes(id);
+  // 2. Мета-информация активной категории
+  const catBadge = document.getElementById('shopCatBadge');
+  const catBadgeIcon = document.getElementById('shopCatBadgeIcon');
+  const catBadgeText = document.getElementById('shopCatBadgeText');
+  const catTitle = document.getElementById('shopCatTitle');
+  const catDesc = document.getElementById('shopCatDesc');
+  const catHeader = document.getElementById('shopActiveCatHeader');
+  const dynamicGrid = document.getElementById('shopDynamicGrid');
+  const paginationBar = document.getElementById('shopPaginationBar');
+  const premiumView = document.getElementById('shopPremiumIntegratedView');
 
-      if (isOwned) {
-        btn.className = 'btn-shop-action btn-theme-action bought-disabled';
-        btn.disabled = true;
-        btn.innerHTML = '<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-check-circle"/></svg><span>Куплено</span>';
-        btn.onclick = null;
+  const catMeta = {
+    frames: { title: 'Рамки для аватарок', desc: 'Уникальные анимированные эффекты вокруг вашей аватарки во всех чатах и анкетах', badge: 'ГАРДЕРОБ', icon: '#icon-frame' },
+    name_styles: { title: 'Стили и цвета никнейма', desc: 'Косметическая раскраска, градиенты и неоновые переливы вашего никнейма', badge: 'СТИЛЬ НИКА', icon: '#icon-sparkles' },
+    mini_bgs: { title: 'Анимированные фоны мини-профиля', desc: 'Живые динамические фоны быстрой карточки профиля при клике на игрока в чате', badge: 'ЖИВЫЕ ФОНЫ', icon: '#icon-sparkles' },
+    banners: { title: 'Шапки и обложки профиля', desc: 'Панорамный арт в шапке вашего полного профиля игрока', badge: 'ШАПКА', icon: '#icon-game' },
+    themes: { title: 'Темы оформления сайта', desc: 'Глубокая трансформация цветовой схемы интерфейса, космических туманностей и частиц', badge: 'ТЕМЫ', icon: '#icon-palette-shop' },
+    premium: { title: 'Lobbivo Premium & VIP Буст', desc: 'Максимальный VIP статус, анимированные GIF-аватарки, корона и закреп анкеты', badge: 'VIP СТАТУС', icon: '#icon-crown' }
+  };
+
+  const activeMeta = catMeta[shopState.category] || catMeta.frames;
+  if (catTitle) catTitle.textContent = activeMeta.title;
+  if (catDesc) catDesc.textContent = activeMeta.desc;
+  if (catBadgeText) catBadgeText.textContent = activeMeta.badge;
+  if (catBadgeIcon) catBadgeIcon.setAttribute('href', activeMeta.icon);
+
+  // 3. Если выбрана категория 'premium'
+  if (shopState.category === 'premium') {
+    if (dynamicGrid) dynamicGrid.style.display = 'none';
+    if (paginationBar) paginationBar.style.display = 'none';
+    if (premiumView) premiumView.style.display = 'block';
+
+    // Статус Premium
+    const statusEl = document.getElementById('shopPremiumStatusText');
+    const statusBox = document.getElementById('shopPremiumStatusIndicator');
+    if (statusEl && statusBox) {
+      if (isPremium) {
+        statusBox.className = 'shop-premium-status-indicator active';
+        if (user.premiumUntil && Number(user.premiumUntil) > Date.now()) {
+          const remainingDays = Math.ceil((Number(user.premiumUntil) - Date.now()) / (24 * 60 * 60 * 1000));
+          statusEl.textContent = `Активен (${remainingDays} дн.)`;
+        } else {
+          statusEl.textContent = 'Активен (LIFETIME)';
+        }
       } else {
-        btn.disabled = false;
-        btn.className = 'btn-shop-action btn-theme-action';
-        const cost = parseInt(btn.dataset.cost, 10) || 80;
-        const discountCost = isPremium ? Math.round(cost * 0.9) : cost;
-        btn.textContent = isPremium ? `Купить (${discountCost} LC -10%)` : `Купить (${cost} LC)`;
-        btn.onclick = () => buyShopItem('theme', id, cost);
+        statusBox.className = 'shop-premium-status-indicator';
+        statusEl.textContent = 'Не активен';
       }
     }
+
+    // Кнопки Premium тарифов
+    document.querySelectorAll('.btn-buy-premium').forEach(btn => {
+      if (isPremium && user?.isPremium === true && !user?.premiumUntil) {
+        btn.disabled = true;
+        btn.className = 'btn-buy-shop-item btn-buy-premium bought-disabled';
+        btn.innerHTML = '<svg style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"><use href="#icon-check-circle"/></svg><span>Куплено навсегда</span>';
+      } else {
+        btn.disabled = false;
+        const plan = btn.closest('.premium-plan-card')?.dataset.plan;
+        btn.textContent = plan === '9999' ? 'Навсегда' : (plan === '30' ? 'Выбрать' : 'Купить');
+      }
+    });
+
+    // VIP-Буст
+    const boostBtn = document.getElementById('btnBuySquadBoost');
+    if (boostBtn) {
+      if (hasVipBoost && user.vipBoostUntil) {
+        const remainingHours = Math.max(1, Math.ceil((Number(user.vipBoostUntil) - Date.now()) / (60 * 60 * 1000)));
+        boostBtn.className = 'btn-shop-action btn-buy-boost active';
+        boostBtn.textContent = `Закреп активен (ещё ${remainingHours} ч.)`;
+        boostBtn.onclick = () => showNotification('VIP-Закреп', `Ваша анкета закреплена в мировом чате ещё ${remainingHours} ч.`);
+      } else {
+        const cost = isPremium ? 81 : 90;
+        boostBtn.className = 'btn-shop-action btn-buy-boost';
+        boostBtn.textContent = isPremium ? `Закрепить анкету (${cost} LC -10%)` : `Закрепить анкету (${cost} LC)`;
+        boostBtn.onclick = () => buyShopItem('boost', 'vip_squad', 90);
+      }
+    }
+    return;
+  }
+
+  // 4. Обычные категории товаров (Рамки, Стили ника, Фоны, Шапки, Темы) - отображаем весь ассортимент
+  if (premiumView) premiumView.style.display = 'none';
+  if (dynamicGrid) dynamicGrid.style.display = 'grid';
+
+  let itemsList = [];
+  if (shopState.category === 'frames') {
+    itemsList = FRAME_DEFINITIONS.filter(f => !f.gaOnly && f.id !== 'none');
+  } else if (shopState.category === 'name_styles') {
+    itemsList = NAME_STYLE_DEFINITIONS.filter(s => s.id !== 'default');
+  } else if (shopState.category === 'mini_bgs') {
+    itemsList = MINI_BG_DEFINITIONS.filter(b => b.id !== 'default');
+  } else if (shopState.category === 'banners') {
+    itemsList = BANNER_DEFINITIONS.filter(b => b.id !== 'default');
+  } else if (shopState.category === 'themes') {
+    itemsList = THEME_DEFINITIONS.filter(t => t.id !== 'default' && t.id !== 'lobbivo');
+  }
+
+  let gridHtml = '';
+  const avatarContent = (user && user.avatar) ? `<img src="${user.avatar}" alt="${escapeHtml(current)}">` : `<span>${current ? current.slice(0, 2).toUpperCase() : 'VIP'}</span>`;
+
+  itemsList.forEach(item => {
+    const rawCost = item.cost || 0;
+    const finalCost = isPremium ? Math.round(rawCost * 0.9) : rawCost;
+    let isOwned = false;
+
+    if (shopState.category === 'frames') {
+      isOwned = inventory.frames.includes(item.id);
+    } else if (shopState.category === 'name_styles') {
+      isOwned = inventory.nameStyles.includes(item.id);
+    } else if (shopState.category === 'mini_bgs') {
+      isOwned = inventory.miniBgs.includes(item.id);
+    } else if (shopState.category === 'banners') {
+      isOwned = inventory.banners.includes(item.id);
+    } else if (shopState.category === 'themes') {
+      isOwned = inventory.themes.includes(item.id);
+    }
+
+    const priceHtml = isPremium ? `
+      <div class="shop-price-container">
+        <div class="shop-price-main-row">
+          <span class="shop-price-old-striked">${rawCost} LC</span>
+          <span class="shop-item-curr-price is-discount"><span class="shop-coin-l">L</span> ${finalCost} LC</span>
+          <span class="shop-discount-tag-badge">-10% VIP</span>
+        </div>
+      </div>
+    ` : `
+      <div class="shop-price-container">
+        <div class="shop-price-main-row">
+          <span class="shop-item-curr-price"><span class="shop-coin-l">L</span> ${rawCost} LC</span>
+        </div>
+      </div>
+    `;
+
+    const tagBadge = item.tag ? `<span class="item-tag-pill tag-${(item.tag || '').toLowerCase().replace(/\s+/g, '-')}">${escapeHtml(item.tag)}</span>` : '';
+    const badgeRow = `<div class="shop-card-badge-row">${tagBadge}<span class="shop-card-try-hint"><svg style="width:11px;height:11px;fill:currentColor;"><use href="#icon-sparkles"/></svg><span>Примерить</span></span></div>`;
+
+    let buyOrEquipBtnHtml = '';
+    const itemType = shopState.category === 'frames' ? 'frame' : (shopState.category === 'name_styles' ? 'name_style' : (shopState.category === 'mini_bgs' ? 'mini_bg' : (shopState.category === 'banners' ? 'banner' : 'theme')));
+
+    let isItemEquipped = false;
+    if (shopState.category === 'frames') {
+      isItemEquipped = getUserAvatarFrame(current) === item.id;
+    } else if (shopState.category === 'name_styles') {
+      isItemEquipped = getUserNameStyle(current) === item.id;
+    } else if (shopState.category === 'mini_bgs') {
+      isItemEquipped = getUserEquippedMiniBg(current) === item.id;
+    } else if (shopState.category === 'banners') {
+      isItemEquipped = getUserEquippedBanner(current) === item.id;
+    } else if (shopState.category === 'themes') {
+      isItemEquipped = (AppState.currentTheme || localStorage.getItem('squad_theme') || 'default') === item.id;
+    }
+
+    if (isItemEquipped) {
+      buyOrEquipBtnHtml = `
+        <button type="button" class="btn-shop-buy-action is-equipped" disabled>
+          <svg style="width:13px;height:13px;display:inline-block;vertical-align:middle;"><use href="#icon-check-circle"/></svg>
+          <span>Надето</span>
+        </button>
+      `;
+    } else if (isOwned) {
+      buyOrEquipBtnHtml = `
+        <button type="button" class="btn-shop-buy-action is-owned" onclick="event.stopPropagation(); equipItemFromShop('${shopState.category}', '${item.id}')">
+          <span>Надеть</span>
+        </button>
+      `;
+    } else {
+      buyOrEquipBtnHtml = `
+        <button type="button" class="btn-shop-buy-action" onclick="event.stopPropagation(); buyShopItem('${itemType}', '${item.id}', ${rawCost})">
+          <span>Купить · ${finalCost} LC</span>
+        </button>
+      `;
+    }
+
+    const actionsRowHtml = `
+      <div class="shop-card-actions-row">
+        <button type="button" class="btn-shop-preview-action" onclick="event.stopPropagation(); openShopItemPreview('${shopState.category}', '${item.id}')" title="Примерить на себе">
+          <svg><use href="#icon-sparkles"/></svg>
+          <span>Примерить</span>
+        </button>
+        ${buyOrEquipBtnHtml}
+      </div>
+    `;
+
+    if (shopState.category === 'frames') {
+      gridHtml += `
+        <div class="shop-item-card shop-frame-card-pro" data-id="${item.id}" onclick="openShopItemPreview('frames', '${item.id}')" title="Нажмите для примерки">
+          ${badgeRow}
+          <div class="frame-preview-box">
+            <div class="avatar-frame-wrap frame-${item.id}">
+              <div class="frame-preview-avatar">${avatarContent}</div>
+            </div>
+          </div>
+          <div class="frame-card-info">
+            <div class="frame-name"><svg class="item-title-icon ${item.id}-icon"><use href="#${item.icon}"/></svg> <span>${escapeHtml(item.name)}</span></div>
+            <div class="frame-desc">${escapeHtml(item.desc)}</div>
+            ${priceHtml}
+          </div>
+          ${actionsRowHtml}
+        </div>
+      `;
+    } else if (shopState.category === 'name_styles') {
+      gridHtml += `
+        <div class="shop-item-card shop-name-style-card-pro" data-id="${item.id}" onclick="openShopItemPreview('name_styles', '${item.id}')" title="Нажмите для примерки">
+          ${badgeRow}
+          <div class="name-style-preview-box">
+            <span class="preview-name-text name-style-${item.id}">${escapeHtml(current || 'Игрок')}</span>
+          </div>
+          <div class="frame-card-info">
+            <div class="frame-name"><svg class="item-title-icon"><use href="#icon-sparkles"/></svg> <span>${escapeHtml(item.name)}</span></div>
+            <div class="frame-desc">${escapeHtml(item.desc)}</div>
+            ${priceHtml}
+          </div>
+          ${actionsRowHtml}
+        </div>
+      `;
+    } else if (shopState.category === 'mini_bgs') {
+      gridHtml += `
+        <div class="shop-item-card shop-mini-bg-card-pro" data-id="${item.id}" onclick="openShopItemPreview('mini_bgs', '${item.id}')" title="Нажмите для примерки">
+          ${badgeRow}
+          <div class="mini-bg-preview-canvas mini-bg-${item.id}">
+            <div class="mini-bg-preview-overlay">
+              <span class="mini-bg-preview-tag">${escapeHtml(item.name)}</span>
+            </div>
+          </div>
+          <div class="frame-card-info">
+            <div class="frame-name"><svg class="item-title-icon"><use href="#icon-sparkles"/></svg> <span>${escapeHtml(item.name)}</span></div>
+            <div class="frame-desc">${escapeHtml(item.desc)}</div>
+            ${priceHtml}
+          </div>
+          ${actionsRowHtml}
+        </div>
+      `;
+    } else if (shopState.category === 'banners') {
+      gridHtml += `
+        <div class="shop-item-card shop-banner-card-pro" data-id="${item.id}" onclick="openShopItemPreview('banners', '${item.id}')" title="Нажмите для примерки">
+          ${badgeRow}
+          <div class="banner-preview-box banner-${item.id}">
+            <div class="banner-preview-overlay">
+              <span class="banner-preview-tag">${escapeHtml(item.name)}</span>
+            </div>
+          </div>
+          <div class="frame-card-info">
+            <div class="frame-name"><svg class="item-title-icon"><use href="#icon-game"/></svg> <span>${escapeHtml(item.name)}</span></div>
+            <div class="frame-desc">${escapeHtml(item.desc)}</div>
+            ${priceHtml}
+          </div>
+          ${actionsRowHtml}
+        </div>
+      `;
+    } else if (shopState.category === 'themes') {
+      let previewChipHtml = '';
+      if (item.id === 'nebula') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-palette-shop"/></svg><span class="preview-theme-tag">NEBULA</span></div>`;
+      } else if (item.id === 'crimson') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-flame"/></svg><span class="preview-theme-tag">CRIMSON</span></div>`;
+      } else if (item.id === 'matrix') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-nodes-menu"/></svg><span class="preview-theme-tag">MATRIX</span></div>`;
+      } else {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#${item.icon}"/></svg><span class="preview-theme-tag">${escapeHtml(item.name.slice(0,6))}</span></div>`;
+      }
+
+      gridHtml += `
+        <div class="shop-item-card shop-theme-card-pro" data-id="${item.id}" onclick="openShopItemPreview('themes', '${item.id}')" title="Нажмите для примерки">
+          <div class="shop-card-badge-row"><span class="item-tag-pill tag-theme">ТЕМА</span><span class="shop-card-try-hint"><svg style="width:11px;height:11px;fill:currentColor;"><use href="#icon-sparkles"/></svg><span>Примерить</span></span></div>
+          <div class="theme-palette-preview ${item.previewClass}">
+            ${previewChipHtml}
+          </div>
+          <div class="frame-card-info">
+            <div class="frame-name"><svg class="item-title-icon ${item.id}-icon"><use href="#${item.icon}"/></svg> <span>${escapeHtml(item.name)}</span></div>
+            <div class="frame-desc">${escapeHtml(item.desc)}</div>
+            ${priceHtml}
+          </div>
+          ${actionsRowHtml}
+        </div>
+      `;
+    }
   });
+
+  if (dynamicGrid) dynamicGrid.innerHTML = gridHtml;
+
+  // 5. Скрываем ненужную пагинацию
+  if (paginationBar) {
+    paginationBar.style.display = 'none';
+  }
 }
 
-function buyShopItem(type, id, baseCost, durationDays = 0) {
+// Быстрая экипировка предмета прямо из магазина
+function equipItemFromShop(category, itemId) {
   const current = AppState.currentUser;
   if (!current || !AppState.users[current]) {
-    showNotification('Требуется вход', 'Войдите или создайте аккаунт, чтобы делать покупки в магазине!');
+    showNotification('Требуется вход', 'Войдите в аккаунт, чтобы надеть предмет');
     showAuthModal('login');
     return;
   }
 
   const user = AppState.users[current];
+  if (category === 'frames') {
+    user.equippedFrame = itemId;
+  } else if (category === 'name_styles') {
+    user.nameStyle = itemId;
+  } else if (category === 'mini_bgs') {
+    user.equippedMiniBg = itemId;
+  } else if (category === 'banners') {
+    user.equippedBanner = itemId;
+  } else if (category === 'themes') {
+    saveTheme(itemId);
+  }
+
+  saveUsers(current);
+  renderShopItems();
+  if (typeof renderProfileCustomization === 'function') renderProfileCustomization();
+  if (typeof renderProfile === 'function') renderProfile();
+  if (typeof renderWorldChat === 'function') renderWorldChat();
+  if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
+  if (typeof updateUI === 'function') updateUI();
+
+  showNotification('Успешно экипировано', 'Предмет активирован на вашем профиле!');
+}
+window.equipItemFromShop = equipItemFromShop;
+
+function buyShopItem(type, id, cost, duration = 30) {
+  const current = AppState.currentUser;
+  if (!current) {
+    showNotification('Требуется вход', 'Войдите или зарегистрируйтесь, чтобы совершать покупки!');
+    showAuthModal('login');
+    return;
+  }
+
+  const user = AppState.users[current];
+  if (!user) return;
+
   const isPremium = isUserPremium(current);
-  const cost = (type !== 'premium' && isPremium) ? Math.round(baseCost * 0.9) : baseCost;
+  const finalCost = (isPremium && type !== 'premium') ? Math.round(cost * 0.9) : cost;
+  const userCoins = typeof user.coins === 'number' ? user.coins : 0;
 
-  if (typeof user.coins !== 'number') user.coins = 0;
-
-  if (user.coins < cost) {
-    showNotification('Недостаточно LC', `Для покупки требуется ${cost} LC. На вашем балансе: ${user.coins} LC.`);
+  if (userCoins < finalCost) {
+    const diff = finalCost - userCoins;
+    showNotification('Недостаточно монет', `Вам не хватает ${diff} LC. Выполните задания или пополните баланс!`);
     switchCoinTab('buy');
     return;
   }
 
   // Списание монет
-  user.coins -= cost;
+  user.coins = userCoins - finalCost;
 
   if (type === 'premium') {
-    if (durationDays >= 9999) {
-      user.isPremium = true;
-      user.premiumUntil = null;
-    } else {
-      const currentUntil = (user.premiumUntil && Number(user.premiumUntil) > Date.now()) ? Number(user.premiumUntil) : Date.now();
-      user.premiumUntil = currentUntil + (durationDays * 24 * 60 * 60 * 1000);
-      user.isPremium = true;
-    }
-    showNotification('Поздравляем с Premium!', 'Вам открыты GIF-аватарки, значок короны, неоновый ник и приоритет в поиске!');
+    const now = Date.now();
+    const currentUntil = (user.premiumUntil && Number(user.premiumUntil) > now) ? Number(user.premiumUntil) : now;
+    user.isPremium = true;
+    user.premiumUntil = currentUntil + (duration * 24 * 60 * 60 * 1000);
+    showNotification('Поздравляем с VIP!', `Статус Lobbivo Premium успешно продлен на ${duration} дней!`);
   } else if (type === 'frame') {
-    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], boosts: 0 };
+    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
     if (!Array.isArray(user.inventory.frames)) user.inventory.frames = [];
     if (!user.inventory.frames.includes(id)) {
       user.inventory.frames.push(id);
     }
-    showNotification('Рамка куплена!', 'Новая рамка добавлена в раздел «Кастомизация» в Настройках вашего профиля.');
+    user.equippedFrame = id;
+    const def = FRAME_DEFINITIONS.find(f => f.id === id);
+    showNotification('Рамка куплена и надета!', `Рамка «${def?.name || id}» успешно добавлена в гардероб и активирована!`);
+  } else if (type === 'name_style') {
+    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
+    if (!Array.isArray(user.inventory.nameStyles)) user.inventory.nameStyles = [];
+    if (!user.inventory.nameStyles.includes(id)) {
+      user.inventory.nameStyles.push(id);
+    }
+    user.nameStyle = id;
+    const def = NAME_STYLE_DEFINITIONS.find(s => s.id === id);
+    showNotification('Стиль ника куплен и надет!', `Стиль «${def?.name || id}» успешно добавлен и активирован!`);
+  } else if (type === 'mini_bg') {
+    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
+    if (!Array.isArray(user.inventory.miniBgs)) user.inventory.miniBgs = [];
+    if (!user.inventory.miniBgs.includes(id)) {
+      user.inventory.miniBgs.push(id);
+    }
+    user.equippedMiniBg = id;
+    const def = MINI_BG_DEFINITIONS.find(b => b.id === id);
+    showNotification('Фон мини-профиля куплен!', `Фон «${def?.name || id}» успешно добавлен и активирован!`);
+  } else if (type === 'banner') {
+    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
+    if (!Array.isArray(user.inventory.banners)) user.inventory.banners = [];
+    if (!user.inventory.banners.includes(id)) {
+      user.inventory.banners.push(id);
+    }
+    user.equippedBanner = id;
+    const def = BANNER_DEFINITIONS.find(b => b.id === id);
+    showNotification('Шапка профиля куплена!', `Обложка «${def?.name || id}» успешно добавлена и активирована!`);
   } else if (type === 'boost') {
     const now = Date.now();
     const currentUntil = (user.vipBoostUntil && Number(user.vipBoostUntil) > now) ? Number(user.vipBoostUntil) : now;
@@ -707,18 +1000,21 @@ function buyShopItem(type, id, baseCost, durationDays = 0) {
     user.hasCreatedSquad = true;
     showNotification('VIP-Закреп активирован!', 'Ваша анкета закреплена в шапке мирового чата на 24 часа!');
   } else if (type === 'theme') {
-    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], boosts: 0 };
+    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
     if (!Array.isArray(user.inventory.themes)) user.inventory.themes = [];
     if (!user.inventory.themes.includes(id)) {
       user.inventory.themes.push(id);
     }
-    showNotification('Тема куплена!', 'Новая тема добавлена в раздел «Кастомизация» в Настройках вашего профиля.');
+    saveTheme(id);
+    const def = THEME_DEFINITIONS.find(t => t.id === id);
+    showNotification('Тема куплена и активирована!', `Тема «${def?.name || id}» успешно применена!`);
   }
 
   saveUsers(current);
   renderCoinModal();
   renderShopItems();
-  if (typeof renderSettingsCustomization === 'function') renderSettingsCustomization();
+  if (typeof renderProfileCustomization === 'function') renderProfileCustomization();
+  if (typeof renderProfile === 'function') renderProfile();
   if (typeof renderWorldChat === 'function') renderWorldChat();
   if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
   if (typeof updateUI === 'function') updateUI();
@@ -728,6 +1024,579 @@ function buyShopItem(type, id, baseCost, durationDays = 0) {
     playNotificationSound();
   }
 }
+window.buyShopItem = buyShopItem;
+
+function equipItemFromShop(category, itemId) {
+  const current = AppState.currentUser;
+  if (!current || !AppState.users[current]) {
+    showNotification('Требуется вход', 'Войдите в аккаунт, чтобы надеть предмет');
+    showAuthModal('login');
+    return;
+  }
+
+  const user = AppState.users[current];
+  let itemName = itemId;
+
+  if (category === 'frames') {
+    user.equippedFrame = itemId;
+    const def = FRAME_DEFINITIONS.find(f => f.id === itemId);
+    if (def) itemName = def.name;
+  } else if (category === 'name_styles') {
+    user.nameStyle = itemId;
+    const def = NAME_STYLE_DEFINITIONS.find(s => s.id === itemId);
+    if (def) itemName = def.name;
+  } else if (category === 'mini_bgs') {
+    user.equippedMiniBg = itemId;
+    const def = MINI_BG_DEFINITIONS.find(b => b.id === itemId);
+    if (def) itemName = def.name;
+  } else if (category === 'banners') {
+    user.equippedBanner = itemId;
+    const def = BANNER_DEFINITIONS.find(b => b.id === itemId);
+    if (def) itemName = def.name;
+  } else if (category === 'themes') {
+    saveTheme(itemId);
+    const def = THEME_DEFINITIONS.find(t => t.id === itemId);
+    if (def) itemName = def.name;
+  }
+
+  saveUsers(current);
+  renderShopItems();
+  if (typeof renderProfileCustomization === 'function') renderProfileCustomization();
+  if (typeof renderProfile === 'function') renderProfile();
+  if (typeof renderWorldChat === 'function') renderWorldChat();
+  if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
+  if (typeof updateUI === 'function') updateUI();
+
+  showNotification('Предмет надет!', `Вы успешно активировали «${itemName}»!`);
+}
+window.equipItemFromShop = equipItemFromShop;
+
+// ============================================================
+//  ИНТЕРАКТИВНЫЙ РЕЖИМ ПРИМЕРКИ И ПРЕДОСМОТРА ТОВАРОВ (LIVE SHOWCASE)
+// ============================================================
+
+// Тестовое интерактивное состояние внутри модалки предпросмотра
+const ShopPreviewState = {
+  activeCategory: 'frames',
+  activeItemId: 'default',
+  testStatus: 'in_game', // 'online' | 'in_game' | 'away'
+  testPraiseCount: 48,
+  testFrameId: null
+};
+
+function openShopItemPreview(category, itemId, options = {}) {
+  const modal = document.getElementById('shopPreviewModal');
+  if (!modal) return;
+
+  ShopPreviewState.activeCategory = category;
+  ShopPreviewState.activeItemId = itemId;
+  if (options.testFrameId !== undefined) ShopPreviewState.testFrameId = options.testFrameId;
+
+  const current = AppState.currentUser;
+  const user = current ? (AppState.users[current] || {}) : {};
+  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
+  const isPremium = isUserPremium(current);
+  const userCoins = typeof user.coins === 'number' ? user.coins : 0;
+
+  let item = null;
+  let catLabel = 'ПРИМЕРКА ПРЕДМЕТА';
+  let catIcon = 'icon-sparkles';
+  let typeBadge = '';
+  let categoryItems = [];
+  let selectorTitle = '⚡ Быстрое переключение для теста:';
+
+  if (category === 'frames') {
+    item = FRAME_DEFINITIONS.find(f => f.id === itemId);
+    catLabel = 'РАМКА ДЛЯ АВАТАРА';
+    catIcon = 'icon-frame';
+    typeBadge = 'Рамка аватара';
+    categoryItems = FRAME_DEFINITIONS;
+    selectorTitle = `⚡ Быстрый тест всех рамок (${FRAME_DEFINITIONS.length}):`;
+  } else if (category === 'name_styles') {
+    item = NAME_STYLE_DEFINITIONS.find(s => s.id === itemId);
+    catLabel = 'СТИЛЬ И ЦВЕТ НИКА';
+    catIcon = 'icon-sparkles';
+    typeBadge = 'Стиль никнейма';
+    categoryItems = NAME_STYLE_DEFINITIONS;
+    selectorTitle = `⚡ Быстрый тест стилей ника (${NAME_STYLE_DEFINITIONS.length}):`;
+  } else if (category === 'mini_bgs') {
+    item = MINI_BG_DEFINITIONS.find(b => b.id === itemId);
+    catLabel = 'ЖИВОЙ ФОН МИНИ-ПРОФИЛЯ';
+    catIcon = 'icon-sparkles';
+    typeBadge = 'Анимированный фон';
+    categoryItems = MINI_BG_DEFINITIONS;
+    selectorTitle = `⚡ Быстрый тест всех живых фонов (${MINI_BG_DEFINITIONS.length}):`;
+  } else if (category === 'banners') {
+    item = BANNER_DEFINITIONS.find(b => b.id === itemId);
+    catLabel = 'ШАПКА ПОЛНОГО ПРОФИЛЯ';
+    catIcon = 'icon-game';
+    typeBadge = 'Панорамный баннер';
+    categoryItems = BANNER_DEFINITIONS;
+    selectorTitle = `⚡ Быстрый тест всех шапок профиля (${BANNER_DEFINITIONS.length}):`;
+  } else if (category === 'themes') {
+    item = THEME_DEFINITIONS.find(t => t.id === itemId);
+    catLabel = 'ТЕМА ОФОРМЛЕНИЯ САЙТА';
+    catIcon = 'icon-palette-shop';
+    typeBadge = 'Визуальная тема';
+    categoryItems = THEME_DEFINITIONS;
+    selectorTitle = `⚡ Быстрый тест всех тем сайта (${THEME_DEFINITIONS.length}):`;
+  }
+
+  if (!item) return;
+
+  // 1. Метаданные товара
+  const catIconEl = document.getElementById('previewCatIcon');
+  if (catIconEl) catIconEl.setAttribute('href', `#${catIcon}`);
+  const catLabelEl = document.getElementById('previewCatLabel');
+  if (catLabelEl) catLabelEl.textContent = catLabel;
+  const titleEl = document.getElementById('previewItemTitle');
+  if (titleEl) titleEl.textContent = item.name;
+  
+  const rarityTagEl = document.getElementById('previewItemRarityTag');
+  if (rarityTagEl) {
+    rarityTagEl.textContent = item.tag || (category === 'themes' ? 'ТЕМА' : 'ПРЕМИУМ');
+    rarityTagEl.className = `item-tag-pill tag-${(item.tag || 'rare').toLowerCase().replace(/\s+/g, '-')}`;
+  }
+
+  const typeBadgeEl = document.getElementById('previewItemTypeBadge');
+  if (typeBadgeEl) typeBadgeEl.textContent = typeBadge;
+
+  const descEl = document.getElementById('previewItemDesc');
+  if (descEl) descEl.textContent = item.desc || '';
+
+  const userBalanceEl = document.getElementById('previewUserBalanceVal');
+  if (userBalanceEl) userBalanceEl.textContent = userCoins.toLocaleString('ru-RU');
+
+  // 2. Расчет стоимости
+  const rawCost = item.cost || 0;
+  const finalCost = isPremium ? Math.round(rawCost * 0.9) : rawCost;
+
+  const priceBox = document.getElementById('previewPriceBox');
+  if (priceBox) {
+    if (isPremium && rawCost > 0) {
+      priceBox.innerHTML = `
+        <div class="shop-price-container">
+          <div class="shop-price-main-row">
+            <span class="shop-price-old-striked">${rawCost} LC</span>
+            <span class="shop-item-curr-price is-discount"><span class="shop-coin-l">L</span> ${finalCost} LC</span>
+            <span class="shop-discount-tag-badge">-10% VIP</span>
+          </div>
+        </div>
+      `;
+    } else {
+      priceBox.innerHTML = `
+        <div class="shop-price-container">
+          <div class="shop-price-main-row">
+            <span class="shop-item-curr-price"><span class="shop-coin-l">L</span> ${rawCost} LC</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // 3. Интерактивная сцена примерки (РЕАЛИСТИЧНЫЙ ЧАТ, STEAM МИНИ-ПРОФИЛЬ, ШАПКА, ТЕМА)
+  const viewport = document.getElementById('previewStageViewport');
+  if (viewport) {
+    const avatarContent = (user && user.avatar) 
+      ? `<img src="${user.avatar}" class="preview-large-avatar-img" alt="${escapeHtml(current || 'Игрок')}">` 
+      : `<div class="preview-large-avatar-img">${current ? escapeHtml(current.slice(0, 2).toUpperCase()) : 'VIP'}</div>`;
+
+    const avatarContentMini = (user && user.avatar)
+      ? `<img src="${user.avatar}" alt="${escapeHtml(current || 'Игрок')}">`
+      : `<span>${current ? escapeHtml(current.slice(0, 2).toUpperCase()) : 'VIP'}</span>`;
+
+    const userFrame = ShopPreviewState.testFrameId || (category === 'frames' ? itemId : getUserAvatarFrame(current));
+    const userNameStyle = category === 'name_styles' ? itemId : getUserNameStyle(current);
+    const nameClass = getUserNameClass(current, userNameStyle);
+
+    if (category === 'frames' || category === 'name_styles') {
+      // Реалистичный чат и карточка аватара
+      viewport.innerHTML = `
+        <div class="preview-chat-showcase">
+          <div class="preview-hero-identity-card">
+            <div class="avatar-frame-wrap frame-${userFrame}" style="width: 72px; height: 72px; flex-shrink: 0;">
+              ${avatarContent}
+            </div>
+            <div class="preview-hero-identity-info">
+              <div class="preview-hero-name ${nameClass}">${escapeHtml(current || 'Ваш никнейм')}</div>
+              <div class="preview-hero-badges">
+                <span class="preview-badge-pill preview-badge-vip"><svg style="width:11px;height:11px;"><use href="#icon-crown"/></svg> VIP</span>
+                <span class="preview-badge-pill preview-badge-lvl">LVL ${user.level || 15}</span>
+                <span class="preview-badge-pill preview-badge-game">CS 2 • Premier</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-fake-chat-card">
+            <div class="fake-chat-header">
+              <div class="fake-chat-title">
+                <span class="fake-chat-dot"></span>
+                <span>Мировой чат Lobbivo</span>
+              </div>
+              <span class="fake-chat-tag">ПРЕДПРОСМОТР В ЧАТЕ</span>
+            </div>
+
+            <div class="fake-chat-msg">
+              <div class="fake-chat-avatar-mini">
+                <div class="preview-small-avatar"><span>AL</span></div>
+              </div>
+              <div class="fake-chat-bubble">
+                <div class="fake-chat-author-line">
+                  <span class="fake-chat-author-other">Alex_Sniper</span>
+                  <span class="fake-chat-time">19:42</span>
+                </div>
+                <div class="fake-chat-text">Ищем +1 в сквад на вечерний рейтинг, кто с нами?</div>
+              </div>
+            </div>
+
+            <div class="fake-chat-msg highlight-demo">
+              <div class="fake-chat-avatar-mini">
+                <div class="avatar-frame-wrap frame-${userFrame}" style="width:38px;height:38px;">
+                  <div class="preview-small-avatar">${avatarContentMini}</div>
+                </div>
+              </div>
+              <div class="fake-chat-bubble">
+                <div class="fake-chat-author-line">
+                  <span class="fake-chat-author-me ${nameClass}">${escapeHtml(current || 'Ваш никнейм')}</span>
+                  <span class="preview-crown-mini"><svg style="width:12px;height:12px;"><use href="#icon-crown"/></svg></span>
+                  <span class="fake-chat-time">только что</span>
+                </div>
+                <div class="fake-chat-text">Я готов! Залетаю в лобби, связь в дискорде 🚀🔥</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (category === 'mini_bgs') {
+      // Реалистичный Steam-style мини-профиль с живым тестом похвал и статусов
+      let statusText = '🟢 В сети • Ищет команду';
+      let statusDotClass = 'online';
+      if (ShopPreviewState.testStatus === 'in_game') {
+        statusText = '🎮 В игре: Counter-Strike 2 • Premier';
+        statusDotClass = 'online';
+      } else if (ShopPreviewState.testStatus === 'away') {
+        statusText = '🌙 Отошёл • Скоро буду';
+        statusDotClass = 'away';
+      }
+
+      viewport.innerHTML = `
+        <div class="preview-steam-miniprofile-wrap">
+          <div class="steam-miniprofile-card">
+            <div class="popover-animated-bg mini-bg-${itemId}"></div>
+            <div class="steam-miniprofile-glow-layer"></div>
+            
+            <div class="steam-miniprofile-content">
+              <div class="miniprofile-header-row">
+                <div class="avatar-frame-wrap frame-${userFrame}" style="width: 68px; height: 68px; flex-shrink: 0;">
+                  ${avatarContent}
+                </div>
+                <div class="miniprofile-user-meta">
+                  <div class="${nameClass}" style="font-size: 1.15rem; font-weight: 900;">
+                    ${escapeHtml(current || 'Ваш никнейм')}
+                  </div>
+                  <div class="miniprofile-status-row">
+                    <span class="miniprofile-status-dot ${statusDotClass}"></span>
+                    <span>${statusText}</span>
+                  </div>
+                  <div class="miniprofile-level-badge">
+                    <span>Уровень ${user.level || 25}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="miniprofile-game-card">
+                <div class="miniprofile-game-icon">
+                  <svg style="width: 18px; height: 18px;"><use href="#icon-game"/></svg>
+                </div>
+                <div class="miniprofile-game-info">
+                  <div class="miniprofile-game-name">Counter-Strike 2</div>
+                  <div class="miniprofile-game-details">Premier 19,450 ELO • Сквад</div>
+                </div>
+              </div>
+
+              <div class="miniprofile-bio-box">
+                «Играю на победу. Прайм-тайм каждый вечер с 19:00»
+              </div>
+
+              <div class="miniprofile-stats-row">
+                <div class="miniprofile-stat-chip miniprofile-praise-btn" onclick="testMiniProfilePraise()" title="Нажмите, чтобы протестировать реакцию похвалы">
+                  <svg style="width:12px;height:12px;color:#34d399;"><use href="#icon-thumbs-up"/></svg>
+                  <span id="previewPraiseNumVal">+${ShopPreviewState.testPraiseCount} Похвал (Тест)</span>
+                </div>
+                <div class="miniprofile-stat-chip">
+                  <svg style="width:12px;height:12px;color:#00d4ff;"><use href="#icon-clock"/></svg>
+                  <span>780 ч. в игре</span>
+                </div>
+              </div>
+
+              <div class="miniprofile-actions-row">
+                <div class="miniprofile-action-btn primary">Написать в ЛС</div>
+                <div class="miniprofile-action-btn secondary">В друзья</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Интерактивные тест-кнопки статуса профиля -->
+          <div class="preview-live-interactive-bar">
+            <span style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-right:2px;">Тест статуса:</span>
+            <button type="button" class="preview-test-toggle-btn ${ShopPreviewState.testStatus === 'online' ? 'active' : ''}" onclick="testMiniProfileStatus('online')">🟢 Онлайн</button>
+            <button type="button" class="preview-test-toggle-btn ${ShopPreviewState.testStatus === 'in_game' ? 'active' : ''}" onclick="testMiniProfileStatus('in_game')">🎮 В игре CS2</button>
+            <button type="button" class="preview-test-toggle-btn ${ShopPreviewState.testStatus === 'away' ? 'active' : ''}" onclick="testMiniProfileStatus('away')">🌙 Отошёл</button>
+          </div>
+        </div>
+      `;
+    } else if (category === 'banners') {
+      // Реалистичная панорамная шапка профиля (Gamer Hero Banner)
+      viewport.innerHTML = `
+        <div class="preview-profile-banner-showcase">
+          <div class="preview-hero-banner-frame">
+            <div class="profile-hero-banner-cover banner-${itemId}"></div>
+            <div class="preview-banner-vignette"></div>
+
+            <div class="preview-hero-banner-content">
+              <div class="avatar-frame-wrap frame-${userFrame}" style="width: 60px; height: 60px; flex-shrink: 0;">
+                ${avatarContent}
+              </div>
+              <div class="preview-banner-identity">
+                <div class="preview-banner-username ${nameClass}">${escapeHtml(current || 'Ваш никнейм')}</div>
+                <div class="preview-banner-tags">
+                  <span class="preview-banner-pill"><svg style="width:11px;height:11px;"><use href="#icon-device-pc"/></svg> PC</span>
+                  <span class="preview-banner-pill"><svg style="width:11px;height:11px;"><use href="#icon-game"/></svg> CS 2</span>
+                  <span class="preview-banner-pill" style="color:#00ff9d;">• Онлайн</span>
+                </div>
+              </div>
+              <div class="preview-banner-karma-pill">
+                <svg style="width:13px;height:13px;"><use href="#icon-thumbs-up"/></svg>
+                <span>+52</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (category === 'themes') {
+      // Реалистичный мини UI интерфейса темы
+      viewport.innerHTML = `
+        <div class="preview-theme-showcase-wrap ${item.previewClass}">
+          <div class="mini-ui-mockup">
+            <div class="mini-ui-header">
+              <div class="mini-ui-brand">
+                <span class="mini-ui-logo-badge">L</span>
+                <span class="mini-ui-brand-title">Lobbivo</span>
+              </div>
+              <div class="mini-ui-nav">
+                <span class="mini-ui-nav-link active">Игры</span>
+                <span class="mini-ui-nav-link">Тиммейты</span>
+              </div>
+              <div class="mini-ui-coin-pill">
+                <span class="coin-l-letter">L</span>
+                <span>850 LC</span>
+              </div>
+            </div>
+
+            <div class="mini-ui-card">
+              <div class="mini-ui-card-title">Тема: ${escapeHtml(item.name)}</div>
+              <div class="mini-ui-card-sub">${escapeHtml(item.desc || 'Уникальная цветовая палитра всего сайта')}</div>
+              <div class="mini-ui-btn-row">
+                <div class="mini-ui-btn primary">Войти в лобби</div>
+                <div class="mini-ui-btn outline">Подробнее</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // 4. Панель быстрого переключения и теста всех предметов текущей категории (QUICK SWITCHER TRAY)
+  const quickSelectorWrap = document.getElementById('previewQuickSelectorWrap');
+  const quickSelectorRow = document.getElementById('previewQuickSelectorRow');
+  const quickSelectorTitleEl = document.getElementById('previewQuickSelectorTitle');
+
+  if (quickSelectorWrap && quickSelectorRow && categoryItems.length > 0) {
+    quickSelectorWrap.style.display = 'block';
+    if (quickSelectorTitleEl) quickSelectorTitleEl.textContent = selectorTitle;
+
+    let trayHtml = '';
+    categoryItems.forEach(catItem => {
+      const isActive = catItem.id === itemId;
+      let isItemOwned = false;
+      let isItemEquipped = false;
+
+      if (category === 'frames') {
+        isItemOwned = inventory.frames.includes(catItem.id);
+        isItemEquipped = getUserAvatarFrame(current) === catItem.id;
+      } else if (category === 'name_styles') {
+        isItemOwned = inventory.nameStyles.includes(catItem.id);
+        isItemEquipped = getUserNameStyle(current) === catItem.id;
+      } else if (category === 'mini_bgs') {
+        isItemOwned = inventory.miniBgs.includes(catItem.id);
+        isItemEquipped = getUserEquippedMiniBg(current) === catItem.id;
+      } else if (category === 'banners') {
+        isItemOwned = inventory.banners.includes(catItem.id);
+        isItemEquipped = getUserEquippedBanner(current) === catItem.id;
+      } else if (category === 'themes') {
+        isItemOwned = inventory.themes.includes(catItem.id);
+        isItemEquipped = (AppState.currentTheme || localStorage.getItem('squad_theme') || 'default') === catItem.id;
+      }
+
+      let thumbHtml = '';
+      if (category === 'mini_bgs') {
+        thumbHtml = `<div class="preview-quick-thumb mini-bg-${catItem.id}"></div>`;
+      } else if (category === 'banners') {
+        thumbHtml = `<div class="preview-quick-thumb banner-${catItem.id}"></div>`;
+      } else if (category === 'frames') {
+        thumbHtml = `<div class="preview-quick-thumb" style="display:flex;align-items:center;justify-content:center;background:#0d1527;"><div class="avatar-frame-wrap frame-${catItem.id}" style="width:34px;height:34px;"><div style="width:100%;height:100%;border-radius:50%;background:#1b253b;font-size:10px;display:flex;align-items:center;justify-content:center;">★</div></div></div>`;
+      } else if (category === 'name_styles') {
+        thumbHtml = `<div class="preview-quick-thumb" style="display:flex;align-items:center;justify-content:center;background:#0d1527;"><span class="name-style-${catItem.id}" style="font-size:11px;font-weight:900;">ААА</span></div>`;
+      } else if (category === 'themes') {
+        thumbHtml = `<div class="preview-quick-thumb ${catItem.previewClass}" style="display:flex;align-items:center;justify-content:center;"><span style="font-size:10px;font-weight:900;color:#fff;">${escapeHtml(catItem.name.slice(0,3))}</span></div>`;
+      }
+
+      let statusBadge = isItemEquipped ? '✓ Надето' : (isItemOwned ? 'В наличии' : `${catItem.cost || 0} LC`);
+
+      trayHtml += `
+        <div class="preview-quick-item-btn ${isActive ? 'active' : ''} ${isItemEquipped ? 'is-equipped' : ''}" onclick="openShopItemPreview('${category}', '${catItem.id}')" title="Нажмите для мгновенного теста «${escapeHtml(catItem.name)}»">
+          ${thumbHtml}
+          <span class="preview-quick-item-name">${escapeHtml(catItem.name)}</span>
+          <span class="preview-quick-item-status">${statusBadge}</span>
+        </div>
+      `;
+    });
+
+    quickSelectorRow.innerHTML = trayHtml;
+  } else if (quickSelectorWrap) {
+    quickSelectorWrap.style.display = 'none';
+  }
+
+  // 5. Проверка владения и экипировки
+  let isOwned = false;
+  let isEquipped = false;
+
+  if (category === 'frames') {
+    isOwned = inventory.frames.includes(itemId);
+    isEquipped = getUserAvatarFrame(current) === itemId;
+  } else if (category === 'name_styles') {
+    isOwned = inventory.nameStyles.includes(itemId);
+    isEquipped = getUserNameStyle(current) === itemId;
+  } else if (category === 'mini_bgs') {
+    isOwned = inventory.miniBgs.includes(itemId);
+    isEquipped = getUserEquippedMiniBg(current) === itemId;
+  } else if (category === 'banners') {
+    isOwned = inventory.banners.includes(itemId);
+    isEquipped = getUserEquippedBanner(current) === itemId;
+  } else if (category === 'themes') {
+    isOwned = inventory.themes.includes(itemId);
+    isEquipped = (AppState.currentTheme || localStorage.getItem('squad_theme') || 'default') === itemId;
+  }
+
+  const actionBtn = document.getElementById('previewActionBtn');
+  const actionBtnText = document.getElementById('previewActionBtnText');
+
+  if (actionBtn && actionBtnText) {
+    if (isEquipped) {
+      actionBtn.className = 'btn btn-primary preview-action-btn is-equipped';
+      actionBtn.disabled = true;
+      actionBtnText.textContent = '✓ Уже надето';
+      actionBtn.onclick = null;
+    } else if (isOwned) {
+      actionBtn.className = 'btn btn-primary preview-action-btn';
+      actionBtn.disabled = false;
+      actionBtnText.textContent = 'Экипировать сейчас';
+      actionBtn.onclick = () => {
+        if (!current) return;
+        if (category === 'frames') {
+          user.equippedFrame = itemId;
+        } else if (category === 'name_styles') {
+          user.nameStyle = itemId;
+        } else if (category === 'mini_bgs') {
+          user.equippedMiniBg = itemId;
+        } else if (category === 'banners') {
+          user.equippedBanner = itemId;
+        } else if (category === 'themes') {
+          saveTheme(itemId);
+        }
+        saveUsers(current);
+        if (typeof renderProfileCustomization === 'function') renderProfileCustomization();
+        if (typeof renderProfile === 'function') renderProfile();
+        if (typeof renderWorldChat === 'function') renderWorldChat();
+        if (typeof updateUI === 'function') updateUI();
+        showNotification('Успешно экипировано', `Предмет «${item.name}» теперь активен на вашем профиле!`);
+        closeShopItemPreview();
+      };
+    } else {
+      if (!current) {
+        actionBtn.className = 'btn btn-primary preview-action-btn';
+        actionBtn.disabled = false;
+        actionBtnText.textContent = `Войти для покупки (${finalCost} LC)`;
+        actionBtn.onclick = () => {
+          closeShopItemPreview();
+          showAuthModal('login');
+        };
+      } else if (userCoins >= finalCost) {
+        actionBtn.className = 'btn btn-primary preview-action-btn';
+        actionBtn.disabled = false;
+        actionBtnText.textContent = `Купить за ${finalCost} LC`;
+        actionBtn.onclick = () => {
+          const type = category === 'frames' ? 'frame' : (category === 'name_styles' ? 'name_style' : (category === 'mini_bgs' ? 'mini_bg' : (category === 'banners' ? 'banner' : 'theme')));
+          buyShopItem(type, itemId, rawCost);
+          closeShopItemPreview();
+        };
+      } else {
+        const diff = finalCost - userCoins;
+        actionBtn.className = 'btn btn-primary preview-action-btn';
+        actionBtn.disabled = false;
+        actionBtnText.textContent = `Не хватает ${diff} LC • Пополнить`;
+        actionBtn.onclick = () => {
+          closeShopItemPreview();
+          switchCoinTab('buy');
+        };
+      }
+    }
+  }
+
+  modal.classList.add('show');
+}
+
+// Интерактивные тест-хендлеры для предпросмотра
+function testMiniProfilePraise() {
+  ShopPreviewState.testPraiseCount += 1;
+  const praiseEl = document.getElementById('previewPraiseNumVal');
+  if (praiseEl) {
+    praiseEl.textContent = `+${ShopPreviewState.testPraiseCount} Похвал (Тест)`;
+  }
+  showNotification('Похвала добавлена!', `Тестовая репутация игрока увеличена: +${ShopPreviewState.testPraiseCount}`);
+}
+window.testMiniProfilePraise = testMiniProfilePraise;
+
+function testMiniProfileStatus(status) {
+  ShopPreviewState.testStatus = status;
+  openShopItemPreview(ShopPreviewState.activeCategory, ShopPreviewState.activeItemId);
+}
+window.testMiniProfileStatus = testMiniProfileStatus;
+
+function closeShopItemPreview() {
+  const modal = document.getElementById('shopPreviewModal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.classList.remove('open');
+  }
+}
+window.openShopItemPreview = openShopItemPreview;
+window.closeShopItemPreview = closeShopItemPreview;
+
+// Привязка закрытия модалки предпросмотра
+document.addEventListener('DOMContentLoaded', () => {
+  const closeBtn = document.getElementById('shopPreviewCloseBtn');
+  const cancelBtn = document.getElementById('previewCancelBtn');
+  const modal = document.getElementById('shopPreviewModal');
+  if (closeBtn) closeBtn.onclick = closeShopItemPreview;
+  if (cancelBtn) cancelBtn.onclick = closeShopItemPreview;
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) closeShopItemPreview();
+    });
+  }
+});
 
 // ============================================================
 //  КАСТОМИЗАЦИЯ ПРОФИЛЯ (ГАРДЕРОБ РАМОК И ТЕМ)
@@ -1371,7 +2240,9 @@ function init() {
     link.addEventListener('click', function() {
       const targetPage = this.dataset.nav;
       if (targetPage) {
-        if (isChatOpen) closeChat();
+        if (typeof closeChat === 'function') closeChat();
+        if (typeof closeCoinModal === 'function') closeCoinModal();
+        if (typeof closeShopItemPreview === 'function') closeShopItemPreview();
         if (targetPage === 'pagePlayers') {
           showPlayers(AppState.selectedGameFilter || 'all');
         } else {
@@ -1385,7 +2256,11 @@ function init() {
   const logo = document.getElementById('logoHome');
   if (logo) {
     logo.addEventListener('click', () => {
-      if (isChatOpen) closeChat();
+      if (typeof closeChat === 'function') closeChat();
+      if (typeof closeCoinModal === 'function') closeCoinModal();
+      if (typeof closeShopItemPreview === 'function') closeShopItemPreview();
+      const avatarDropdown = document.getElementById('avatarDropdown');
+      if (avatarDropdown) avatarDropdown.classList.remove('open');
       if (AppState.currentUser) {
         switchPage('pageGames');
       } else {
@@ -1400,12 +2275,16 @@ function init() {
   document.getElementById('welcomeExploreBtn')?.addEventListener('click', () => switchPage('pageGames'));
   document.getElementById('welcomeAboutBtn')?.addEventListener('click', () => switchPage('pageAbout'));
 
-  // Дропдаун профиля в шапке
+  // Дропдаун профиля в шапке / Клик по своей иконке в главном меню
   const avatarWrapper = document.getElementById('avatarWrapper');
   const avatarDropdown = document.getElementById('avatarDropdown');
   if (avatarWrapper && avatarDropdown) {
     avatarWrapper.addEventListener('click', (e) => {
       e.stopPropagation();
+      // Закрываем чат, магазин и предпросмотр при клике на свою иконку
+      if (typeof closeChat === 'function') closeChat();
+      if (typeof closeCoinModal === 'function') closeCoinModal();
+      if (typeof closeShopItemPreview === 'function') closeShopItemPreview();
       avatarDropdown.classList.toggle('open');
     });
     document.addEventListener('click', () => {
@@ -1437,6 +2316,10 @@ function init() {
       e.stopPropagation();
       const action = item.dataset.action;
       if (avatarDropdown) avatarDropdown.classList.remove('open');
+      if (typeof closeChat === 'function') closeChat();
+      if (typeof closeCoinModal === 'function') closeCoinModal();
+      if (typeof closeShopItemPreview === 'function') closeShopItemPreview();
+
       if (action === 'admin') {
         if (typeof openAdminPanel === 'function') openAdminPanel('complaints');
       } else if (action === 'coins') {
@@ -1900,6 +2783,16 @@ function init() {
   document.getElementById('tabCoinShopBtn')?.addEventListener('click', () => switchCoinTab('shop'));
   document.getElementById('tabCoinBuyBtn')?.addEventListener('click', () => switchCoinTab('buy'));
 
+  // Переключение категорий магазина
+  document.getElementById('shopCategoryNav')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.shop-cat-btn');
+    if (!btn) return;
+    const cat = btn.dataset.cat;
+    if (cat) {
+      switchShopCategory(cat);
+    }
+  });
+
   // Клик по тарифам Premium в магазине
   document.querySelectorAll('.btn-buy-premium').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -2068,10 +2961,10 @@ function init() {
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2.9.14', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('./sw.js?v=2.9.15', { updateViaCache: 'none' })
         .then((reg) => {
           reg.update().catch(() => {});
-          console.log('[Lobbivo SW] Service Worker v2.9.14 активен:', reg.scope);
+          console.log('[Lobbivo SW] Service Worker v2.9.15 активен:', reg.scope);
 
           // Проверяем обновления при возврате пользователя на вкладку
           document.addEventListener('visibilitychange', () => {

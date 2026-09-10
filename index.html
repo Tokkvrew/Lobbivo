@@ -901,6 +901,7 @@
 
         <!-- 1. ГЛАВНАЯ КАРТОЧКА ПРОФИЛЯ (GAMER HERO BANNER) -->
         <div class="profile-hero-card">
+          <div class="profile-hero-banner-cover" id="profileHeroBannerCover"></div>
           <div class="profile-card-glow-bg"></div>
 
           <div class="profile-hero-top">
@@ -975,14 +976,14 @@
           </div>
         </div>
 
-        <!-- 2. СЕКЦИЯ: КАСТОМИЗАЦИЯ (ГАРДЕРОБ РАМОК И ТЕМЫ) -->
+        <!-- 2. СЕКЦИЯ: КАСТОМИЗАЦИЯ (ГАРДЕРОБ РАМОК, СТИЛЕЙ И ТЕМ) -->
         <div class="profile-unified-section">
           <div class="unified-section-header">
             <div class="unified-section-title">
               <svg><use href="#icon-palette-shop"/></svg>
               <span>Кастомизация профиля</span>
             </div>
-            <div class="unified-section-sub">Выбирайте и надевайте купленные рамки для аватара и темы оформления сайта</div>
+            <div class="unified-section-sub">Выбирайте и надевайте купленные рамки, стили ника, фоны мини-профиля, шапки и темы оформления сайта</div>
           </div>
 
           <!-- 2.1 РАМКИ АВАТАРКИ -->
@@ -999,11 +1000,53 @@
             </div>
           </div>
 
-          <!-- 2.2 ТЕМЫ ОФОРМЛЕНИЯ -->
+          <!-- 2.2 СТИЛИ И ЦВЕТА НИКНЕЙМА -->
           <div class="custom-wardrobe-block" style="margin-top: 24px;">
             <div class="wardrobe-header">
               <div class="wardrobe-title">
                 <svg><use href="#icon-sparkles"/></svg>
+                <span>Цвет и стиль никнейма</span>
+              </div>
+              <div class="wardrobe-sub">Косметическая раскраска и неоновые переливы вашего никнейма в чатах и карточках</div>
+            </div>
+            <div class="custom-name-styles-grid" id="profileCosmeticNameStylesGrid">
+              <!-- Рендерится через renderProfileCustomization() -->
+            </div>
+          </div>
+
+          <!-- 2.3 ФОНЫ МИНИ-ПРОФИЛЯ -->
+          <div class="custom-wardrobe-block" style="margin-top: 24px;">
+            <div class="wardrobe-header">
+              <div class="wardrobe-title">
+                <svg><use href="#icon-sparkles"/></svg>
+                <span>Анимированные фоны мини-профиля</span>
+              </div>
+              <div class="wardrobe-sub">Живой анимированный фон карточки при нажатии на ваш профиль в чате</div>
+            </div>
+            <div class="custom-mini-bgs-grid" id="profileMiniBgsGrid">
+              <!-- Рендерится через renderProfileCustomization() -->
+            </div>
+          </div>
+
+          <!-- 2.4 ШАПКИ И ОБЛОЖКИ ПРОФИЛЯ -->
+          <div class="custom-wardrobe-block" style="margin-top: 24px;">
+            <div class="wardrobe-header">
+              <div class="wardrobe-title">
+                <svg><use href="#icon-game"/></svg>
+                <span>Шапки и обложки профиля</span>
+              </div>
+              <div class="wardrobe-sub">Панорамный арт в шапке вашего полного профиля игрока</div>
+            </div>
+            <div class="custom-banners-grid" id="profileBannersGrid">
+              <!-- Рендерится через renderProfileCustomization() -->
+            </div>
+          </div>
+
+          <!-- 2.5 ТЕМЫ ОФОРМЛЕНИЯ САЙТА -->
+          <div class="custom-wardrobe-block" style="margin-top: 24px;">
+            <div class="wardrobe-header">
+              <div class="wardrobe-title">
+                <svg><use href="#icon-palette-shop"/></svg>
                 <span>Темы оформления интерфейса</span>
               </div>
               <div class="wardrobe-sub">Глубокая трансформация неоновой палитры, космических туманностей и частиц</div>
@@ -1013,14 +1056,14 @@
             </div>
           </div>
 
-          <!-- 2.3 ЦВЕТ И СТИЛЬ НИКНЕЙМА (ДЛЯ CEO И МОДЕРАТОРОВ) -->
+          <!-- 2.6 ЦВЕТ И СТИЛЬ НИКНЕЙМА (ДЛЯ CEO И МОДЕРАТОРОВ) -->
           <div class="custom-wardrobe-block" id="adminNameStyleBlock" style="margin-top: 24px; display: none;">
             <div class="wardrobe-header">
               <div class="wardrobe-title">
-                <svg><use href="#icon-palette-shop"/></svg>
+                <svg><use href="#icon-shield"/></svg>
                 <span>Фирменный стиль никнейма (CEO и Модераторы)</span>
               </div>
-              <div class="wardrobe-sub">Эксклюзивные анимированные градиенты для отображения вашего никнейма в чатах, карточках и профиле</div>
+              <div class="wardrobe-sub">Эксклюзивные служебные градиенты администрации Lobbivo</div>
             </div>
             <div class="custom-name-styles-grid" id="profileNameStylesGrid">
               <!-- Рендерится через renderProfileCustomization() -->
@@ -1577,7 +1620,8 @@
       <!-- БЫСТРАЯ КАРТОЧКА ПРОФИЛЯ ПО КЛИКУ В МИРОВОМ ЧАТЕ -->
       <div class="user-quick-popover" id="userQuickPopover" style="display:none;">
         <div class="popover-backdrop" id="popoverBackdrop"></div>
-        <div class="popover-card">
+        <div class="popover-card" id="popoverCard">
+          <div class="popover-animated-bg" id="popoverAnimatedBg"></div>
           <button type="button" class="popover-close-btn" id="popoverCloseBtn" title="Закрыть">
             <svg><use href="#icon-close"/></svg>
           </button>
@@ -2248,22 +2292,79 @@
           </div>
         </div>
 
-        <!-- ВКЛАДКА 2: МАГАЗИН (PREMIUM, РАМКИ, БУСТЫ, ТЕМЫ) -->
+        <!-- ВКЛАДКА 2: МАГАЗИН (PAGINATED & RICH CATEGORIES) -->
         <div class="coin-tab-content" id="coinShopContent" style="display:none;">
-          <!-- 1. РАЗДЕЛ: LOBBIVO PREMIUM -->
-          <div class="shop-section shop-section-premium">
-            <div class="shop-section-header">
-              <div class="shop-header-left">
-                <div class="shop-category-badge premium">
-                  <svg><use href="#icon-crown"/></svg>
-                  <span>VIP СТАТУС</span>
-                </div>
-                <div class="shop-section-title">Lobbivo Premium</div>
-                <div class="shop-section-sub">Максимальный статус, анимированные GIF-аватарки и приоритет</div>
+          
+          <!-- Навигация по категориям магазина -->
+          <div class="shop-category-nav-scroll">
+            <div class="shop-category-nav" id="shopCategoryNav">
+              <button type="button" class="shop-cat-btn active" data-cat="frames">
+                <svg><use href="#icon-frame"/></svg>
+                <span>Рамки</span>
+                <span class="shop-cat-count" id="shopFramesCount">14</span>
+              </button>
+              <button type="button" class="shop-cat-btn" data-cat="name_styles">
+                <svg><use href="#icon-sparkles"/></svg>
+                <span>Стили ника</span>
+                <span class="shop-cat-count shop-new-pill">NEW</span>
+              </button>
+              <button type="button" class="shop-cat-btn" data-cat="mini_bgs">
+                <svg><use href="#icon-sparkles"/></svg>
+                <span>Фоны мини-профиля</span>
+                <span class="shop-cat-count shop-live-pill">LIVE FX</span>
+              </button>
+              <button type="button" class="shop-cat-btn" data-cat="banners">
+                <svg><use href="#icon-game"/></svg>
+                <span>Шапки профиля</span>
+                <span class="shop-cat-count shop-new-pill">NEW</span>
+              </button>
+              <button type="button" class="shop-cat-btn" data-cat="themes">
+                <svg><use href="#icon-palette-shop"/></svg>
+                <span>Темы сайта</span>
+                <span class="shop-cat-count">5</span>
+              </button>
+              <button type="button" class="shop-cat-btn" data-cat="premium">
+                <svg><use href="#icon-crown"/></svg>
+                <span>Premium & Буст</span>
+                <span class="shop-cat-count shop-vip-pill">VIP</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Динамический заголовок активной категории -->
+          <div class="shop-active-cat-header" id="shopActiveCatHeader">
+            <div class="shop-header-left">
+              <div class="shop-category-badge" id="shopCatBadge">
+                <svg id="shopCatBadgeIcon"><use href="#icon-frame"/></svg>
+                <span id="shopCatBadgeText">ГАРДЕРОБ</span>
               </div>
-              <div class="shop-premium-status-indicator" id="shopPremiumStatusIndicator">
-                <span class="status-dot"></span>
-                <span id="shopPremiumStatusText">Не активен</span>
+              <div class="shop-section-title" id="shopCatTitle">Рамки для аватарок</div>
+              <div class="shop-section-sub" id="shopCatDesc">Уникальные анимированные эффекты вокруг вашей аватарки</div>
+            </div>
+            <div class="shop-cat-meta-box">
+              <span class="shop-discount-pill" id="shopDiscountPill" style="display:none;">
+                <svg><use href="#icon-crown"/></svg> Скидка Premium -10%
+              </span>
+            </div>
+          </div>
+
+          <!-- Динамическая сетка товаров (по 6 на страницу) -->
+          <div class="shop-dynamic-grid" id="shopDynamicGrid">
+            <!-- Рендерится через renderShopItems() -->
+          </div>
+
+          <!-- Блок Premium и Буста (отображается при выборе категории 'premium') -->
+          <div class="shop-premium-integrated-view" id="shopPremiumIntegratedView" style="display:none;">
+            <!-- Статус Premium -->
+            <div class="shop-premium-status-banner">
+              <div class="status-banner-left">
+                <div class="shop-premium-status-indicator" id="shopPremiumStatusIndicator">
+                  <span class="status-dot"></span>
+                  <span id="shopPremiumStatusText">Не активен</span>
+                </div>
+                <div class="status-banner-text">
+                  <strong>Lobbivo Premium</strong> — приоритет в поиске тиммейтов, GIF-аватарка, корона и 10% скидка на весь ассортимент магазина.
+                </div>
               </div>
             </div>
 
@@ -2345,138 +2446,9 @@
                 </button>
               </div>
             </div>
-          </div>
 
-          <!-- 2. РАЗДЕЛ: АНИМИРОВАННЫЕ РАМКИ -->
-          <div class="shop-section shop-section-frames">
-            <div class="shop-section-header">
-              <div class="shop-header-left">
-                <div class="shop-category-badge frames">
-                  <svg><use href="#icon-frame"/></svg>
-                  <span>ГАРДЕРОБ</span>
-                </div>
-                <div class="shop-section-title">Рамки для аватарок</div>
-                <div class="shop-section-sub">Уникальные анимированные эффекты вокруг вашей аватарки</div>
-              </div>
-            </div>
-
-            <div class="shop-frames-grid" id="shopFramesGrid">
-              <!-- Рамка 1: Огненная ярость -->
-              <div class="shop-frame-card" data-frame-id="fire">
-                <div class="frame-preview-box">
-                  <div class="avatar-frame-wrap frame-fire">
-                    <div class="frame-preview-avatar" id="framePreview_fire"></div>
-                  </div>
-                </div>
-                <div class="frame-card-info">
-                  <div class="frame-name"><svg class="item-title-icon flame-icon"><use href="#icon-flame"/></svg> <span>Flame Fury</span></div>
-                  <div class="frame-desc">Яростное анимированное пламя</div>
-                  <div class="frame-price">
-                    <span class="shop-coin-l">L</span>
-                    <span>120 LC</span>
-                  </div>
-                </div>
-                <button type="button" class="btn-shop-action btn-frame-action" data-frame-id="fire" data-cost="120">
-                  Купить
-                </button>
-              </div>
-
-              <!-- Рамка 2: Cyberpunk Neon -->
-              <div class="shop-frame-card" data-frame-id="cyber">
-                <div class="frame-preview-box">
-                  <div class="avatar-frame-wrap frame-cyber">
-                    <div class="frame-preview-avatar" id="framePreview_cyber"></div>
-                  </div>
-                </div>
-                <div class="frame-card-info">
-                  <div class="frame-name"><svg class="item-title-icon cyber-icon"><use href="#icon-cyber"/></svg> <span>Cyber Neon</span></div>
-                  <div class="frame-desc">Пульсирующий циановый неон</div>
-                  <div class="frame-price">
-                    <span class="shop-coin-l">L</span>
-                    <span>140 LC</span>
-                  </div>
-                </div>
-                <button type="button" class="btn-shop-action btn-frame-action" data-frame-id="cyber" data-cost="140">
-                  Купить
-                </button>
-              </div>
-
-              <!-- Рамка 3: Gold Imperial -->
-              <div class="shop-frame-card" data-frame-id="gold">
-                <div class="frame-preview-box">
-                  <div class="avatar-frame-wrap frame-gold">
-                    <div class="frame-preview-avatar" id="framePreview_gold"></div>
-                  </div>
-                </div>
-                <div class="frame-card-info">
-                  <div class="frame-name"><svg class="item-title-icon gold-icon"><use href="#icon-crown"/></svg> <span>Imperial Gold</span></div>
-                  <div class="frame-desc">Сияющее 24k золото</div>
-                  <div class="frame-price">
-                    <span class="shop-coin-l">L</span>
-                    <span>180 LC</span>
-                  </div>
-                </div>
-                <button type="button" class="btn-shop-action btn-frame-action" data-frame-id="gold" data-cost="180">
-                  Купить
-                </button>
-              </div>
-
-              <!-- Рамка 4: Glacier Ice -->
-              <div class="shop-frame-card" data-frame-id="ice">
-                <div class="frame-preview-box">
-                  <div class="avatar-frame-wrap frame-ice">
-                    <div class="frame-preview-avatar" id="framePreview_ice"></div>
-                  </div>
-                </div>
-                <div class="frame-card-info">
-                  <div class="frame-name"><svg class="item-title-icon ice-icon"><use href="#icon-ice"/></svg> <span>Glacier Ice</span></div>
-                  <div class="frame-desc">Ледяные морозные кристаллы</div>
-                  <div class="frame-price">
-                    <span class="shop-coin-l">L</span>
-                    <span>120 LC</span>
-                  </div>
-                </div>
-                <button type="button" class="btn-shop-action btn-frame-action" data-frame-id="ice" data-cost="120">
-                  Купить
-                </button>
-              </div>
-
-              <!-- Рамка 5: Ghost Void -->
-              <div class="shop-frame-card" data-frame-id="ghost">
-                <div class="frame-preview-box">
-                  <div class="avatar-frame-wrap frame-ghost">
-                    <div class="frame-preview-avatar" id="framePreview_ghost"></div>
-                  </div>
-                </div>
-                <div class="frame-card-info">
-                  <div class="frame-name"><svg class="item-title-icon ghost-icon"><use href="#icon-ghost"/></svg> <span>Ghost Void</span></div>
-                  <div class="frame-desc">Эфирная фиолетовая аура</div>
-                  <div class="frame-price">
-                    <span class="shop-coin-l">L</span>
-                    <span>130 LC</span>
-                  </div>
-                </div>
-                <button type="button" class="btn-shop-action btn-frame-action" data-frame-id="ghost" data-cost="130">
-                  Купить
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. РАЗДЕЛ: VIP-БУСТ АНКЕТЫ В ЧАТЕ -->
-          <div class="shop-section shop-section-boost">
-            <div class="shop-section-header">
-              <div class="shop-header-left">
-                <div class="shop-category-badge boost">
-                  <svg><use href="#icon-squad-boost"/></svg>
-                  <span>ПРОДВИЖЕНИЕ</span>
-                </div>
-                <div class="shop-section-title">VIP-Закреп анкеты в мировом чате</div>
-                <div class="shop-section-sub">Ваш сбор пати закрепляется в самом верху чата для всех игроков на 24 часа</div>
-              </div>
-            </div>
-
-            <div class="shop-boost-card">
+            <!-- VIP-Буст анкеты -->
+            <div class="shop-boost-card" style="margin-top: 20px;">
               <div class="boost-card-preview">
                 <div class="boost-preview-badge">
                   <svg><use href="#icon-badge-vip"/></svg>
@@ -2499,60 +2471,21 @@
             </div>
           </div>
 
-          <!-- 4. РАЗДЕЛ: ЭКСКЛЮЗИВНЫЕ ТЕМЫ -->
-          <div class="shop-section shop-section-themes">
-            <div class="shop-section-header">
-              <div class="shop-header-left">
-                <div class="shop-category-badge themes">
-                  <svg><use href="#icon-palette-shop"/></svg>
-                  <span>СТИЛЬ</span>
-                </div>
-                <div class="shop-section-title">Цветовые темы интерфейса</div>
-                <div class="shop-section-sub">Кастомные цветовые схемы для полного погружения</div>
-              </div>
+          <!-- Панель пагинации (переключение между страницами) -->
+          <div class="shop-pagination-bar" id="shopPaginationBar">
+            <button type="button" class="shop-page-nav-btn" id="shopPrevPageBtn" aria-label="Предыдущая страница">
+              <svg><use href="#icon-chevron-left"/></svg>
+              <span>Назад</span>
+            </button>
+            <div class="shop-page-pills" id="shopPagePills">
+              <!-- Рендерится через renderShopPagination() -->
             </div>
-
-            <div class="shop-themes-grid" id="shopThemesGrid">
-              <!-- Тема 1: Nebula -->
-              <div class="shop-theme-card" data-theme-id="nebula">
-                <div class="theme-palette-preview theme-nebula-preview"></div>
-                <div class="theme-card-info">
-                  <div class="theme-name"><svg class="item-title-icon nebula-icon"><use href="#icon-sparkles"/></svg> <span>Deep Nebula</span></div>
-                  <div class="theme-desc">Космический фиолетовый туман</div>
-                  <div class="theme-price"><span class="shop-coin-l">L</span> 80 LC</div>
-                </div>
-                <button type="button" class="btn-shop-action btn-theme-action" data-theme-id="nebula" data-cost="80">
-                  Купить
-                </button>
-              </div>
-
-              <!-- Тема 2: Crimson -->
-              <div class="shop-theme-card" data-theme-id="crimson">
-                <div class="theme-palette-preview theme-crimson-preview"></div>
-                <div class="theme-card-info">
-                  <div class="theme-name"><svg class="item-title-icon crimson-icon"><use href="#icon-flame"/></svg> <span>Crimson Red</span></div>
-                  <div class="theme-desc">Агрессивный рубиновый закат</div>
-                  <div class="theme-price"><span class="shop-coin-l">L</span> 80 LC</div>
-                </div>
-                <button type="button" class="btn-shop-action btn-theme-action" data-theme-id="crimson" data-cost="80">
-                  Купить
-                </button>
-              </div>
-
-              <!-- Тема 3: Matrix -->
-              <div class="shop-theme-card" data-theme-id="matrix">
-                <div class="theme-palette-preview theme-matrix-preview"></div>
-                <div class="theme-card-info">
-                  <div class="theme-name"><svg class="item-title-icon matrix-icon"><use href="#icon-nodes-menu"/></svg> <span>Matrix Emerald</span></div>
-                  <div class="theme-desc">Изумрудный кибернетический код</div>
-                  <div class="theme-price"><span class="shop-coin-l">L</span> 80 LC</div>
-                </div>
-                <button type="button" class="btn-shop-action btn-theme-action" data-theme-id="matrix" data-cost="80">
-                  Купить
-                </button>
-              </div>
-            </div>
+            <button type="button" class="shop-page-nav-btn" id="shopNextPageBtn" aria-label="Следующая страница">
+              <span>Вперёд</span>
+              <svg><use href="#icon-chevron-right"/></svg>
+            </button>
           </div>
+
         </div>
 
         <!-- ВКЛАДКА 3: КУПИТЬ (ПОПОЛНЕНИЕ & ПАКЕТЫ & КОНВЕРТАЦИЯ) -->
@@ -2957,6 +2890,74 @@
           <button type="button" class="btn btn-warning" id="muteSubmitBtn">
             <svg style="width:14px;height:14px;"><use href="#icon-lock"/></svg>
             Заблокировать чат
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ЖИВОГО ПРЕДОСМОТРА И ПРИМЕРКИ ТОВАРОВ МАГАЗИНА -->
+    <div class="modal-overlay modal-shop-preview-overlay" id="shopPreviewModal">
+      <div class="modal modal-shop-preview-card">
+        <button type="button" class="modal-close" id="shopPreviewCloseBtn" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        
+        <div class="preview-modal-header">
+          <div class="preview-category-badge" id="previewCatBadge">
+            <svg id="previewCatIcon"><use href="#icon-sparkles"/></svg>
+            <span id="previewCatLabel">ПРИМЕРКА ПРЕДМЕТА</span>
+          </div>
+          <h2 class="preview-item-title" id="previewItemTitle">Название предмета</h2>
+          <div class="preview-item-rarity-row">
+            <span class="item-tag-pill" id="previewItemRarityTag">Mythic</span>
+            <span class="preview-item-type-badge" id="previewItemTypeBadge">Рамка аватара</span>
+          </div>
+        </div>
+
+        <!-- Интерактивная сцена живого предосмотра на пользователе -->
+        <div class="preview-stage-container" id="previewStageContainer">
+          <div class="preview-stage-viewport" id="previewStageViewport">
+            <!-- Динамически заполняется через openShopItemPreview() -->
+          </div>
+          <div class="preview-stage-hint">
+            <svg><use href="#icon-sparkles"/></svg>
+            <span>Живой интерактивный предпросмотр на вашей анкете</span>
+          </div>
+        </div>
+
+        <!-- Быстрая панель тестирования и переключения всех предметов -->
+        <div class="preview-quick-selector-wrap" id="previewQuickSelectorWrap" style="display:none;">
+          <div class="preview-quick-selector-title">
+            <span class="preview-quick-selector-title-text" id="previewQuickSelectorTitle">⚡ Быстрое переключение и тест:</span>
+            <span class="preview-quick-selector-hint">Нажмите на любой предмет, чтобы мгновенно примерить</span>
+          </div>
+          <div class="preview-quick-selector-row" id="previewQuickSelectorRow">
+            <!-- Динамически генерируются мини-карточки всех предметов -->
+          </div>
+        </div>
+
+        <!-- Описание и параметры предмета -->
+        <div class="preview-details-box">
+          <p class="preview-item-description" id="previewItemDesc">Описание предмета</p>
+          
+          <div class="preview-finance-row">
+            <div class="preview-user-balance-pill">
+              <span class="balance-sub-label">Ваш баланс:</span>
+              <span class="balance-val-highlight"><span class="shop-coin-l">L</span> <span id="previewUserBalanceVal">0</span> LC</span>
+            </div>
+            
+            <div class="preview-price-display-box" id="previewPriceBox">
+              <!-- Рендерится цена со скидкой или обычная цена -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Панель действий -->
+        <div class="preview-modal-actions">
+          <button type="button" class="btn btn-outline preview-close-btn" id="previewCancelBtn">Назад в магазин</button>
+          <button type="button" class="btn btn-primary preview-action-btn" id="previewActionBtn">
+            <svg><use href="#icon-check-circle"/></svg>
+            <span id="previewActionBtnText">Купить</span>
           </button>
         </div>
       </div>

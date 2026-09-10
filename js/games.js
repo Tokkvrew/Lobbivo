@@ -759,6 +759,7 @@ function showUserProfileModal(username) {
 
   const isMe = AppState.currentUser === username;
   const karma = typeof RetentionEngine !== 'undefined' ? RetentionEngine.getKarma(username) : (data.karma || 0);
+  const bannerId = typeof getUserEquippedBanner === 'function' ? getUserEquippedBanner(username) : 'default';
 
   const existing = document.getElementById('userProfileModalOverlay');
   if (existing) existing.remove();
@@ -767,15 +768,16 @@ function showUserProfileModal(username) {
   overlay.id = 'userProfileModalOverlay';
   overlay.className = 'modal-overlay show';
   overlay.innerHTML = `
-    <div class="modal user-profile-modal" style="max-width: 480px;">
-      <button class="modal-close" id="closeUserModalBtn">
+    <div class="modal user-profile-modal modal-with-banner banner-${bannerId}" style="max-width: 480px; position: relative; overflow: hidden;">
+      <div class="modal-banner-header-cover banner-${bannerId}"></div>
+      <button class="modal-close" id="closeUserModalBtn" style="z-index: 10;">
         <svg><use href="#icon-close"/></svg>
       </button>
-      <h2>
+      <h2 style="position: relative; z-index: 2;">
         <svg><use href="#icon-profile"/></svg>
         Профиль игрока
       </h2>
-      <div class="modal-user-header">
+      <div class="modal-user-header" style="position: relative; z-index: 2;">
         <div class="modal-user-avatar">
           ${avatarHtml}
         </div>

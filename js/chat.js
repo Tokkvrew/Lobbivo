@@ -182,6 +182,11 @@ function toggleChat() {
 }
 
 function openChat(tab = 'world') {
+  // Закрываем меню профиля, магазин и предосмотр товаров
+  const avatarDropdown = document.getElementById('avatarDropdown');
+  if (avatarDropdown) avatarDropdown.classList.remove('open');
+  if (typeof closeCoinModal === 'function') closeCoinModal();
+  if (typeof closeShopItemPreview === 'function') closeShopItemPreview();
   const container = document.getElementById('chatContainer');
   if (!container) return;
 
@@ -196,16 +201,21 @@ function closeChat() {
   const container = document.getElementById('chatContainer');
   if (!container) return;
 
+  // Если чат уже закрыт — немедленно выходим и не запускаем анимацию
+  if (!container.classList.contains('open') && !isChatOpen) return;
+
+  container.classList.remove('open');
   container.classList.add('closing');
+  isChatOpen = false;
+  isInChat = false;
+  AppState.chatPartner = null;
+  cancelReply();
+  
+  closeUserQuickPopover();
+  updateChatBadge();
+
   setTimeout(() => {
-    container.classList.remove('open', 'closing');
-    isChatOpen = false;
-    isInChat = false;
-    AppState.chatPartner = null;
-    cancelReply();
-    
-    closeUserQuickPopover();
-    updateChatBadge();
+    container.classList.remove('closing');
   }, 240);
 }
 
@@ -687,8 +697,19 @@ function openUserQuickPopover(username) {
 
   const isPremium = isUserPremium(username);
   const frameId = getUserEquippedFrame(username);
+  const miniBg = typeof getUserEquippedMiniBg === 'function' ? getUserEquippedMiniBg(username) : 'default';
   const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
   const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" title="Администратор Lobbivo"><svg><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
+
+  // Применение анимированного фона Steam мини-профиля
+  const popoverAnimatedBg = document.getElementById('popoverAnimatedBg');
+  const popoverCard = document.getElementById('popoverCard') || popover.querySelector('.popover-card');
+  if (popoverAnimatedBg) {
+    popoverAnimatedBg.className = `popover-animated-bg mini-bg-${miniBg}`;
+  }
+  if (popoverCard) {
+    popoverCard.setAttribute('data-mini-bg', miniBg);
+  }
 
   if (nameEl) {
     nameEl.innerHTML = `<span class="${getUserNameClass(username)}">${escapeHtml(username)}</span>${isPremium ? ' <span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : ''} ${adminBadgeHtml}`;
@@ -1246,6 +1267,11 @@ function submitFirstContact() {
 function openChatWith(username) {
   if (!AppState.currentUser) return;
   if (!username || username === AppState.currentUser) return;
+
+  const avatarDropdown = document.getElementById('avatarDropdown');
+  if (avatarDropdown) avatarDropdown.classList.remove('open');
+  if (typeof closeCoinModal === 'function') closeCoinModal();
+  if (typeof closeShopItemPreview === 'function') closeShopItemPreview();
 
   // ПЛАТНЫЙ ДОСТУП В ЛС ДЛЯ CEO И МОДЕРАЦИИ
   const targetData = AppState.users ? AppState.users[username] : null;

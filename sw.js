@@ -2,7 +2,7 @@
 //  LOBBIVO SERVICE WORKER (ULTRA-RESILIENT MOBILE & PWA CACHE)
 // ============================================================
 
-const CACHE_NAME = 'lobbivo-cache-v2.9.14';
+const CACHE_NAME = 'lobbivo-cache-v2.9.16';
 const OFFLINE_URL = './index.html';
 
 const CORE_ASSETS = [

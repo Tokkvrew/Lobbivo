@@ -92,13 +92,21 @@ const DEVICE_ICONS = {
 };
 
 const FRAME_DEFINITIONS = [
-  { id: 'none', name: 'Без рамки', icon: 'icon-ban', desc: 'Стандартный профиль без эффектов', cost: 0 },
-  { id: 'ga_overlord', name: 'CEO Blood-Fire Dominator', icon: 'icon-crown', desc: 'Эксклюзив Владельца и CEO: адская плазма, багрово-золотое лезвие и корона превосходства', cost: 0, gaOnly: true },
-  { id: 'fire', name: 'Flame Fury', icon: 'icon-flame', desc: 'Пылающий неоновый огонь', cost: 120 },
-  { id: 'cyber', name: 'Cyber Neon', icon: 'icon-cyber', desc: 'Киберпанковое свечение', cost: 140 },
-  { id: 'gold', name: 'Imperial Gold', icon: 'icon-crown', desc: 'Золотой ореол императора', cost: 180 },
-  { id: 'ice', name: 'Glacier Ice', icon: 'icon-ice', desc: 'Ледяное мерцание кристалла', cost: 120 },
-  { id: 'ghost', name: 'Ghost Void', icon: 'icon-ghost', desc: 'Мистическая фиолетовая бездна', cost: 130 }
+  { id: 'none', name: 'Без рамки', icon: 'icon-ban', desc: 'Стандартный профиль без эффектов', cost: 0, tag: 'Базовый' },
+  { id: 'ga_overlord', name: 'CEO Blood-Fire Dominator', icon: 'icon-crown', desc: 'Эксклюзив Владельца и CEO: адская плазма, багрово-золотое лезвие и корона превосходства', cost: 0, gaOnly: true, tag: 'CEO EXCLUSIVE' },
+  { id: 'fire', name: 'Flame Fury', icon: 'icon-flame', desc: 'Пылающий неоновый огонь с вихрем искр', cost: 120, tag: 'Rare' },
+  { id: 'cyber', name: 'Cyber Neon', icon: 'icon-cyber', desc: 'Пульсирующий цианово-фиолетовый неон', cost: 140, tag: 'Rare' },
+  { id: 'gold', name: 'Imperial Gold', icon: 'icon-crown', desc: 'Сияющий золотой ореол 24k с лучами', cost: 180, tag: 'Epic' },
+  { id: 'ice', name: 'Glacier Frost', icon: 'icon-ice', desc: 'Ледяные морозные кристаллы и иней', cost: 120, tag: 'Rare' },
+  { id: 'ghost', name: 'Ghost Void', icon: 'icon-ghost', desc: 'Эфирная мистическая фиолетовая аура', cost: 130, tag: 'Rare' },
+  { id: 'synthwave', name: 'Synthwave Sunset', icon: 'icon-sparkles', desc: 'Градиент ретро-заката 80-х, неон маджента-оранж', cost: 250, tag: 'Epic' },
+  { id: 'toxic_matrix', name: 'Toxic Biohazard', icon: 'icon-nodes-menu', desc: 'Ядовитый кислотный неоновый пульс', cost: 350, tag: 'Epic' },
+  { id: 'plasma_storm', name: 'Plasma Thunder', icon: 'icon-bolt-fast', desc: 'Электрические разряды и фиолетовая плазма', cost: 500, tag: 'Legendary' },
+  { id: 'blood_moon', name: 'Blood Moon Eclipse', icon: 'icon-flame', desc: 'Багрово-алое затмение и рубиновый ореол', cost: 750, tag: 'Legendary' },
+  { id: 'galaxy_nebula', name: 'Galaxy Nebula', icon: 'icon-sparkles', desc: 'Глубокий космос, звездная пыль и ультрамарин', cost: 1200, tag: 'Mythic' },
+  { id: 'prism_hologram', name: 'Chroma Hologram', icon: 'icon-sparkles', desc: 'Радужная переливающаяся хрома-голограмма', cost: 2000, tag: 'Mythic' },
+  { id: 'dragon_emperor', name: 'Dragon Emperor', icon: 'icon-crown', desc: 'Драконье пламя, кружащиеся огненные угли и золотая чешуя', cost: 5000, tag: 'ULTRA MYTHIC' },
+  { id: 'quantum_singularity', name: 'Quantum Singularity', icon: 'icon-sparkles', desc: 'Горизонт событий, квантовый пространственный вихрь и хрома-плазма', cost: 10000, tag: 'CELESTIAL PRESTIGE' }
 ];
 
 const THEME_DEFINITIONS = [
@@ -107,4 +115,39 @@ const THEME_DEFINITIONS = [
   { id: 'nebula', name: 'Deep Nebula', previewClass: 'theme-nebula-preview', icon: 'icon-palette-shop', desc: 'Космический ультра-фиолет и звезды', cost: 80 },
   { id: 'crimson', name: 'Crimson Red', previewClass: 'theme-crimson-preview', icon: 'icon-flame', desc: 'Огненно-бордовый с искрами', cost: 80 },
   { id: 'matrix', name: 'Matrix Emerald', previewClass: 'theme-matrix-preview', icon: 'icon-nodes-menu', desc: 'Изумрудный кибернетический код', cost: 80 }
+];
+
+const NAME_STYLE_DEFINITIONS = [
+  { id: 'default', name: 'Стандартный', desc: 'Классический цвет никнейма', cost: 0, previewClass: 'name-style-default', tag: 'Базовый' },
+  { id: 'neon_cyan', name: 'Neon Cyber Cyan', desc: 'Электрический циановый неон', cost: 150, previewClass: 'name-style-neon-cyan', tag: 'Rare' },
+  { id: 'toxic_lime', name: 'Toxic Acid Lime', desc: 'Ядовито-зеленый кислотный градиент', cost: 200, previewClass: 'name-style-toxic-lime', tag: 'Rare' },
+  { id: 'sunset_fire', name: 'Sunset Ember Glow', desc: 'Теплый пылающий закатный градиент', cost: 300, previewClass: 'name-style-sunset-fire', tag: 'Epic' },
+  { id: 'ice_frost', name: 'Glacier Diamond Ice', desc: 'Ледяной кристаллический градиент', cost: 400, previewClass: 'name-style-ice-frost', tag: 'Epic' },
+  { id: 'royal_gold', name: 'Gilded Royal Gold', desc: 'Роскошное сияющее 24k золото', cost: 600, previewClass: 'name-style-royal-gold', tag: 'Legendary' },
+  { id: 'chroma_hologram', name: 'Hologram Prism', desc: 'Анимированный радужный перелив', cost: 1000, previewClass: 'name-style-chroma-hologram', tag: 'Legendary' },
+  { id: 'cosmic_quasar', name: 'Cosmic Quasar Nebula', desc: 'Ультра-фиолетовый квазар с мерцанием звезд', cost: 2500, previewClass: 'name-style-cosmic-quasar', tag: 'Mythic' },
+  { id: 'phoenix_flame', name: 'Phoenix Mythic Fire', desc: 'Яростное пламя феникса с живым огненным переливом', cost: 5000, previewClass: 'name-style-phoenix-flame', tag: 'ULTRA MYTHIC' },
+  { id: 'void_singularity', name: 'Void Singularity Eclipse', desc: 'Глубокая черная дыра с хроматическим ореолом', cost: 8000, previewClass: 'name-style-void-singularity', tag: 'CELESTIAL' }
+];
+
+const MINI_BG_DEFINITIONS = [
+  { id: 'default', name: 'Obsidian Cyber Stealth', desc: 'Базовый тёмно-графитовый интерфейс с матовым стеклом', cost: 0, previewClass: 'mini-bg-default', tag: 'Базовый' },
+  { id: 'retrowave_grid', name: 'Retro Neon Synthwave', desc: 'Неоновая кибер-сетка, закатный горизонт и бегущие световые волны', cost: 300, previewClass: 'mini-bg-retrowave-grid', tag: 'Epic' },
+  { id: 'cyber_rain', name: 'Neo-Tokyo Cyber Pulse', desc: 'Электрический киберпанк-дождь и неоновые световые лучи', cost: 450, previewClass: 'mini-bg-cyber-rain', tag: 'Epic' },
+  { id: 'deep_space', name: 'Cosmic Starlight Nebula', desc: 'Космическая ультрамариновая туманность и живые мерцающие звёзды', cost: 600, previewClass: 'mini-bg-deep-space', tag: 'Legendary' },
+  { id: 'glitch_matrix', name: 'Cyber Emerald Matrix', desc: 'Каскадный цифровой поток матричного кода и глитч-эффекты', cost: 800, previewClass: 'mini-bg-glitch-matrix', tag: 'Legendary' },
+  { id: 'volcanic_magma', name: 'Infernal Magma Core', desc: 'Пылающее вулканическое ядро, лавовые потоки и парящие искры', cost: 1200, previewClass: 'mini-bg-volcanic-magma', tag: 'Mythic' },
+  { id: 'aurora_borealis', name: 'Celestial Aurora Borealis', desc: 'Северное сияние с изумрудно-фиолетовыми волнами и космической пылью', cost: 2000, previewClass: 'mini-bg-aurora-borealis', tag: 'Mythic' },
+  { id: 'warp_drive', name: 'Hyperdrive Dimension Warp', desc: 'Сверхсветовой квантовый скачок сквозь пространственные туннели', cost: 4000, previewClass: 'mini-bg-warp-drive', tag: 'ULTRA MYTHIC' }
+];
+
+const BANNER_DEFINITIONS = [
+  { id: 'default', name: 'Lobbivo Titanium Carbon', desc: 'Классический карбоновый градиент с бирюзовой подсветкой', cost: 0, previewClass: 'banner-default', tag: 'Базовый' },
+  { id: 'tokyo_night', name: 'Tokyo Neon Metropolis', desc: 'Ночной неоновый мегаполис, влажный асфальт и киберпанк-свет', cost: 250, previewClass: 'banner-tokyo-night', tag: 'Epic' },
+  { id: 'synthwave_highway', name: 'Outrun 80s Horizon', desc: 'Ретро-хайвей, закатное неоновое солнце и бесконечная трасса', cost: 400, previewClass: 'banner-synthwave-highway', tag: 'Epic' },
+  { id: 'matrix_nexus', name: 'Quantum Matrix Grid', desc: 'Высокотехнологичный нейросетевой хаб и светящиеся цепи данных', cost: 600, previewClass: 'banner-matrix-nexus', tag: 'Legendary' },
+  { id: 'crimson_dragon', name: 'Crimson Dragon Forge', desc: 'Мифический драконий алтарь, багровое пламя и золотые искры', cost: 1000, previewClass: 'banner-crimson-dragon', tag: 'Legendary' },
+  { id: 'cosmic_supernova', name: 'Cosmic Supernova Burst', desc: 'Взрыв сверхновой звезды с кольцами плазмы и звездной пылью', cost: 1800, previewClass: 'banner-cosmic-supernova', tag: 'Mythic' },
+  { id: 'cyberpunk_edge', name: 'Titan Combat HUD Matrix', desc: 'Тактический боевой интерфейс с голографическими элементами', cost: 3000, previewClass: 'banner-cyberpunk-edge', tag: 'Mythic' },
+  { id: 'immortal_monarch', name: 'Immortal Celestial Zenith', desc: 'Императорский золотой трон, лучи превосходства и солнечная корона', cost: 6000, previewClass: 'banner-immortal-monarch', tag: 'CELESTIAL PRESTIGE' }
 ];

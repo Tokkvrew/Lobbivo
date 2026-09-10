@@ -167,17 +167,45 @@ function getUserEquippedFrame(username) {
   if (!user || !user.equippedFrame) return 'none';
   return user.equippedFrame;
 }
+const getUserAvatarFrame = getUserEquippedFrame;
+
+// Получение надетого стиля никнейма
+function getUserNameStyle(username) {
+  if (!username) return 'default';
+  const user = AppState.users[username];
+  if (!user || !user.nameStyle) return 'default';
+  return user.nameStyle;
+}
+
+// Получение надетого фона мини-профиля
+function getUserEquippedMiniBg(username) {
+  if (!username) return 'default';
+  const user = AppState.users[username];
+  if (!user || !user.equippedMiniBg) return 'default';
+  return user.equippedMiniBg;
+}
+
+// Получение надетой шапки / обложки профиля
+function getUserEquippedBanner(username) {
+  if (!username) return 'default';
+  const user = AppState.users[username];
+  if (!user || !user.equippedBanner) return 'default';
+  return user.equippedBanner;
+}
 
 // Получение инвентаря пользователя
 function getUserInventory(username) {
-  if (!username) return { frames: [], themes: [], boosts: 0 };
+  if (!username) return { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
   const user = AppState.users[username];
-  if (!user) return { frames: [], themes: [], boosts: 0 };
+  if (!user) return { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
   if (!user.inventory || typeof user.inventory !== 'object') {
-    user.inventory = { frames: [], themes: [], boosts: 0 };
+    user.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
   }
   if (!Array.isArray(user.inventory.frames)) user.inventory.frames = [];
   if (!Array.isArray(user.inventory.themes)) user.inventory.themes = [];
+  if (!Array.isArray(user.inventory.nameStyles)) user.inventory.nameStyles = [];
+  if (!Array.isArray(user.inventory.miniBgs)) user.inventory.miniBgs = [];
+  if (!Array.isArray(user.inventory.banners)) user.inventory.banners = [];
   return user.inventory;
 }
 
@@ -635,11 +663,16 @@ function loadUsers() {
     }
     if (typeof u.isPremium !== 'boolean') u.isPremium = false;
     if (typeof u.equippedFrame !== 'string') u.equippedFrame = 'none';
+    if (typeof u.equippedMiniBg !== 'string') u.equippedMiniBg = 'default';
+    if (typeof u.equippedBanner !== 'string') u.equippedBanner = 'default';
     if (!u.inventory || typeof u.inventory !== 'object') {
-      u.inventory = { frames: [], themes: [], boosts: 0 };
+      u.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
     }
     if (!Array.isArray(u.inventory.frames)) u.inventory.frames = [];
     if (!Array.isArray(u.inventory.themes)) u.inventory.themes = [];
+    if (!Array.isArray(u.inventory.nameStyles)) u.inventory.nameStyles = [];
+    if (!Array.isArray(u.inventory.miniBgs)) u.inventory.miniBgs = [];
+    if (!Array.isArray(u.inventory.banners)) u.inventory.banners = [];
     if (typeof u.nameStyle !== 'string') u.nameStyle = 'default';
     if (!u.chatDeletedTimestamps || typeof u.chatDeletedTimestamps !== 'object') {
       u.chatDeletedTimestamps = {};
@@ -665,11 +698,11 @@ function saveUsers(specificUser = null, immediate = false) {
   }
 }
 
-// Получение CSS-класса для стилизации и раскраски никнейма (CEO / Модераторы / Premium)
-function getUserNameClass(username) {
+// Получение CSS-класса для стилизации и раскраски никнейма (CEO / Модераторы / Косметические / Premium)
+function getUserNameClass(username, overrideStyle = null) {
   if (!username) return '';
   const user = AppState.users[username];
-  const nameStyle = user?.nameStyle || 'default';
+  const nameStyle = overrideStyle || user?.nameStyle || 'default';
 
   // 1. Стили Владельца и CEO
   if (isUserCEO(username)) {
@@ -682,7 +715,12 @@ function getUserNameClass(username) {
     if (nameStyle === 'mod_emerald') return 'name-style-mod-emerald';
   }
 
-  // 3. Стиль Premium
+  // 3. Косметические стили никнейма (из магазина/гардероба)
+  if (nameStyle && nameStyle !== 'default') {
+    return `name-style-${nameStyle}`;
+  }
+
+  // 4. Стиль Premium по умолчанию
   if (isUserPremium(username)) {
     return 'premium-author';
   }
@@ -1236,7 +1274,7 @@ function applyTheme(theme) {
   }
 
   // Обновляем активные классы на карточках тем
-  document.querySelectorAll('.theme-card, .settings-theme-card').forEach(c => {
+  document.querySelectorAll('.theme-card, .settings-theme-card, .custom-theme-card').forEach(c => {
     c.classList.toggle('active', c.dataset.theme === currentTheme || c.dataset.themeId === currentTheme);
   });
 

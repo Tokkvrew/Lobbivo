@@ -113,8 +113,11 @@ const FirebaseSync = {
               if (cloudUser.inventory) {
                 cloudUser.inventory.frames = cloudUser.inventory.frames ? (Array.isArray(cloudUser.inventory.frames) ? cloudUser.inventory.frames : Object.values(cloudUser.inventory.frames)) : [];
                 cloudUser.inventory.themes = cloudUser.inventory.themes ? (Array.isArray(cloudUser.inventory.themes) ? cloudUser.inventory.themes : Object.values(cloudUser.inventory.themes)) : [];
+                cloudUser.inventory.nameStyles = cloudUser.inventory.nameStyles ? (Array.isArray(cloudUser.inventory.nameStyles) ? cloudUser.inventory.nameStyles : Object.values(cloudUser.inventory.nameStyles)) : [];
+                cloudUser.inventory.miniBgs = cloudUser.inventory.miniBgs ? (Array.isArray(cloudUser.inventory.miniBgs) ? cloudUser.inventory.miniBgs : Object.values(cloudUser.inventory.miniBgs)) : [];
+                cloudUser.inventory.banners = cloudUser.inventory.banners ? (Array.isArray(cloudUser.inventory.banners) ? cloudUser.inventory.banners : Object.values(cloudUser.inventory.banners)) : [];
               } else {
-                cloudUser.inventory = { frames: [], themes: [] };
+                cloudUser.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
               }
 
               if (!cloudUser.privacy && localUser?.privacy) {

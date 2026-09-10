@@ -225,6 +225,13 @@ function renderProfile() {
     karmaValEl.textContent = `${userKarma}`;
   }
 
+  // Обновление шапки профиля (Hero Banner Cover)
+  const equippedBanner = getUserEquippedBanner(current) || 'default';
+  const heroBannerEl = document.getElementById('profileHeroBannerCover');
+  if (heroBannerEl) {
+    heroBannerEl.className = `profile-hero-banner-cover banner-${equippedBanner}`;
+  }
+
   // 5. Заполнение формы редактирования анкеты
   const editUsername = document.getElementById('editUsername');
   const editGame = document.getElementById('editGame');
@@ -246,7 +253,7 @@ function renderProfile() {
     initProfileEditingTags(current);
   }
 
-  // 7. Обновление кастомизации (рамок и тем)
+  // 7. Обновление кастомизации (рамок, стилей, фонов и тем)
   renderProfileCustomization();
 
   // 8. Обновление секции «Мои анкеты»
@@ -264,7 +271,10 @@ function renderProfileCustomization() {
   const current = AppState.currentUser;
   const user = current ? AppState.users[current] : null;
   const equippedFrame = current ? getUserEquippedFrame(current) : 'none';
-  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], boosts: 0 };
+  const equippedNameStyle = user?.nameStyle || 'default';
+  const equippedMiniBg = current ? getUserEquippedMiniBg(current) : 'default';
+  const equippedBanner = current ? getUserEquippedBanner(current) : 'default';
+  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
   const currentTheme = AppState.currentTheme || 'default';
 
   // 1. Обновление стенда живого предпросмотра
@@ -289,35 +299,34 @@ function renderProfileCustomization() {
   const isCEO = current && (typeof isUserCEO === 'function' ? isUserCEO(current) : (typeof isUserGA === 'function' && isUserGA(current)));
   const isMod = current && typeof isUserAdmin === 'function' && isUserAdmin(current);
 
-  // 2. Сетка рамок
+  // 2. Сетка рамок (Только купленные и базовые)
   const framesGrid = document.getElementById('profileFramesGrid');
   if (framesGrid) {
     let html = '';
-    FRAME_DEFINITIONS.forEach(frame => {
+    const ownedFrames = FRAME_DEFINITIONS.filter(frame => {
+      if (frame.id === 'none') return true;
+      if (frame.gaOnly) return isCEO || inventory.frames.includes(frame.id);
+      return inventory.frames.includes(frame.id);
+    });
+
+    ownedFrames.forEach(frame => {
       const isEquipped = equippedFrame === frame.id;
-      let isOwned = frame.id === 'none' || inventory.frames.includes(frame.id);
-      if (frame.gaOnly) {
-        isOwned = isCEO || inventory.frames.includes(frame.id);
-      }
       const activeClass = isEquipped ? ' active' : '';
 
       let btnHtml = '';
       if (isEquipped) {
         btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
-      } else if (isOwned) {
-        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipFrameFromProfile('${frame.id}')"><span>Надеть</span></button>`;
-      } else if (frame.gaOnly) {
-        btnHtml = `<div class="btn-custom-action btn-locked-ga" title="Только для CEO"><svg><use href="#icon-crown"/></svg> <span>Эксклюзив CEO</span></div>`;
       } else {
-        btnHtml = `<button type="button" class="btn-custom-action btn-buy-link" onclick="openShopForCustomization('shop')"><svg><use href="#icon-shop"/></svg> <span>В магазине (${frame.cost} LC)</span></button>`;
+        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipFrameFromProfile('${frame.id}')"><span>Надеть</span></button>`;
       }
 
       const avatarContent = (user && user.avatar) ? `<img src="${user.avatar}" alt="${escapeHtml(current)}">` : `<span>${current ? current.slice(0, 2).toUpperCase() : '?'}</span>`;
       const frameWrapClass = frame.id !== 'none' ? ` frame-${frame.id}` : '';
       const gaBadgeHtml = frame.gaOnly ? '<span class="frame-ga-pill"><svg><use href="#icon-crown"/></svg>CEO EXCLUSIVE</span>' : '';
+      const tagHtml = frame.tag ? `<span class="item-tag-pill tag-${(frame.tag || '').toLowerCase().replace(/\s+/g, '-')}">${escapeHtml(frame.tag)}</span>` : '';
 
       html += `
-        <div class="custom-frame-card${activeClass} ${frame.gaOnly ? 'ga-exclusive-card' : ''}" data-frame-id="${frame.id}">
+        <div class="custom-frame-card${activeClass} ${frame.gaOnly ? 'ga-exclusive-card' : ''}" data-frame-id="${frame.id}" onclick="equipFrameFromProfile('${frame.id}')">
           <div class="frame-preview-box">
             <div class="avatar-frame-wrap${frameWrapClass}">
               <div class="frame-preview-avatar">${avatarContent}</div>
@@ -330,30 +339,205 @@ function renderProfileCustomization() {
               ${gaBadgeHtml}
             </div>
             <div class="frame-desc">${frame.desc}</div>
+            ${tagHtml ? `<div class="frame-tag-box">${tagHtml}</div>` : ''}
           </div>
           ${btnHtml}
         </div>
       `;
     });
+
+    // Карточка для перехода в магазин
+    html += `
+      <div class="custom-frame-card custom-shop-link-card" onclick="openShopForCustomization('shop')">
+        <div class="frame-preview-box add-more-box">
+          <svg class="add-more-svg"><use href="#icon-shop"/></svg>
+        </div>
+        <div class="frame-card-info">
+          <div class="frame-name"><span>Магазин рамок</span></div>
+          <div class="frame-desc">Открыть магазин и выбрать новые анимированные рамки</div>
+        </div>
+        <button type="button" class="btn-custom-action btn-buy-link"><span>Купить ещё</span></button>
+      </div>
+    `;
+
     framesGrid.innerHTML = html;
   }
 
-  // 3. Сетка тем
+  // 3. Сетка косметических стилей никнейма (Только купленные и базовые)
+  const cosmeticNameStylesGrid = document.getElementById('profileCosmeticNameStylesGrid');
+  if (cosmeticNameStylesGrid) {
+    let html = '';
+    const ownedNameStyles = NAME_STYLE_DEFINITIONS.filter(style => {
+      if (style.id === 'default') return true;
+      return inventory.nameStyles.includes(style.id);
+    });
+
+    ownedNameStyles.forEach(style => {
+      const isEquipped = equippedNameStyle === style.id;
+      const activeClass = isEquipped ? ' active' : '';
+
+      let btnHtml = '';
+      if (isEquipped) {
+        btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
+      } else {
+        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipNameStyleFromProfile('${style.id}')"><span>Надеть</span></button>`;
+      }
+
+      html += `
+        <div class="custom-name-style-card${activeClass}" data-style-id="${style.id}" onclick="equipNameStyleFromProfile('${style.id}')">
+          <div class="name-style-preview-box">
+            <span class="preview-name-text name-style-${style.id}">${escapeHtml(current || 'Игрок')}</span>
+          </div>
+          <div class="name-style-card-info">
+            <div class="name-style-title">${style.name}</div>
+            <div class="name-style-desc">${style.desc}</div>
+            ${style.tag ? `<div class="frame-tag-box"><span class="item-tag-pill tag-${(style.tag || '').toLowerCase().replace(/\s+/g, '-')}">${escapeHtml(style.tag)}</span></div>` : ''}
+          </div>
+          ${btnHtml}
+        </div>
+      `;
+    });
+
+    html += `
+      <div class="custom-name-style-card custom-shop-link-card" onclick="openShopForCustomization('shop')">
+        <div class="name-style-preview-box add-more-box">
+          <svg class="add-more-svg"><use href="#icon-sparkles"/></svg>
+        </div>
+        <div class="name-style-card-info">
+          <div class="name-style-title">Магазин стилей ника</div>
+          <div class="name-style-desc">Выбрать неоновые и огненные градиенты</div>
+        </div>
+        <button type="button" class="btn-custom-action btn-buy-link"><span>Купить ещё</span></button>
+      </div>
+    `;
+
+    cosmeticNameStylesGrid.innerHTML = html;
+  }
+
+  // 4. Сетка анимированных фонов мини-профиля (Только купленные и базовые)
+  const miniBgsGrid = document.getElementById('profileMiniBgsGrid');
+  if (miniBgsGrid) {
+    let html = '';
+    const ownedMiniBgs = MINI_BG_DEFINITIONS.filter(bg => {
+      if (bg.id === 'default') return true;
+      return inventory.miniBgs.includes(bg.id);
+    });
+
+    ownedMiniBgs.forEach(bg => {
+      const isEquipped = equippedMiniBg === bg.id;
+      const activeClass = isEquipped ? ' active' : '';
+
+      let btnHtml = '';
+      if (isEquipped) {
+        btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
+      } else {
+        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipMiniBgFromProfile('${bg.id}')"><span>Надеть</span></button>`;
+      }
+
+      html += `
+        <div class="custom-mini-bg-card${activeClass}" data-bg-id="${bg.id}" onclick="equipMiniBgFromProfile('${bg.id}')">
+          <div class="mini-bg-preview-canvas mini-bg-${bg.id}">
+            <div class="mini-bg-preview-overlay">
+              <span class="mini-bg-preview-tag">${escapeHtml(bg.name)}</span>
+            </div>
+          </div>
+          <div class="mini-bg-card-info">
+            <div class="mini-bg-title">${bg.name}</div>
+            <div class="mini-bg-desc">${bg.desc}</div>
+            ${bg.tag ? `<div class="frame-tag-box"><span class="item-tag-pill tag-${(bg.tag || '').toLowerCase().replace(/\s+/g, '-')}">${escapeHtml(bg.tag)}</span></div>` : ''}
+          </div>
+          ${btnHtml}
+        </div>
+      `;
+    });
+
+    html += `
+      <div class="custom-mini-bg-card custom-shop-link-card" onclick="openShopForCustomization('shop')">
+        <div class="mini-bg-preview-canvas add-more-box" style="display:flex;align-items:center;justify-content:center;background:rgba(0,212,255,0.06);">
+          <svg class="add-more-svg"><use href="#icon-sparkles"/></svg>
+        </div>
+        <div class="mini-bg-card-info">
+          <div class="mini-bg-title">Магазин фонов</div>
+          <div class="mini-bg-desc">Выбрать живые анимированные фоны</div>
+        </div>
+        <button type="button" class="btn-custom-action btn-buy-link"><span>Купить ещё</span></button>
+      </div>
+    `;
+
+    miniBgsGrid.innerHTML = html;
+  }
+
+  // 5. Сетка шапок и обложек профиля (Только купленные и базовые)
+  const bannersGrid = document.getElementById('profileBannersGrid');
+  if (bannersGrid) {
+    let html = '';
+    const ownedBanners = BANNER_DEFINITIONS.filter(banner => {
+      if (banner.id === 'default') return true;
+      return inventory.banners.includes(banner.id);
+    });
+
+    ownedBanners.forEach(banner => {
+      const isEquipped = equippedBanner === banner.id;
+      const activeClass = isEquipped ? ' active' : '';
+
+      let btnHtml = '';
+      if (isEquipped) {
+        btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
+      } else {
+        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipBannerFromProfile('${banner.id}')"><span>Надеть</span></button>`;
+      }
+
+      html += `
+        <div class="custom-banner-card${activeClass}" data-banner-id="${banner.id}" onclick="equipBannerFromProfile('${banner.id}')">
+          <div class="banner-preview-box banner-${banner.id}">
+            <div class="banner-preview-overlay">
+              <span class="banner-preview-tag">${escapeHtml(banner.name)}</span>
+            </div>
+          </div>
+          <div class="banner-card-info">
+            <div class="banner-title">${banner.name}</div>
+            <div class="banner-desc">${banner.desc}</div>
+            ${banner.tag ? `<div class="frame-tag-box"><span class="item-tag-pill tag-${(banner.tag || '').toLowerCase().replace(/\s+/g, '-')}">${escapeHtml(banner.tag)}</span></div>` : ''}
+          </div>
+          ${btnHtml}
+        </div>
+      `;
+    });
+
+    html += `
+      <div class="custom-banner-card custom-shop-link-card" onclick="openShopForCustomization('shop')">
+        <div class="banner-preview-box add-more-box" style="display:flex;align-items:center;justify-content:center;background:rgba(0,212,255,0.06);">
+          <svg class="add-more-svg"><use href="#icon-game"/></svg>
+        </div>
+        <div class="banner-card-info">
+          <div class="banner-title">Магазин шапок</div>
+          <div class="banner-desc">Выбрать панорамные арты для профиля</div>
+        </div>
+        <button type="button" class="btn-custom-action btn-buy-link"><span>Купить ещё</span></button>
+      </div>
+    `;
+
+    bannersGrid.innerHTML = html;
+  }
+
+  // 6. Сетка тем (Только купленные и базовые)
   const themesGrid = document.getElementById('profileThemesGrid');
   if (themesGrid) {
     let html = '';
-    THEME_DEFINITIONS.forEach(theme => {
+    const ownedThemes = THEME_DEFINITIONS.filter(theme => {
+      if (theme.id === 'default' || theme.id === 'lobbivo') return true;
+      return inventory.themes.includes(theme.id);
+    });
+
+    ownedThemes.forEach(theme => {
       const isActive = currentTheme === theme.id;
-      const isOwned = theme.id === 'default' || theme.id === 'lobbivo' || inventory.themes.includes(theme.id);
       const activeClass = isActive ? ' active' : '';
 
       let btnHtml = '';
       if (isActive) {
         btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Активна</span></div>`;
-      } else if (isOwned) {
-        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="applyThemeFromProfile('${theme.id}')"><span>Применить</span></button>`;
       } else {
-        btnHtml = `<button type="button" class="btn-custom-action btn-buy-link" onclick="openShopForCustomization('shop')"><svg><use href="#icon-shop"/></svg> <span>В магазине (${theme.cost} LC)</span></button>`;
+        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="applyThemeFromProfile('${theme.id}')"><span>Применить</span></button>`;
       }
 
       let previewChipHtml = '';
@@ -372,7 +556,7 @@ function renderProfileCustomization() {
       }
 
       html += `
-        <div class="custom-theme-card${activeClass}" data-theme-id="${theme.id}" onclick="if('${isOwned}' === 'true') applyThemeFromProfile('${theme.id}')">
+        <div class="custom-theme-card${activeClass}" data-theme-id="${theme.id}" onclick="applyThemeFromProfile('${theme.id}')">
           <div class="theme-palette-preview ${theme.previewClass}">
             ${previewChipHtml}
           </div>
@@ -387,10 +571,24 @@ function renderProfileCustomization() {
         </div>
       `;
     });
+
+    html += `
+      <div class="custom-theme-card custom-shop-link-card" onclick="openShopForCustomization('shop')">
+        <div class="theme-palette-preview add-more-box" style="display:flex;align-items:center;justify-content:center;background:rgba(0,212,255,0.06);">
+          <svg class="add-more-svg"><use href="#icon-palette-shop"/></svg>
+        </div>
+        <div class="theme-card-info">
+          <div class="theme-name"><span>Магазин тем</span></div>
+          <div class="theme-desc">Выбрать космические и огненные темы</div>
+        </div>
+        <button type="button" class="btn-custom-action btn-buy-link"><span>Купить ещё</span></button>
+      </div>
+    `;
+
     themesGrid.innerHTML = html;
   }
 
-  // 4. Сетка стилей никнейма (для CEO и Модераторов)
+  // 7. Сетка стилей никнейма (для CEO и Модераторов)
   const nameStyleBlock = document.getElementById('adminNameStyleBlock');
   const nameStylesGrid = document.getElementById('profileNameStylesGrid');
 
@@ -446,6 +644,58 @@ function renderProfileCustomization() {
   }
 }
 
+function equipNameStyleFromProfile(styleId) {
+  const current = AppState.currentUser;
+  if (!current || !AppState.users[current]) return;
+
+  const user = AppState.users[current];
+  user.nameStyle = styleId;
+  saveUsers(current);
+
+  renderProfile();
+  renderProfileCustomization();
+  if (typeof renderWorldChat === 'function') renderWorldChat();
+  if (typeof renderPlayers === 'function') renderPlayers(AppState.selectedGameFilter);
+  if (typeof updateHeaderAvatar === 'function') updateHeaderAvatar();
+  if (typeof updateUI === 'function') updateUI();
+
+  const styleDef = NAME_STYLE_DEFINITIONS.find(s => s.id === styleId);
+  showNotification('Стиль ника изменён', styleId === 'default' ? 'Установлен стандартный цвет никнейма' : `Активирован стиль: ${styleDef?.name || styleId}`);
+}
+window.equipNameStyleFromProfile = equipNameStyleFromProfile;
+
+function equipMiniBgFromProfile(bgId) {
+  const current = AppState.currentUser;
+  if (!current || !AppState.users[current]) return;
+
+  const user = AppState.users[current];
+  user.equippedMiniBg = bgId;
+  saveUsers(current);
+
+  renderProfile();
+  renderProfileCustomization();
+
+  const bgDef = MINI_BG_DEFINITIONS.find(b => b.id === bgId);
+  showNotification('Фон мини-профиля установлен', bgId === 'default' ? 'Установлен стандартный фон' : `Активирован фон: ${bgDef?.name || bgId}`);
+}
+window.equipMiniBgFromProfile = equipMiniBgFromProfile;
+
+function equipBannerFromProfile(bannerId) {
+  const current = AppState.currentUser;
+  if (!current || !AppState.users[current]) return;
+
+  const user = AppState.users[current];
+  user.equippedBanner = bannerId;
+  saveUsers(current);
+
+  renderProfile();
+  renderProfileCustomization();
+
+  const bannerDef = BANNER_DEFINITIONS.find(b => b.id === bannerId);
+  showNotification('Шапка профиля обновлена', bannerId === 'default' ? 'Установлена стандартная шапка' : `Активирована обложка: ${bannerDef?.name || bannerId}`);
+}
+window.equipBannerFromProfile = equipBannerFromProfile;
+
 function applyNameStyleFromProfile(styleId) {
   const current = AppState.currentUser;
   if (!current || !AppState.users[current]) return;
@@ -489,6 +739,7 @@ function equipFrameFromProfile(frameId) {
   const frameDef = FRAME_DEFINITIONS.find(f => f.id === frameId);
   showNotification('Рамка установлена', frameId === 'none' ? 'Установлен стандартный аватар без рамки' : `Надета рамка: ${frameDef?.name || frameId}`);
 }
+window.equipFrameFromProfile = equipFrameFromProfile;
 
 function applyThemeFromProfile(themeId) {
   const current = AppState.currentUser;
@@ -511,6 +762,8 @@ function applyThemeFromProfile(themeId) {
     showNotification('Тема изменена', `Активирована тема: ${themeName}`);
   });
 }
+window.applyThemeFromProfile = applyThemeFromProfile;
+window.renderProfileCustomization = renderProfileCustomization;
 
 async function saveProfile() {
   if (!AppState.currentUser) return;
