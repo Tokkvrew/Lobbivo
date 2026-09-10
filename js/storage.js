@@ -853,6 +853,16 @@ function acceptFriendRequest(viewer, sender) {
   if (!uViewer.friends.includes(sender)) uViewer.friends.push(sender);
   if (!uSender.friends.includes(viewer)) uSender.friends.push(viewer);
 
+  // При принятии заявки в друзья диалог навсегда разблокируется бесплатно
+  if (!Array.isArray(uViewer.paidDmUsers)) uViewer.paidDmUsers = [];
+  if (!uViewer.paidDmUsers.includes(sender)) uViewer.paidDmUsers.push(sender);
+  if (!Array.isArray(uSender.unlockedDms)) uSender.unlockedDms = [];
+  if (!uSender.unlockedDms.includes(viewer)) uSender.unlockedDms.push(viewer);
+  if (!Array.isArray(uSender.paidDmUsers)) uSender.paidDmUsers = [];
+  if (!uSender.paidDmUsers.includes(viewer)) uSender.paidDmUsers.push(viewer);
+  if (!Array.isArray(uViewer.unlockedDms)) uViewer.unlockedDms = [];
+  if (!uViewer.unlockedDms.includes(sender)) uViewer.unlockedDms.push(sender);
+
   const updateStatus = (userObj) => {
     if (Array.isArray(userObj.friendRequests)) {
       userObj.friendRequests.forEach(r => {
@@ -887,6 +897,37 @@ function declineFriendRequest(viewer, sender) {
   updateStatus(uSender);
 
   saveUsers();
+  return true;
+}
+
+function removeFriend(user1, user2) {
+  if (!user1 || !user2) return false;
+  const u1 = AppState.users[user1];
+  const u2 = AppState.users[user2];
+  if (!u1 && !u2) return false;
+
+  if (u1 && Array.isArray(u1.friends)) {
+    u1.friends = u1.friends.filter(f => f !== user2);
+  }
+  if (u2 && Array.isArray(u2.friends)) {
+    u2.friends = u2.friends.filter(f => f !== user1);
+  }
+
+  const cleanRequests = (userObj) => {
+    if (userObj && Array.isArray(userObj.friendRequests)) {
+      userObj.friendRequests = userObj.friendRequests.filter(r => 
+        !((r.from === user1 && r.to === user2) || (r.from === user2 && r.to === user1))
+      );
+    }
+  };
+  cleanRequests(u1);
+  cleanRequests(u2);
+
+  saveUsers();
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    if (u1) FirebaseSync.saveUser(user1);
+    if (u2) FirebaseSync.saveUser(user2);
+  }
   return true;
 }
 
@@ -1001,6 +1042,33 @@ function addMessage(from, to, text, replyTo = null) {
   AppState.messages[key].push(msg);
   saveMessages();
 
+  // Если отправитель — персонал (CEO/модератор) или имеет платный ЛС,
+  // при ответе собеседнику диалог становится навсегда бесплатным для получателя
+  const uFrom = AppState.users[from];
+  const uTo = AppState.users[to];
+  if (uFrom && uTo) {
+    let usersUpdated = false;
+    if (uFrom.privacy?.dmAccess === 'coins' || (typeof isUserAdmin === 'function' && isUserAdmin(from))) {
+      if (!Array.isArray(uFrom.paidDmUsers)) uFrom.paidDmUsers = [];
+      if (!uFrom.paidDmUsers.includes(to)) {
+        uFrom.paidDmUsers.push(to);
+        usersUpdated = true;
+      }
+      if (!Array.isArray(uTo.unlockedDms)) uTo.unlockedDms = [];
+      if (!uTo.unlockedDms.includes(from)) {
+        uTo.unlockedDms.push(from);
+        usersUpdated = true;
+      }
+    }
+    if (usersUpdated) {
+      saveUsers();
+      if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+        FirebaseSync.saveUser(from, uFrom);
+        FirebaseSync.saveUser(to, uTo);
+      }
+    }
+  }
+
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     FirebaseSync.saveDirectChat(key);
   }
@@ -1053,6 +1121,9 @@ function deleteChatForSelf(currentUser, partner) {
   }
   user.chatDeletedTimestamps[partner] = Date.now();
   saveUsers(currentUser);
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    FirebaseSync.saveUser(currentUser);
+  }
   return true;
 }
 
@@ -1061,11 +1132,13 @@ function deleteChatForBoth(user1, user2) {
   if (!user1 || !user2) return false;
   const key = getMessagesKey(user1, user2);
   const oldKey = [String(user1), String(user2)].sort().join('_');
+  const directKey1 = `${user1}_${user2}`;
+  const directKey2 = `${user2}_${user1}`;
 
   delete AppState.messages[key];
-  if (AppState.messages[oldKey]) {
-    delete AppState.messages[oldKey];
-  }
+  delete AppState.messages[oldKey];
+  delete AppState.messages[directKey1];
+  delete AppState.messages[directKey2];
   saveMessages();
 
   // Очищаем метки удаления для себя у обоих участников
@@ -1083,6 +1156,10 @@ function deleteChatForBoth(user1, user2) {
     if (oldKey !== key) {
       FirebaseSync.deleteDirectChat(oldKey);
     }
+    FirebaseSync.deleteDirectChat(directKey1);
+    FirebaseSync.deleteDirectChat(directKey2);
+    FirebaseSync.saveUser(user1);
+    FirebaseSync.saveUser(user2);
   }
   return true;
 }

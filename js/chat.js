@@ -777,6 +777,21 @@ function openUserQuickPopover(username) {
     };
   }
 
+  const unfriendBtn = document.getElementById('popoverUnfriendBtn');
+  if (unfriendBtn) {
+    const isFriend = !isMe && typeof areFriends === 'function' && areFriends(AppState.currentUser, username);
+    unfriendBtn.style.display = isFriend ? 'flex' : 'none';
+    unfriendBtn.onclick = () => {
+      closeUserQuickPopover();
+      if (typeof handleRemoveFriend === 'function') {
+        handleRemoveFriend(username);
+      } else if (typeof removeFriend === 'function') {
+        removeFriend(AppState.currentUser, username);
+        showNotification('Друг удалён', `Пользователь ${username} удален из списка друзей`);
+      }
+    };
+  }
+
   popover.style.display = 'flex';
 }
 
@@ -956,6 +971,169 @@ function updateChatList() {
   });
 }
 
+function isDmUnlockedForUser(targetUser, currentUsername) {
+  if (!targetUser || !currentUsername) return true;
+  if (targetUser === currentUsername) return true;
+  // Персонал (CEO/модераторы) пишут друг другу свободно
+  if (typeof isUserAdmin === 'function' && isUserAdmin(currentUsername)) return true;
+  // Друзьям писать бесплатно
+  if (typeof areFriends === 'function' && areFriends(currentUsername, targetUser)) return true;
+
+  const targetData = AppState.users ? AppState.users[targetUser] : null;
+  if (!targetData) return true;
+
+  const dmAccess = targetData.privacy?.dmAccess || 'all';
+  if (dmAccess !== 'coins') return true;
+
+  // Проверка: целевой пользователь добавил в список оплативших / разрешенных
+  if (Array.isArray(targetData.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername)) {
+    return true;
+  }
+
+  // Проверка: текущий пользователь имеет запись о разблокировке этого стаффа
+  const currentUserData = AppState.users ? AppState.users[currentUsername] : null;
+  if (currentUserData && Array.isArray(currentUserData.unlockedDms) && currentUserData.unlockedDms.includes(targetUser)) {
+    return true;
+  }
+
+  // Проверка: стафф уже ответил в диалоге хотя бы одним сообщением
+  if (typeof getChatMessages === 'function') {
+    const msgs = getChatMessages(currentUsername, targetUser);
+    if (msgs && msgs.some(m => m.from === targetUser)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+let pendingPaidDmUser = null;
+let pendingPaidDmCost = 50;
+
+function openPaidDmModal(username, cost) {
+  pendingPaidDmUser = username;
+  pendingPaidDmCost = cost || 50;
+
+  const modal = document.getElementById('paidDmModal');
+  const avatarEl = document.getElementById('paidDmAvatar');
+  const targetNameEl = document.getElementById('paidDmTargetName');
+  const staffRoleEl = document.getElementById('paidDmStaffRole');
+  const costAmountEl = document.getElementById('paidDmCostAmount');
+  const userBalanceEl = document.getElementById('paidDmUserBalance');
+  const confirmBtn = document.getElementById('paidDmConfirmBtn');
+  const confirmBtnText = document.getElementById('paidDmConfirmBtnText');
+  const topUpBtn = document.getElementById('paidDmTopUpBtn');
+  const errorBox = document.getElementById('paidDmErrorBox');
+
+  const targetData = AppState.users ? AppState.users[username] : null;
+  const currentUserData = AppState.currentUser && AppState.users ? AppState.users[AppState.currentUser] : null;
+  const userCoins = currentUserData && typeof currentUserData.coins === 'number' ? currentUserData.coins : 0;
+
+  if (avatarEl) {
+    avatarEl.src = targetData?.avatar || 'img/avatars/user-default.png';
+  }
+  if (targetNameEl) {
+    targetNameEl.textContent = username;
+  }
+  if (staffRoleEl) {
+    if (targetData?.role === 'ceo' || targetData?.role === 'ga') {
+      staffRoleEl.textContent = 'CEO';
+    } else if (targetData?.role === 'moderator') {
+      staffRoleEl.textContent = 'Модератор';
+    } else if (targetData?.isAdmin) {
+      staffRoleEl.textContent = 'Админ';
+    } else {
+      staffRoleEl.textContent = 'VIP';
+    }
+  }
+
+  if (costAmountEl) costAmountEl.textContent = pendingPaidDmCost.toLocaleString('ru-RU');
+  if (userBalanceEl) userBalanceEl.textContent = `${userCoins.toLocaleString('ru-RU')} LC`;
+  if (confirmBtnText) confirmBtnText.textContent = `Оплатить ${pendingPaidDmCost} LC и открыть чат`;
+
+  const hasEnoughCoins = userCoins >= pendingPaidDmCost;
+  if (errorBox) errorBox.style.display = hasEnoughCoins ? 'none' : 'flex';
+  if (confirmBtn) confirmBtn.style.display = hasEnoughCoins ? 'inline-flex' : 'none';
+  if (topUpBtn) topUpBtn.style.display = hasEnoughCoins ? 'none' : 'inline-flex';
+
+  if (modal) {
+    modal.classList.add('show', 'open');
+  }
+}
+
+function closePaidDmModal() {
+  const modal = document.getElementById('paidDmModal');
+  if (modal) {
+    modal.classList.remove('show', 'open');
+  }
+  pendingPaidDmUser = null;
+}
+
+function confirmPaidDm() {
+  if (!pendingPaidDmUser || !AppState.currentUser) return;
+  const targetUser = pendingPaidDmUser;
+  const targetData = AppState.users[targetUser];
+  const currentUserData = AppState.users[AppState.currentUser];
+
+  if (!targetData || !currentUserData) return;
+
+  const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || pendingPaidDmCost || 50);
+  const userCoins = typeof currentUserData.coins === 'number' ? currentUserData.coins : 0;
+
+  if (userCoins < cost) {
+    showNotification('Недостаточно коинов', `Для открытия диалога требуется ${cost} LC. Пополните ваш баланс.`);
+    if (typeof openCoinModal === 'function') {
+      closePaidDmModal();
+      openCoinModal('shop');
+    }
+    return;
+  }
+
+  // Списание у отправителя
+  currentUserData.coins = Math.max(0, userCoins - cost);
+
+  // Начисление целевому пользователю (CEO/модератору)
+  targetData.coins = (typeof targetData.coins === 'number' ? targetData.coins : 0) + cost;
+
+  // Разблокировка в обоих профилях для надежности
+  if (!Array.isArray(targetData.paidDmUsers)) targetData.paidDmUsers = [];
+  if (!targetData.paidDmUsers.includes(AppState.currentUser)) {
+    targetData.paidDmUsers.push(AppState.currentUser);
+  }
+
+  if (!Array.isArray(currentUserData.unlockedDms)) currentUserData.unlockedDms = [];
+  if (!currentUserData.unlockedDms.includes(targetUser)) {
+    currentUserData.unlockedDms.push(targetUser);
+  }
+
+  saveUsers();
+
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    FirebaseSync.saveUser(AppState.currentUser, currentUserData);
+    FirebaseSync.saveUser(targetUser, targetData);
+  }
+
+  if (typeof updateCoinDisplay === 'function') {
+    updateCoinDisplay();
+  }
+  if (typeof renderHeaderProfile === 'function') {
+    renderHeaderProfile();
+  }
+
+  closePaidDmModal();
+  showNotification('Диалог открыт! 💎', `Списано ${cost} LC. Все дальнейшие сообщения с ${targetUser} навсегда бесплатны.`);
+
+  const isFriends = areFriends(AppState.currentUser, targetUser);
+  const msgs = getChatMessages(AppState.currentUser, targetUser);
+  const friendReq = getFriendRequest(AppState.currentUser, targetUser);
+
+  if (msgs.length === 0 && !isFriends && !friendReq) {
+    openFirstContactModal(targetUser);
+  } else {
+    openChatWith(targetUser);
+  }
+}
+
 function initiateChatWith(targetUser) {
   if (!AppState.currentUser) {
     showNotification('Требуется вход', 'Войдите в аккаунт, чтобы написать игроку');
@@ -981,6 +1159,13 @@ function initiateChatWith(targetUser) {
   const targetData = AppState.users[targetUser];
   const targetDmAccess = targetData?.privacy?.dmAccess || 'all';
   const isFriends = areFriends(AppState.currentUser, targetUser);
+
+  // ПЛАТНЫЙ ДОСТУП В ЛС ДЛЯ CEO И МОДЕРАЦИИ
+  if (targetDmAccess === 'coins' && !isDmUnlockedForUser(targetUser, AppState.currentUser)) {
+    const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || 50);
+    openPaidDmModal(targetUser, cost);
+    return;
+  }
 
   if (targetDmAccess === 'friends' && !isFriends) {
     showNotification('Приватный профиль', 'Этот пользователь принимает сообщения только от друзей. Отправьте заявку!');
@@ -1057,6 +1242,15 @@ function submitFirstContact() {
 function openChatWith(username) {
   if (!AppState.currentUser) return;
   if (!username || username === AppState.currentUser) return;
+
+  // ПЛАТНЫЙ ДОСТУП В ЛС ДЛЯ CEO И МОДЕРАЦИИ
+  const targetData = AppState.users ? AppState.users[username] : null;
+  const targetDmAccess = targetData?.privacy?.dmAccess || 'all';
+  if (targetDmAccess === 'coins' && typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(username, AppState.currentUser)) {
+    const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || 50);
+    openPaidDmModal(username, cost);
+    return;
+  }
 
   AppState.chatPartner = username;
   isInChat = true;
@@ -1547,8 +1741,25 @@ function renderPrivacySettings() {
   const access = user.privacy?.dmAccess || 'all';
   const radioAll = document.getElementById('privacyDmAll');
   const radioFriends = document.getElementById('privacyDmFriends');
+  const radioCoins = document.getElementById('privacyDmCoins');
+  const coinsItem = document.getElementById('privacyDmCoinsItem');
+  const costBlock = document.getElementById('dmCoinsCostBlock');
+  const costInput = document.getElementById('dmCoinsCostInput');
+
   if (radioAll) radioAll.checked = access === 'all';
   if (radioFriends) radioFriends.checked = access === 'friends';
+  if (radioCoins) radioCoins.checked = access === 'coins';
+
+  const isStaff = typeof isUserAdmin === 'function' && isUserAdmin(AppState.currentUser);
+  if (coinsItem) {
+    coinsItem.style.display = isStaff ? 'flex' : 'none';
+  }
+  if (costBlock) {
+    costBlock.style.display = (isStaff && access === 'coins') ? 'block' : 'none';
+  }
+  if (costInput) {
+    costInput.value = user.privacy?.dmCost || 50;
+  }
 
   const censorshipToggle = document.getElementById('chatCensorshipToggle');
   if (censorshipToggle) {

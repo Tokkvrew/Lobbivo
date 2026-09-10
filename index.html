@@ -1026,9 +1026,23 @@
               <!-- Рендерится через renderProfileCustomization() -->
             </div>
           </div>
+        <!-- 3. СЕКЦИЯ: МОИ ДРУЗЬЯ (СПИСОК ДРУЗЕЙ) -->
+        <div class="profile-unified-section" id="profileFriendsSection" style="margin-top: 24px;">
+          <div class="unified-section-header">
+            <div class="unified-section-title">
+              <svg><use href="#icon-users"/></svg>
+              <span>Мои друзья</span>
+              <span class="friends-counter-badge" id="profileFriendsCounter">0</span>
+            </div>
+            <div class="unified-section-sub">Список игроков в вашем френдлисте. Нажмите «Чат», чтобы написать, или удалите из друзей.</div>
+          </div>
+
+          <div class="profile-friends-container" id="profileFriendsList">
+            <!-- Рендерится через renderProfileFriends() -->
+          </div>
         </div>
 
-        <!-- 3. СЕКЦИЯ: НАСТРОЙКИ АНКЕТЫ И ПЕРСОНАЛЬНЫЕ ДАННЫЕ -->
+        <!-- 4. СЕКЦИЯ: НАСТРОЙКИ АНКЕТЫ И ПЕРСОНАЛЬНЫЕ ДАННЫЕ -->
         <div class="profile-unified-section" style="margin-top: 24px;">
           <div class="unified-section-header">
             <div class="unified-section-title">
@@ -1266,6 +1280,39 @@
                     <span>Новые игроки могут отправить 1 сообщение вместе с заявкой в друзья</span>
                   </div>
                 </label>
+                <!-- ПЛАТНЫЙ ДОСТУП: ДЛЯ CEO И МОДЕРАЦИИ -->
+                <label class="privacy-radio-item privacy-radio-coins" id="privacyDmCoinsItem" style="display: none;">
+                  <input type="radio" name="dmPrivacy" value="coins" id="privacyDmCoins">
+                  <span class="privacy-radio-custom"></span>
+                  <div class="privacy-radio-info">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                      <strong>СМС за коины (Платный доступ)</strong>
+                      <span class="staff-monetize-badge"><svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><use href="#icon-coins"/></svg>VIP / Стафф</span>
+                    </div>
+                    <span>Игроки платят коины за первое сообщение. Если вы ответите или примете заявку в друзья — все последующие сообщения бесплатны.</span>
+                  </div>
+                </label>
+              </div>
+
+              <!-- БЛОК НАСТРОЙКИ СТОИМОСТИ ДИАЛОГА -->
+              <div class="dm-coins-cost-block" id="dmCoinsCostBlock" style="display: none;">
+                <div class="dm-coins-cost-header">
+                  <div class="dm-coins-cost-title">
+                    <svg style="width:16px;height:16px;color:var(--neon-gold, #ffb800);"><use href="#icon-coins"/></svg>
+                    <span>Стоимость обращения в ЛС:</span>
+                  </div>
+                  <span class="dm-coins-cost-hint">Коины поступят напрямую на ваш баланс при открытии диалога</span>
+                </div>
+                <div class="dm-coins-cost-input-row">
+                  <div class="cyber-input-wrapper dm-coins-input-wrap">
+                    <input type="number" id="dmCoinsCostInput" min="1" max="10000" step="1" value="50" placeholder="50">
+                    <span class="dm-coins-suffix">LC</span>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-primary" id="saveDmCoinsCostBtn">
+                    <svg style="width:14px;height:14px;"><use href="#icon-check"/></svg>
+                    <span>Сохранить</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1531,6 +1578,10 @@
               <svg><use href="#icon-flag"/></svg>
               <span id="popoverBlockText">В чёрный список</span>
             </button>
+            <button type="button" class="btn-popover-action btn-popover-unfriend" id="popoverUnfriendBtn" style="display:none;">
+              <svg><use href="#icon-trash"/></svg>
+              <span>Удалить из друзей</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1563,6 +1614,71 @@
           <button type="button" class="btn btn-primary" id="firstContactSendBtn">
             <svg><use href="#icon-send"/></svg>
             <span>Отправить заявку</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА ПЛАТНОГО ДОСТУПА К ЛС (СМС ЗА КОИНЫ) -->
+    <div class="modal-overlay" id="paidDmModal">
+      <div class="modal paid-dm-modal-glass">
+        <button class="modal-close" id="paidDmModalClose" title="Закрыть">
+          <svg><use href="#icon-close"/></svg>
+        </button>
+        <div class="paid-dm-header">
+          <div class="paid-dm-avatar-wrap">
+            <img src="img/avatars/user-default.png" alt="Avatar" class="paid-dm-avatar" id="paidDmAvatar">
+            <div class="paid-dm-staff-pill" id="paidDmStaffPill">
+              <svg style="width:12px;height:12px;"><use href="#icon-admin-shield"/></svg>
+              <span id="paidDmStaffRole">CEO</span>
+            </div>
+          </div>
+          <div class="paid-dm-title-box">
+            <h3 id="paidDmTargetName">Имя пользователя</h3>
+            <span class="paid-dm-sub">Платное обращение в Личные Сообщения</span>
+          </div>
+        </div>
+
+        <div class="paid-dm-body">
+          <div class="paid-dm-info-card">
+            <div class="paid-dm-cost-row">
+              <span class="paid-dm-cost-label">Стоимость открытия диалога:</span>
+              <div class="paid-dm-cost-val">
+                <span class="paid-dm-cost-amount" id="paidDmCostAmount">50</span>
+                <span class="paid-dm-cost-unit">LC</span>
+              </div>
+            </div>
+            <div class="paid-dm-balance-row">
+              <span class="paid-dm-balance-label">Ваш текущий баланс:</span>
+              <span class="paid-dm-balance-val" id="paidDmUserBalance">0 LC</span>
+            </div>
+          </div>
+
+          <div class="paid-dm-notice">
+            <div class="paid-dm-notice-icon">
+              <svg style="width:18px;height:18px;"><use href="#icon-shield"/></svg>
+            </div>
+            <div class="paid-dm-notice-text">
+              <strong>Гарантия бесплатного общения:</strong>
+              <span>Оплата списывается единоразово за открытие диалога. После оплаты или если администратор ответит / примет заявку в друзья — все последующие сообщения навсегда <b>бесплатны</b>.</span>
+            </div>
+          </div>
+
+          <div class="paid-dm-error-box" id="paidDmErrorBox" style="display:none;">
+            <svg style="width:16px;height:16px;flex-shrink:0;"><use href="#icon-alert"/></svg>
+            <span>Недостаточно коинов на балансе для открытия диалога.</span>
+          </div>
+        </div>
+
+        <div class="paid-dm-actions">
+          <button type="button" class="btn btn-outline" id="paidDmCancelBtn">Отмена</button>
+          <button type="button" class="btn btn-primary btn-paid-dm-confirm" id="paidDmConfirmBtn">
+            <svg style="width:16px;height:16px;"><use href="#icon-coins"/></svg>
+            <span id="paidDmConfirmBtnText">Оплатить 50 LC и открыть чат</span>
+          </button>
+          <button type="button" class="btn btn-primary" id="paidDmTopUpBtn" style="display:none;">
+            <svg style="width:16px;height:16px;"><use href="#icon-plus"/></svg>
+            <span>Пополнить баланс</span>
           </button>
         </div>
       </div>

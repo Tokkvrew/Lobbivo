@@ -205,12 +205,26 @@ const FirebaseSync = {
         const incomingPushQueue = [];
 
         if (data && typeof data === 'object') {
+          // Очищаем из AppState.messages все ключи, которые были удалены в облаке (удаление у обоих)
+          const cloudKeys = new Set(Object.keys(data));
+          for (const localKey of Object.keys(AppState.messages)) {
+            if (!cloudKeys.has(localKey)) {
+              delete AppState.messages[localKey];
+            }
+          }
+
           for (const key of Object.keys(data)) {
-            if (key && data[key] && Array.isArray(data[key].messages)) {
-              AppState.messages[key] = data[key].messages;
+            if (key && data[key]) {
+              let msgs = [];
+              if (Array.isArray(data[key].messages)) {
+                msgs = data[key].messages;
+              } else if (typeof data[key].messages === 'object' && data[key].messages !== null) {
+                msgs = Object.values(data[key].messages);
+              }
+              AppState.messages[key] = msgs;
 
               // Отслеживаем новые сообщения для отправки Push-уведомлений
-              for (const msg of data[key].messages) {
+              for (const msg of msgs) {
                 const uniqueKey = msg.id || `${key}_${msg.time}_${msg.text}`;
                 if (!_seenDirectMsgKeys.has(uniqueKey)) {
                   _seenDirectMsgKeys.add(uniqueKey);
@@ -249,6 +263,17 @@ const FirebaseSync = {
             }
           }
 
+          if (typeof updateChatList === 'function') updateChatList();
+          if (typeof updateChatBadge === 'function') updateChatBadge();
+          if (typeof renderChatMessages === 'function' && AppState.chatPartner) {
+            renderChatMessages();
+          }
+        } else {
+          // Если в облаке нет сообщений вообще
+          AppState.messages = {};
+          try {
+            localStorage.setItem('squad_messages', JSON.stringify(AppState.messages));
+          } catch (e) {}
           if (typeof updateChatList === 'function') updateChatList();
           if (typeof updateChatBadge === 'function') updateChatBadge();
           if (typeof renderChatMessages === 'function' && AppState.chatPartner) {

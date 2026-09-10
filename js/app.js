@@ -1441,6 +1441,12 @@ function init() {
         openCoinModal('earn');
       } else if (action === 'profile' || action === 'customization') {
         showProfile();
+      } else if (action === 'friends') {
+        showProfile();
+        setTimeout(() => {
+          const el = document.getElementById('profileFriendsSection');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
       } else if (action === 'settings') {
         if (typeof showSettings === 'function') {
           showSettings();
@@ -1664,9 +1670,37 @@ function init() {
     if (e.target === this) closeDeleteChatModal();
   });
 
+  // Модалка платного обращения (СМС за коины)
+  document.getElementById('paidDmModalClose')?.addEventListener('click', closePaidDmModal);
+  document.getElementById('paidDmCancelBtn')?.addEventListener('click', closePaidDmModal);
+  document.getElementById('paidDmConfirmBtn')?.addEventListener('click', confirmPaidDm);
+  document.getElementById('paidDmModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closePaidDmModal();
+  });
+
   // Принятие / отклонение заявки в друзья
   document.getElementById('btnAcceptFriendReq')?.addEventListener('click', handleAcceptFriendReq);
   document.getElementById('btnDeclineFriendReq')?.addEventListener('click', handleDeclineFriendReq);
+
+  // Сохранение стоимости платного сообщения (СМС за коины)
+  document.getElementById('saveDmCoinsCostBtn')?.addEventListener('click', function() {
+    if (!AppState.currentUser || !AppState.users[AppState.currentUser]) return;
+    const input = document.getElementById('dmCoinsCostInput');
+    let val = parseInt(input ? input.value : 50, 10);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 10000) val = 10000;
+    if (input) input.value = val;
+
+    if (!AppState.users[AppState.currentUser].privacy) {
+      AppState.users[AppState.currentUser].privacy = {};
+    }
+    AppState.users[AppState.currentUser].privacy.dmCost = val;
+    saveUsers();
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+      FirebaseSync.saveUser(AppState.currentUser, AppState.users[AppState.currentUser]);
+    }
+    showNotification('Стоимость сохранена', `Стоимость платного обращения в ЛС установлена: ${val} LC`);
+  });
 
   // Настройки приватности (кто может писать в ЛС)
   document.querySelectorAll('input[name="dmPrivacy"]').forEach(radio => {
@@ -1676,14 +1710,27 @@ function init() {
           AppState.users[AppState.currentUser].privacy = {};
         }
         AppState.users[AppState.currentUser].privacy.dmAccess = this.value;
+
+        const costBlock = document.getElementById('dmCoinsCostBlock');
+        if (costBlock) {
+          const isStaff = typeof isUserAdmin === 'function' && isUserAdmin(AppState.currentUser);
+          costBlock.style.display = (isStaff && this.value === 'coins') ? 'block' : 'none';
+        }
+
         saveUsers();
         if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
           FirebaseSync.saveUser(AppState.currentUser, AppState.users[AppState.currentUser]);
         }
-        showNotification(
-          'Приватность обновлена',
-          this.value === 'all' ? 'Теперь вам могут писать все пользователи' : 'Теперь писать в ЛС могут только друзья'
-        );
+
+        let msg = 'Теперь вам могут писать все пользователи';
+        if (this.value === 'friends') {
+          msg = 'Теперь писать в ЛС могут только друзья';
+        } else if (this.value === 'coins') {
+          const cost = AppState.users[AppState.currentUser].privacy.dmCost || 50;
+          msg = `Включен платный доступ: ${cost} LC за первое обращение`;
+        }
+
+        showNotification('Приватность обновлена', msg);
       }
     });
   });
@@ -1897,6 +1944,7 @@ function init() {
       if (typeof closeBanModal === 'function') closeBanModal();
       if (typeof closeMuteModal === 'function') closeMuteModal();
       if (typeof closeFirstContactModal === 'function') closeFirstContactModal();
+      if (typeof closePaidDmModal === 'function') closePaidDmModal();
       if (typeof closeUserQuickPopover === 'function') closeUserQuickPopover();
       document.getElementById('userProfileModalOverlay')?.remove();
       document.getElementById('avatarDropdown')?.classList.remove('open');
@@ -1980,6 +2028,9 @@ function init() {
         if (privacyPanel) {
           privacyPanel.classList.add('active');
           privacyPanel.style.display = 'block';
+        }
+        if (typeof renderPrivacySettings === 'function') {
+          renderPrivacySettings();
         }
       }
     });
