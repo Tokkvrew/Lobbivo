@@ -457,14 +457,39 @@
   .filter-bar {
     width: 100%;
     display: flex;
-    gap: 8px;
+    gap: 6px;
+    flex-wrap: nowrap;
   }
 
   .filter-bar .btn {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     justify-content: center;
-    padding: 9px 12px;
-    font-size: 0.85rem;
+    padding: 8px 6px;
+    font-size: 0.76rem;
+    gap: 4px;
+    white-space: nowrap;
+    letter-spacing: -0.2px;
+  }
+
+  .filter-bar .btn svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  .filter-bar .btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.2;
+  }
+
+  #createSquadBtn {
+    font-size: 0.74rem;
+    padding: 8px 4px;
+    letter-spacing: -0.35px;
   }
 
   .players-grid {
@@ -1140,6 +1165,28 @@
 
   .game-picker-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .filter-bar {
+    gap: 4px;
+  }
+
+  .filter-bar .btn {
+    padding: 7px 3px;
+    font-size: 0.70rem;
+    gap: 3px;
+    letter-spacing: -0.3px;
+  }
+
+  .filter-bar .btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  #createSquadBtn {
+    font-size: 0.68rem;
+    padding: 7px 2px;
+    letter-spacing: -0.4px;
   }
 
   /* Шапка-капсула и кнопка профиля для iPhone и компактных смартфонов */
