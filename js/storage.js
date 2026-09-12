@@ -643,6 +643,9 @@ function loadUsers() {
     if (u.squads.length > 0) {
       u.lookingForTeam = u.squads.some(s => s && s.active !== false);
       u.hasCreatedSquad = true;
+    } else {
+      u.lookingForTeam = false;
+      u.hasCreatedSquad = false;
     }
 
     if (typeof u.coins !== 'number') u.coins = 0;
@@ -658,9 +661,7 @@ function loadUsers() {
     if (!Array.isArray(u.contactedTeammates)) {
       u.contactedTeammates = [];
     }
-    if (typeof u.hasCreatedSquad !== 'boolean') {
-      u.hasCreatedSquad = Boolean(u.lookingForTeam || (u.squads && u.squads.length > 0));
-    }
+    u.hasCreatedSquad = Boolean(u.squads && u.squads.length > 0);
     if (typeof u.isPremium !== 'boolean') u.isPremium = false;
     if (typeof u.equippedFrame !== 'string') u.equippedFrame = 'none';
     if (typeof u.equippedMiniBg !== 'string') u.equippedMiniBg = 'default';

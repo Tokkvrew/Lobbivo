@@ -21,7 +21,8 @@ function _computeUsersFingerprint(usersObj) {
     const k = keys[i];
     const u = usersObj[k];
     if (!u) continue;
-    fp += `${k}:${u.avatar || ''}:${u.frame || ''}:${u.coins || 0}:${u.game || ''}:${u.nameStyle || ''}:${u.banned ? 1 : 0}:${u.isMuted ? 1 : 0}:${(u.squads || []).length}:${(u.customTags || []).join(',')};`;
+    const squadListStr = Array.isArray(u.squads) ? u.squads.map(s => `${s.id || ''}:${s.game || ''}:${s.active !== false ? 1 : 0}:${s.updatedAt || ''}`).join(',') : '';
+    fp += `${k}:${u.avatar || ''}:${u.frame || ''}:${u.coins || 0}:${u.game || ''}:${u.nameStyle || ''}:${u.banned ? 1 : 0}:${u.isMuted ? 1 : 0}:${u.lookingForTeam ? 1 : 0}:${squadListStr}:${(u.customTags || []).join(',')};`;
   }
   return fp;
 }
@@ -92,16 +93,13 @@ const FirebaseSync = {
                   cloudUser.squads = [];
                 }
               } else {
-                // Если в облаке нет поля squads, но локально у пользователя были анкеты, сохраняем локальные
-                cloudUser.squads = (AppState.users[username] && Array.isArray(AppState.users[username].squads))
-                  ? AppState.users[username].squads
-                  : [];
+                // Если в облаке нет поля squads (потому что массив squads был очищен/удален),
+                // то squads ДОЛЖЕН БЫТЬ ПУСТЫМ МАССИВОМ [], а НЕ восстанавливаться из старого локального кэша!
+                cloudUser.squads = [];
               }
 
-              if (cloudUser.squads.length > 0) {
-                cloudUser.lookingForTeam = cloudUser.squads.some(s => s && s.active !== false);
-                cloudUser.hasCreatedSquad = true;
-              }
+              cloudUser.lookingForTeam = cloudUser.squads.length > 0 && cloudUser.squads.some(s => s && s.active !== false);
+              cloudUser.hasCreatedSquad = cloudUser.squads.length > 0;
 
               cloudUser.friends = cloudUser.friends ? (Array.isArray(cloudUser.friends) ? cloudUser.friends : Object.values(cloudUser.friends)) : [];
               cloudUser.blockedUsers = cloudUser.blockedUsers ? (Array.isArray(cloudUser.blockedUsers) ? cloudUser.blockedUsers : Object.values(cloudUser.blockedUsers)) : [];
@@ -114,18 +112,17 @@ const FirebaseSync = {
                 cloudUser.inventory.frames = cloudUser.inventory.frames ? (Array.isArray(cloudUser.inventory.frames) ? cloudUser.inventory.frames : Object.values(cloudUser.inventory.frames)) : [];
                 cloudUser.inventory.themes = cloudUser.inventory.themes ? (Array.isArray(cloudUser.inventory.themes) ? cloudUser.inventory.themes : Object.values(cloudUser.inventory.themes)) : [];
                 cloudUser.inventory.nameStyles = cloudUser.inventory.nameStyles ? (Array.isArray(cloudUser.inventory.nameStyles) ? cloudUser.inventory.nameStyles : Object.values(cloudUser.inventory.nameStyles)) : [];
-                cloudUser.inventory.miniBgs = cloudUser.inventory.miniBgs ? (Array.isArray(cloudUser.inventory.miniBgs) ? cloudUser.inventory.miniBgs : Object.values(cloudUser.inventory.miniBgs)) : [];
                 cloudUser.inventory.banners = cloudUser.inventory.banners ? (Array.isArray(cloudUser.inventory.banners) ? cloudUser.inventory.banners : Object.values(cloudUser.inventory.banners)) : [];
               } else {
-                cloudUser.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
+                cloudUser.inventory = { frames: [], themes: [], nameStyles: [], banners: [], boosts: 0 };
               }
 
+              const localUser = AppState.users[username];
               if (!cloudUser.privacy && localUser?.privacy) {
                 cloudUser.privacy = localUser.privacy;
               }
 
               // Защита локального аватара и данных активного пользователя от отката назад старыми пакетами
-              const localUser = AppState.users[username];
               if (localUser && username === AppState.currentUser) {
                 const localAvatarTs = Number(localUser.avatarUpdatedAt || localUser.updatedAt || 0);
                 const cloudAvatarTs = Number(cloudUser.avatarUpdatedAt || cloudUser.updatedAt || 0);
@@ -145,6 +142,9 @@ const FirebaseSync = {
                 AppState.users[username] = {
                   ...localUser,
                   ...cloudUser,
+                  squads: cloudUser.squads,
+                  lookingForTeam: cloudUser.lookingForTeam,
+                  hasCreatedSquad: cloudUser.hasCreatedSquad,
                   friends: cloudUser.friends,
                   blockedUsers: cloudUser.blockedUsers,
                   friendRequests: cloudUser.friendRequests,
@@ -158,6 +158,9 @@ const FirebaseSync = {
                 AppState.users[username] = {
                   ...localUser,
                   ...cloudUser,
+                  squads: cloudUser.squads,
+                  lookingForTeam: cloudUser.lookingForTeam,
+                  hasCreatedSquad: cloudUser.hasCreatedSquad,
                   friends: cloudUser.friends,
                   blockedUsers: cloudUser.blockedUsers,
                   friendRequests: cloudUser.friendRequests,
@@ -458,6 +461,9 @@ const FirebaseSync = {
         if (payload.squads.length > 0) {
           payload.lookingForTeam = payload.squads.some(s => s && s.active !== false);
           payload.hasCreatedSquad = true;
+        } else {
+          payload.lookingForTeam = false;
+          payload.hasCreatedSquad = false;
         }
         this.rtdb.ref('users/' + username).set(payload)
           .catch(err => console.warn('Cloud save user error:', err.message));

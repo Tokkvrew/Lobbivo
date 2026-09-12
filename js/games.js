@@ -168,12 +168,11 @@ function updateGameCounts() {
     let count = 0;
     for (const [uname, user] of Object.entries(AppState.users)) {
       if (!user) continue;
-      if (Array.isArray(user.squads) && user.squads.length > 0) {
-        if (user.squads.some(s => s && s.active !== false && s.game === game.id)) {
+      const squads = getUserSquads(uname);
+      if (squads.length > 0) {
+        if (squads.some(s => s && s.active !== false && s.game === game.id)) {
           count++;
         }
-      } else if (user.game === game.id && user.lookingForTeam) {
-        count++;
       }
     }
     const el = document.getElementById(`gameCount_${game.id}`);
@@ -422,17 +421,22 @@ function deleteSquad(squadId) {
   if (!user) return;
 
   if (Array.isArray(user.squads)) {
-    user.squads = user.squads.filter(s => s.id !== squadId);
-    user.lookingForTeam = user.squads.some(s => s.active !== false);
-    user.hasCreatedSquad = user.squads.length > 0;
-    if (user.squads.length > 0) {
-      user.game = user.squads[0].game || user.game;
-    }
+    user.squads = user.squads.filter(s => s && s.id !== squadId);
   } else {
     user.squads = [];
-    user.lookingForTeam = false;
-    user.hasCreatedSquad = false;
   }
+
+  // Если удалялся fallback-id ('sq_' + user.id или 'sq_' + username) или squads теперь пуст
+  if (squadId.startsWith('sq_' + (user.id || AppState.currentUser)) || user.squads.length === 0) {
+    user.squads = [];
+  }
+
+  user.lookingForTeam = user.squads.length > 0 && user.squads.some(s => s && s.active !== false);
+  user.hasCreatedSquad = user.squads.length > 0;
+  if (user.squads.length > 0) {
+    user.game = user.squads[0].game || user.game;
+  }
+  user.updatedAt = Date.now();
 
   saveUsers(AppState.currentUser, true);
   if (typeof renderMySquads === 'function') renderMySquads();
@@ -451,6 +455,7 @@ function renderPlayers(gameFilter = 'all') {
   const squadCards = [];
 
   for (const [username, user] of Object.entries(AppState.users)) {
+    if (!user) continue;
     const isMe = (username === current);
     const squads = getUserSquads(username);
 
@@ -465,21 +470,6 @@ function renderPlayers(gameFilter = 'all') {
           squad: sq,
           isMe
         });
-      });
-    } else if (user.lookingForTeam) {
-      if (gameFilter && gameFilter !== 'all' && user.game !== gameFilter) return;
-      squadCards.push({
-        username,
-        userData: user,
-        squad: {
-          id: 'sq_' + (user.id || username),
-          game: user.game || 'csgo',
-          rank: user.rank || '',
-          device: user.device || 'PC',
-          desc: user.desc || '',
-          createdAt: user.created || Date.now()
-        },
-        isMe
       });
     }
   }
