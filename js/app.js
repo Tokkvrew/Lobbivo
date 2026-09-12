@@ -618,7 +618,6 @@ function renderShopItems() {
   const catMeta = {
     frames: { title: 'Рамки для аватарок', desc: 'Уникальные анимированные эффекты вокруг вашей аватарки во всех чатах и анкетах', badge: 'ГАРДЕРОБ', icon: '#icon-frame' },
     name_styles: { title: 'Стили и цвета никнейма', desc: 'Косметическая раскраска, градиенты и неоновые переливы вашего никнейма', badge: 'СТИЛЬ НИКА', icon: '#icon-sparkles' },
-    mini_bgs: { title: 'Анимированные фоны мини-профиля', desc: 'Живые динамические фоны быстрой карточки профиля при клике на игрока в чате', badge: 'ЖИВЫЕ ФОНЫ', icon: '#icon-sparkles' },
     banners: { title: 'Шапки и обложки профиля', desc: 'Панорамный арт в шапке вашего полного профиля игрока', badge: 'ШАПКА', icon: '#icon-game' },
     themes: { title: 'Темы оформления сайта', desc: 'Глубокая трансформация цветовой схемы интерфейса, космических туманностей и частиц', badge: 'ТЕМЫ', icon: '#icon-palette-shop' },
     premium: { title: 'Lobbivo Premium & VIP Буст', desc: 'Максимальный VIP статус, анимированные GIF-аватарки, корона и закреп анкеты', badge: 'VIP СТАТУС', icon: '#icon-crown' }
@@ -694,8 +693,6 @@ function renderShopItems() {
     itemsList = FRAME_DEFINITIONS.filter(f => !f.gaOnly && f.id !== 'none');
   } else if (shopState.category === 'name_styles') {
     itemsList = NAME_STYLE_DEFINITIONS.filter(s => s.id !== 'default');
-  } else if (shopState.category === 'mini_bgs') {
-    itemsList = MINI_BG_DEFINITIONS.filter(b => b.id !== 'default');
   } else if (shopState.category === 'themes') {
     itemsList = THEME_DEFINITIONS.filter(t => t.id !== 'default' && t.id !== 'lobbivo');
   }
@@ -712,8 +709,6 @@ function renderShopItems() {
       isOwned = inventory.frames.includes(item.id);
     } else if (shopState.category === 'name_styles') {
       isOwned = inventory.nameStyles.includes(item.id);
-    } else if (shopState.category === 'mini_bgs') {
-      isOwned = inventory.miniBgs.includes(item.id);
     } else if (shopState.category === 'themes') {
       isOwned = inventory.themes.includes(item.id);
     }
@@ -738,15 +733,13 @@ function renderShopItems() {
     const badgeRow = `<div class="shop-card-badge-row">${tagBadge}<span class="shop-card-try-hint"><svg style="width:11px;height:11px;fill:currentColor;"><use href="#icon-sparkles"/></svg><span>Примерить</span></span></div>`;
 
     let buyOrEquipBtnHtml = '';
-    const itemType = shopState.category === 'frames' ? 'frame' : (shopState.category === 'name_styles' ? 'name_style' : (shopState.category === 'mini_bgs' ? 'mini_bg' : 'theme'));
+    const itemType = shopState.category === 'frames' ? 'frame' : (shopState.category === 'name_styles' ? 'name_style' : 'theme');
 
     let isItemEquipped = false;
     if (shopState.category === 'frames') {
       isItemEquipped = getUserAvatarFrame(current) === item.id;
     } else if (shopState.category === 'name_styles') {
       isItemEquipped = getUserNameStyle(current) === item.id;
-    } else if (shopState.category === 'mini_bgs') {
-      isItemEquipped = getUserEquippedMiniBg(current) === item.id;
     } else if (shopState.category === 'themes') {
       isItemEquipped = (AppState.currentTheme || localStorage.getItem('squad_theme') || 'default') === item.id;
     }
@@ -814,23 +807,7 @@ function renderShopItems() {
           ${actionsRowHtml}
         </div>
       `;
-    } else if (shopState.category === 'mini_bgs') {
-      gridHtml += `
-        <div class="shop-item-card shop-mini-bg-card-pro" data-id="${item.id}" onclick="openShopItemPreview('mini_bgs', '${item.id}')" title="Нажмите для примерки">
-          ${badgeRow}
-          <div class="mini-bg-preview-canvas mini-bg-${item.id}">
-            <div class="mini-bg-preview-overlay">
-              <span class="mini-bg-preview-tag">${escapeHtml(item.name)}</span>
-            </div>
-          </div>
-          <div class="frame-card-info">
-            <div class="frame-name"><svg class="item-title-icon"><use href="#icon-sparkles"/></svg> <span>${escapeHtml(item.name)}</span></div>
-            <div class="frame-desc">${escapeHtml(item.desc)}</div>
-            ${priceHtml}
-          </div>
-          ${actionsRowHtml}
-        </div>
-      `;
+
     } else if (shopState.category === 'themes') {
       let previewChipHtml = '';
       if (item.id === 'nebula') {
@@ -882,8 +859,6 @@ function equipItemFromShop(category, itemId) {
     user.equippedFrame = itemId;
   } else if (category === 'name_styles') {
     user.nameStyle = itemId;
-  } else if (category === 'mini_bgs') {
-    user.equippedMiniBg = itemId;
   } else if (category === 'banners') {
     user.equippedBanner = itemId;
   } else if (category === 'themes') {
@@ -951,15 +926,7 @@ function buyShopItem(type, id, cost, duration = 30) {
     user.nameStyle = id;
     const def = NAME_STYLE_DEFINITIONS.find(s => s.id === id);
     showNotification('Стиль ника куплен и надет!', `Стиль «${def?.name || id}» успешно добавлен и активирован!`);
-  } else if (type === 'mini_bg') {
-    if (!user.inventory || typeof user.inventory !== 'object') user.inventory = { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
-    if (!Array.isArray(user.inventory.miniBgs)) user.inventory.miniBgs = [];
-    if (!user.inventory.miniBgs.includes(id)) {
-      user.inventory.miniBgs.push(id);
-    }
-    user.equippedMiniBg = id;
-    const def = MINI_BG_DEFINITIONS.find(b => b.id === id);
-    showNotification('Фон мини-профиля куплен!', `Фон «${def?.name || id}» успешно добавлен и активирован!`);
+
   } else if (type === 'boost') {
     const now = Date.now();
     const currentUntil = (user.vipBoostUntil && Number(user.vipBoostUntil) > now) ? Number(user.vipBoostUntil) : now;
@@ -1012,10 +979,6 @@ function equipItemFromShop(category, itemId) {
   } else if (category === 'name_styles') {
     user.nameStyle = itemId;
     const def = NAME_STYLE_DEFINITIONS.find(s => s.id === itemId);
-    if (def) itemName = def.name;
-  } else if (category === 'mini_bgs') {
-    user.equippedMiniBg = itemId;
-    const def = MINI_BG_DEFINITIONS.find(b => b.id === itemId);
     if (def) itemName = def.name;
   } else if (category === 'themes') {
     saveTheme(itemId);
@@ -1083,13 +1046,6 @@ function openShopItemPreview(category, itemId, options = {}) {
     typeBadge = 'Стиль никнейма';
     categoryItems = NAME_STYLE_DEFINITIONS;
     selectorTitle = `⚡ Быстрый тест стилей ника (${NAME_STYLE_DEFINITIONS.length}):`;
-  } else if (category === 'mini_bgs') {
-    item = MINI_BG_DEFINITIONS.find(b => b.id === itemId);
-    catLabel = 'ЖИВОЙ ФОН МИНИ-ПРОФИЛЯ';
-    catIcon = 'icon-sparkles';
-    typeBadge = 'Анимированный фон';
-    categoryItems = MINI_BG_DEFINITIONS;
-    selectorTitle = `⚡ Быстрый тест всех живых фонов (${MINI_BG_DEFINITIONS.length}):`;
   } else if (category === 'themes') {
     item = THEME_DEFINITIONS.find(t => t.id === itemId);
     catLabel = 'ТЕМА ОФОРМЛЕНИЯ САЙТА';
@@ -1224,84 +1180,7 @@ function openShopItemPreview(category, itemId, options = {}) {
           </div>
         </div>
       `;
-    } else if (category === 'mini_bgs') {
-      // Реалистичный Steam-style мини-профиль с живым тестом похвал и статусов
-      let statusText = '🟢 В сети • Ищет команду';
-      let statusDotClass = 'online';
-      if (ShopPreviewState.testStatus === 'in_game') {
-        statusText = '🎮 В игре: Counter-Strike 2 • Premier';
-        statusDotClass = 'online';
-      } else if (ShopPreviewState.testStatus === 'away') {
-        statusText = '🌙 Отошёл • Скоро буду';
-        statusDotClass = 'away';
-      }
 
-      viewport.innerHTML = `
-        <div class="preview-steam-miniprofile-wrap">
-          <div class="steam-miniprofile-card">
-            <div class="popover-animated-bg mini-bg-${itemId}"></div>
-            <div class="steam-miniprofile-glow-layer"></div>
-            
-            <div class="steam-miniprofile-content">
-              <div class="miniprofile-header-row">
-                <div class="avatar-frame-wrap frame-${userFrame}" style="width: 68px; height: 68px; flex-shrink: 0;">
-                  ${avatarContent}
-                </div>
-                <div class="miniprofile-user-meta">
-                  <div class="${nameClass}" style="font-size: 1.15rem; font-weight: 900;">
-                    ${escapeHtml(current || 'Ваш никнейм')}
-                  </div>
-                  <div class="miniprofile-status-row">
-                    <span class="miniprofile-status-dot ${statusDotClass}"></span>
-                    <span>${statusText}</span>
-                  </div>
-                  <div class="miniprofile-level-badge">
-                    <span>Уровень ${user.level || 25}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="miniprofile-game-card">
-                <div class="miniprofile-game-icon">
-                  <svg style="width: 18px; height: 18px;"><use href="#icon-game"/></svg>
-                </div>
-                <div class="miniprofile-game-info">
-                  <div class="miniprofile-game-name">Counter-Strike 2</div>
-                  <div class="miniprofile-game-details">Premier 19,450 ELO • Сквад</div>
-                </div>
-              </div>
-
-              <div class="miniprofile-bio-box">
-                «Играю на победу. Прайм-тайм каждый вечер с 19:00»
-              </div>
-
-              <div class="miniprofile-stats-row">
-                <div class="miniprofile-stat-chip miniprofile-praise-btn" onclick="testMiniProfilePraise()" title="Нажмите, чтобы протестировать реакцию похвалы">
-                  <svg style="width:12px;height:12px;color:#34d399;"><use href="#icon-thumbs-up"/></svg>
-                  <span id="previewPraiseNumVal">+${ShopPreviewState.testPraiseCount} Похвал (Тест)</span>
-                </div>
-                <div class="miniprofile-stat-chip">
-                  <svg style="width:12px;height:12px;color:#00d4ff;"><use href="#icon-clock"/></svg>
-                  <span>780 ч. в игре</span>
-                </div>
-              </div>
-
-              <div class="miniprofile-actions-row">
-                <div class="miniprofile-action-btn primary">Написать в ЛС</div>
-                <div class="miniprofile-action-btn secondary">В друзья</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Интерактивные тест-кнопки статуса профиля -->
-          <div class="preview-live-interactive-bar">
-            <span style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-right:2px;">Тест статуса:</span>
-            <button type="button" class="preview-test-toggle-btn ${ShopPreviewState.testStatus === 'online' ? 'active' : ''}" onclick="testMiniProfileStatus('online')">🟢 Онлайн</button>
-            <button type="button" class="preview-test-toggle-btn ${ShopPreviewState.testStatus === 'in_game' ? 'active' : ''}" onclick="testMiniProfileStatus('in_game')">🎮 В игре CS2</button>
-            <button type="button" class="preview-test-toggle-btn ${ShopPreviewState.testStatus === 'away' ? 'active' : ''}" onclick="testMiniProfileStatus('away')">🌙 Отошёл</button>
-          </div>
-        </div>
-      `;
     } else if (category === 'themes') {
       // Реалистичный мини UI интерфейса темы
       viewport.innerHTML = `
@@ -1357,18 +1236,13 @@ function openShopItemPreview(category, itemId, options = {}) {
       } else if (category === 'name_styles') {
         isItemOwned = inventory.nameStyles.includes(catItem.id);
         isItemEquipped = getUserNameStyle(current) === catItem.id;
-      } else if (category === 'mini_bgs') {
-        isItemOwned = inventory.miniBgs.includes(catItem.id);
-        isItemEquipped = getUserEquippedMiniBg(current) === catItem.id;
       } else if (category === 'themes') {
         isItemOwned = inventory.themes.includes(catItem.id);
         isItemEquipped = (AppState.currentTheme || localStorage.getItem('squad_theme') || 'default') === catItem.id;
       }
 
       let thumbHtml = '';
-      if (category === 'mini_bgs') {
-        thumbHtml = `<div class="preview-quick-thumb mini-bg-${catItem.id}"></div>`;
-      } else if (category === 'frames') {
+      if (category === 'frames') {
         thumbHtml = `<div class="preview-quick-thumb" style="display:flex;align-items:center;justify-content:center;background:#0d1527;"><div class="avatar-frame-wrap frame-${catItem.id}" style="width:34px;height:34px;"><div style="width:100%;height:100%;border-radius:50%;background:#1b253b;font-size:10px;display:flex;align-items:center;justify-content:center;">★</div></div></div>`;
       } else if (category === 'name_styles') {
         thumbHtml = `<div class="preview-quick-thumb" style="display:flex;align-items:center;justify-content:center;background:#0d1527;"><span class="name-style-${catItem.id}" style="font-size:11px;font-weight:900;">ААА</span></div>`;
@@ -1402,9 +1276,6 @@ function openShopItemPreview(category, itemId, options = {}) {
   } else if (category === 'name_styles') {
     isOwned = inventory.nameStyles.includes(itemId);
     isEquipped = getUserNameStyle(current) === itemId;
-  } else if (category === 'mini_bgs') {
-    isOwned = inventory.miniBgs.includes(itemId);
-    isEquipped = getUserEquippedMiniBg(current) === itemId;
   } else if (category === 'banners') {
     isOwned = inventory.banners.includes(itemId);
     isEquipped = getUserEquippedBanner(current) === itemId;
@@ -1432,8 +1303,6 @@ function openShopItemPreview(category, itemId, options = {}) {
           user.equippedFrame = itemId;
         } else if (category === 'name_styles') {
           user.nameStyle = itemId;
-        } else if (category === 'mini_bgs') {
-          user.equippedMiniBg = itemId;
         } else if (category === 'banners') {
           user.equippedBanner = itemId;
         } else if (category === 'themes') {
@@ -1461,7 +1330,7 @@ function openShopItemPreview(category, itemId, options = {}) {
         actionBtn.disabled = false;
         actionBtnText.textContent = `Купить за ${finalCost} LC`;
         actionBtn.onclick = () => {
-          const type = category === 'frames' ? 'frame' : (category === 'name_styles' ? 'name_style' : (category === 'mini_bgs' ? 'mini_bg' : (category === 'banners' ? 'banner' : 'theme')));
+          const type = category === 'frames' ? 'frame' : (category === 'name_styles' ? 'name_style' : (category === 'banners' ? 'banner' : 'theme'));
           buyShopItem(type, itemId, rawCost);
           closeShopItemPreview();
         };

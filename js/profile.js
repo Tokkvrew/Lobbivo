@@ -271,9 +271,8 @@ function renderProfileCustomization() {
   const user = current ? AppState.users[current] : null;
   const equippedFrame = current ? getUserEquippedFrame(current) : 'none';
   const equippedNameStyle = user?.nameStyle || 'default';
-  const equippedMiniBg = current ? getUserEquippedMiniBg(current) : 'default';
   const equippedBanner = current ? getUserEquippedBanner(current) : 'default';
-  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], nameStyles: [], miniBgs: [], banners: [], boosts: 0 };
+  const inventory = current ? getUserInventory(current) : { frames: [], themes: [], nameStyles: [], banners: [], boosts: 0 };
   const currentTheme = AppState.currentTheme || 'default';
 
   // 1. Обновление стенда живого предпросмотра
@@ -413,58 +412,6 @@ function renderProfileCustomization() {
     cosmeticNameStylesGrid.innerHTML = html;
   }
 
-  // 4. Сетка анимированных фонов мини-профиля (Только купленные и базовые)
-  const miniBgsGrid = document.getElementById('profileMiniBgsGrid');
-  if (miniBgsGrid) {
-    let html = '';
-    const ownedMiniBgs = MINI_BG_DEFINITIONS.filter(bg => {
-      if (bg.id === 'default') return true;
-      return inventory.miniBgs.includes(bg.id);
-    });
-
-    ownedMiniBgs.forEach(bg => {
-      const isEquipped = equippedMiniBg === bg.id;
-      const activeClass = isEquipped ? ' active' : '';
-
-      let btnHtml = '';
-      if (isEquipped) {
-        btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
-      } else {
-        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipMiniBgFromProfile('${bg.id}')"><span>Надеть</span></button>`;
-      }
-
-      html += `
-        <div class="custom-mini-bg-card${activeClass}" data-bg-id="${bg.id}" onclick="equipMiniBgFromProfile('${bg.id}')">
-          <div class="mini-bg-preview-canvas mini-bg-${bg.id}">
-            <div class="mini-bg-preview-overlay">
-              <span class="mini-bg-preview-tag">${escapeHtml(bg.name)}</span>
-            </div>
-          </div>
-          <div class="mini-bg-card-info">
-            <div class="mini-bg-title">${bg.name}</div>
-            <div class="mini-bg-desc">${bg.desc}</div>
-            ${bg.tag ? `<div class="frame-tag-box"><span class="item-tag-pill tag-${(bg.tag || '').toLowerCase().replace(/\s+/g, '-')}">${escapeHtml(bg.tag)}</span></div>` : ''}
-          </div>
-          ${btnHtml}
-        </div>
-      `;
-    });
-
-    html += `
-      <div class="custom-mini-bg-card custom-shop-link-card" onclick="openShopForCustomization('shop')">
-        <div class="mini-bg-preview-canvas add-more-box" style="display:flex;align-items:center;justify-content:center;background:rgba(0,212,255,0.06);">
-          <svg class="add-more-svg"><use href="#icon-sparkles"/></svg>
-        </div>
-        <div class="mini-bg-card-info">
-          <div class="mini-bg-title">Магазин фонов</div>
-          <div class="mini-bg-desc">Выбрать живые анимированные фоны</div>
-        </div>
-        <button type="button" class="btn-custom-action btn-buy-link"><span>Купить ещё</span></button>
-      </div>
-    `;
-
-    miniBgsGrid.innerHTML = html;
-  }
 
   // 4. Сетка тем (Только купленные и базовые)
   const themesGrid = document.getElementById('profileThemesGrid');
@@ -610,21 +557,6 @@ function equipNameStyleFromProfile(styleId) {
 }
 window.equipNameStyleFromProfile = equipNameStyleFromProfile;
 
-function equipMiniBgFromProfile(bgId) {
-  const current = AppState.currentUser;
-  if (!current || !AppState.users[current]) return;
-
-  const user = AppState.users[current];
-  user.equippedMiniBg = bgId;
-  saveUsers(current);
-
-  renderProfile();
-  renderProfileCustomization();
-
-  const bgDef = MINI_BG_DEFINITIONS.find(b => b.id === bgId);
-  showNotification('Фон мини-профиля установлен', bgId === 'default' ? 'Установлен стандартный фон' : `Активирован фон: ${bgDef?.name || bgId}`);
-}
-window.equipMiniBgFromProfile = equipMiniBgFromProfile;
 
 function applyNameStyleFromProfile(styleId) {
   const current = AppState.currentUser;

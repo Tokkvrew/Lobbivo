@@ -697,18 +697,12 @@ function openUserQuickPopover(username) {
 
   const isPremium = isUserPremium(username);
   const frameId = getUserEquippedFrame(username);
-  const miniBg = typeof getUserEquippedMiniBg === 'function' ? getUserEquippedMiniBg(username) : 'default';
   const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
   const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" title="Администратор Lobbivo"><svg><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';
 
-  // Применение анимированного фона Steam мини-профиля
-  const popoverAnimatedBg = document.getElementById('popoverAnimatedBg');
   const popoverCard = document.getElementById('popoverCard') || popover.querySelector('.popover-card');
-  if (popoverAnimatedBg) {
-    popoverAnimatedBg.className = `popover-animated-bg mini-bg-${miniBg}`;
-  }
   if (popoverCard) {
-    popoverCard.setAttribute('data-mini-bg', miniBg);
+    popoverCard.removeAttribute('data-mini-bg');
   }
 
   if (nameEl) {

@@ -530,6 +530,36 @@
     <symbol id="icon-bolt-fast" viewBox="0 0 24 24">
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.3" stroke-linejoin="round"/>
     </symbol>
+    <!-- Киберспорт и Рейтинг (Трофей / Кубок киберспорта) -->
+    <symbol id="icon-trophy" viewBox="0 0 24 24">
+      <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 3h12v7a6 6 0 0 1-12 0V3z" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25" stroke-linejoin="round"/>
+      <path d="M12 16v3M8 22h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M10 7.5l2-1.5 2 1.5-1 3h-2l-1-3z" fill="currentColor" fill-opacity="0.7"/>
+    </symbol>
+    <!-- Песочницы и Кооп (Кубы / Блоки) -->
+    <symbol id="icon-blocks" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25"/>
+      <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25"/>
+      <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25"/>
+      <rect x="13" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25"/>
+    </symbol>
+    <symbol id="icon-coins" viewBox="0 0 24 24">
+      <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.25"/>
+      <path d="M18.09 10.37A6 6 0 1 1 10.34 18" stroke="currentColor" stroke-width="1.8" fill="none"/>
+      <circle cx="8" cy="8" r="2.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="12" cy="17" r="1" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-chevron-left" viewBox="0 0 24 24">
+      <polyline points="15 18 9 12 15 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
     <symbol id="icon-volume-on" viewBox="0 0 24 24">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
@@ -1014,19 +1044,6 @@
             </div>
           </div>
 
-          <!-- 2.3 ФОНЫ МИНИ-ПРОФИЛЯ -->
-          <div class="custom-wardrobe-block" style="margin-top: 24px;">
-            <div class="wardrobe-header">
-              <div class="wardrobe-title">
-                <svg><use href="#icon-sparkles"/></svg>
-                <span>Анимированные фоны мини-профиля</span>
-              </div>
-              <div class="wardrobe-sub">Живой анимированный фон карточки при нажатии на ваш профиль в чате</div>
-            </div>
-            <div class="custom-mini-bgs-grid" id="profileMiniBgsGrid">
-              <!-- Рендерится через renderProfileCustomization() -->
-            </div>
-          </div>
 
           <!-- 2.4 ТЕМЫ ОФОРМЛЕНИЯ САЙТА -->
           <div class="custom-wardrobe-block" style="margin-top: 24px;">
@@ -1607,7 +1624,6 @@
       <div class="user-quick-popover" id="userQuickPopover" style="display:none;">
         <div class="popover-backdrop" id="popoverBackdrop"></div>
         <div class="popover-card" id="popoverCard">
-          <div class="popover-animated-bg" id="popoverAnimatedBg"></div>
           <button type="button" class="popover-close-btn" id="popoverCloseBtn" title="Закрыть">
             <svg><use href="#icon-close"/></svg>
           </button>
@@ -2293,11 +2309,6 @@
                 <svg><use href="#icon-sparkles"/></svg>
                 <span>Стили ника</span>
                 <span class="shop-cat-count shop-new-pill">NEW</span>
-              </button>
-              <button type="button" class="shop-cat-btn" data-cat="mini_bgs">
-                <svg><use href="#icon-sparkles"/></svg>
-                <span>Фоны мини-профиля</span>
-                <span class="shop-cat-count shop-live-pill">LIVE FX</span>
               </button>
               <button type="button" class="shop-cat-btn" data-cat="themes">
                 <svg><use href="#icon-palette-shop"/></svg>

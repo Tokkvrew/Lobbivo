@@ -129,14 +129,3 @@ const NAME_STYLE_DEFINITIONS = [
   { id: 'phoenix_flame', name: 'Phoenix Mythic Fire', desc: 'Яростное пламя феникса с живым огненным переливом', cost: 5000, previewClass: 'name-style-phoenix-flame', tag: 'ULTRA MYTHIC' },
   { id: 'void_singularity', name: 'Void Singularity Eclipse', desc: 'Глубокая черная дыра с хроматическим ореолом', cost: 8000, previewClass: 'name-style-void-singularity', tag: 'CELESTIAL' }
 ];
-
-const MINI_BG_DEFINITIONS = [
-  { id: 'default', name: 'Obsidian Cyber Stealth', desc: 'Базовый тёмно-графитовый интерфейс с матовым стеклом', cost: 0, previewClass: 'mini-bg-default', tag: 'Базовый' },
-  { id: 'retrowave_grid', name: 'Retro Neon Synthwave', desc: 'Неоновая кибер-сетка, закатный горизонт и бегущие световые волны', cost: 300, previewClass: 'mini-bg-retrowave-grid', tag: 'Epic' },
-  { id: 'cyber_rain', name: 'Neo-Tokyo Cyber Pulse', desc: 'Электрический киберпанк-дождь и неоновые световые лучи', cost: 450, previewClass: 'mini-bg-cyber-rain', tag: 'Epic' },
-  { id: 'deep_space', name: 'Cosmic Starlight Nebula', desc: 'Космическая ультрамариновая туманность и живые мерцающие звёзды', cost: 600, previewClass: 'mini-bg-deep-space', tag: 'Legendary' },
-  { id: 'glitch_matrix', name: 'Cyber Emerald Matrix', desc: 'Каскадный цифровой поток матричного кода и глитч-эффекты', cost: 800, previewClass: 'mini-bg-glitch-matrix', tag: 'Legendary' },
-  { id: 'volcanic_magma', name: 'Infernal Magma Core', desc: 'Пылающее вулканическое ядро, лавовые потоки и парящие искры', cost: 1200, previewClass: 'mini-bg-volcanic-magma', tag: 'Mythic' },
-  { id: 'aurora_borealis', name: 'Celestial Aurora Borealis', desc: 'Северное сияние с изумрудно-фиолетовыми волнами и космической пылью', cost: 2000, previewClass: 'mini-bg-aurora-borealis', tag: 'Mythic' },
-  { id: 'warp_drive', name: 'Hyperdrive Dimension Warp', desc: 'Сверхсветовой квантовый скачок сквозь пространственные туннели', cost: 4000, previewClass: 'mini-bg-warp-drive', tag: 'ULTRA MYTHIC' }
-];

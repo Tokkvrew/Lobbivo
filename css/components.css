@@ -12187,140 +12187,7 @@ select:-webkit-autofill {
   display: inline-block;
 }
 
-/* 3. АНИМИРОВАННЫЕ ЖИВЫЕ ФОНЫ МИНИ-ПРОФИЛЯ (STEAM STYLE PRO) */
-.user-quick-popover .popover-card {
-  position: relative;
-  overflow: hidden;
-}
 
-.popover-animated-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0.75;
-  transition: opacity 0.3s ease;
-}
-
-.popover-card > *:not(.popover-animated-bg) {
-  position: relative;
-  z-index: 2;
-}
-
-/* 3.1 Детальные кинематографичные фоны мини-профиля (AAA Gaming Visual Art) */
-.mini-bg-default {
-  background: 
-    radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.35) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(121, 40, 202, 0.3) 0%, transparent 55%),
-    radial-gradient(circle at 0% 100%, rgba(0, 255, 170, 0.2) 0%, transparent 55%),
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 2px, transparent 2px, transparent 8px),
-    linear-gradient(180deg, #091224 0%, #050b18 50%, #03060e 100%) !important;
-  border: 1.5px solid rgba(0, 212, 255, 0.35) !important;
-  box-shadow: inset 0 0 25px rgba(0, 212, 255, 0.15) !important;
-}
-
-.mini-bg-retrowave_grid,
-.mini-bg-retrowave-grid {
-  background: 
-    radial-gradient(circle at 50% 25%, #ffe600 0%, #ff007f 30%, rgba(255, 0, 127, 0) 65%),
-    linear-gradient(rgba(0, 240, 255, 0.55) 1.5px, transparent 1.5px),
-    linear-gradient(90deg, rgba(255, 0, 128, 0.45) 1.5px, transparent 1.5px),
-    linear-gradient(180deg, #16002c 0%, #350048 45%, #080012 100%) !important;
-  background-size: 100% 100%, 28px 28px, 28px 28px, 100% 100% !important;
-  animation: retrowaveGridMove 1.8s linear infinite !important;
-  opacity: 0.98 !important;
-  border: 1.5px solid rgba(255, 0, 128, 0.5) !important;
-  box-shadow: inset 0 0 40px rgba(255, 0, 128, 0.45), 0 0 20px rgba(255, 0, 128, 0.25) !important;
-}
-
-.mini-bg-cyber_rain,
-.mini-bg-cyber-rain {
-  background: 
-    radial-gradient(circle at 50% 100%, rgba(0, 240, 255, 0.6) 0%, transparent 65%),
-    radial-gradient(circle at 80% 20%, rgba(255, 0, 180, 0.45) 0%, transparent 50%),
-    repeating-linear-gradient(180deg, rgba(0, 240, 255, 0.9) 0, rgba(0, 240, 255, 0.9) 3px, transparent 3px, transparent 22px),
-    repeating-linear-gradient(180deg, rgba(255, 0, 128, 0.6) 0, rgba(255, 0, 128, 0.6) 2px, transparent 2px, transparent 30px),
-    linear-gradient(180deg, #010614 0%, #081a38 50%, #01040d 100%) !important;
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
-  animation: cyberRainFall 0.9s linear infinite !important;
-  opacity: 0.97 !important;
-  border: 1.5px solid rgba(0, 240, 255, 0.45) !important;
-  box-shadow: inset 0 0 35px rgba(0, 240, 255, 0.35), 0 0 18px rgba(0, 240, 255, 0.2) !important;
-}
-
-.mini-bg-deep_space,
-.mini-bg-deep-space {
-  background: 
-    radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(3px 3px at 85px 100px, #00f0ff, rgba(0,0,0,0)),
-    radial-gradient(3.5px 3.5px at 160px 40px, #ff00ea, rgba(0,0,0,0)),
-    radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.85) 0%, transparent 55%),
-    radial-gradient(circle at 15% 85%, rgba(6, 182, 212, 0.75) 0%, transparent 50%),
-    linear-gradient(135deg, #040114 0%, #110842 50%, #02010c 100%) !important;
-  background-size: 140px 140px, 170px 170px, 190px 190px, 100% 100%, 100% 100%, 100% 100% !important;
-  animation: deepSpaceDrift 6.5s ease infinite alternate !important;
-  opacity: 0.98 !important;
-  border: 1.5px solid rgba(168, 85, 247, 0.5) !important;
-  box-shadow: inset 0 0 40px rgba(168, 85, 247, 0.4), 0 0 20px rgba(168, 85, 247, 0.25) !important;
-}
-
-.mini-bg-glitch_matrix,
-.mini-bg-glitch-matrix {
-  background: 
-    repeating-linear-gradient(0deg, rgba(0, 255, 136, 0.65) 0px, rgba(0, 255, 136, 0.65) 2.5px, transparent 3.5px, transparent 15px),
-    repeating-linear-gradient(90deg, rgba(0, 255, 136, 0.2) 0px, rgba(0, 255, 136, 0.2) 1.5px, transparent 1.5px, transparent 22px),
-    radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.6) 0%, transparent 65%),
-    linear-gradient(180deg, #001509 0%, #023216 50%, #000c04 100%) !important;
-  animation: matrixCodeRain 1.1s linear infinite !important;
-  opacity: 0.98 !important;
-  border: 1.5px solid rgba(0, 255, 136, 0.5) !important;
-  box-shadow: inset 0 0 40px rgba(0, 255, 136, 0.4), 0 0 20px rgba(0, 255, 136, 0.25) !important;
-}
-
-.mini-bg-volcanic_magma,
-.mini-bg-volcanic-magma {
-  background: 
-    radial-gradient(circle at 50% 105%, #ff4400 0%, rgba(255, 170, 0, 0.85) 32%, transparent 70%),
-    radial-gradient(3.5px 3.5px at 35px 90px, #ffe600, rgba(0,0,0,0)),
-    radial-gradient(3px 3px at 125px 55px, #ff3300, rgba(0,0,0,0)),
-    linear-gradient(180deg, #240300 0%, #520900 50%, #7d1300 100%) !important;
-  background-size: 100% 100%, 120px 120px, 140px 140px, 100% 100% !important;
-  animation: volcanicLavaPuff 2s ease-in-out infinite !important;
-  opacity: 0.98 !important;
-  border: 1.5px solid rgba(255, 68, 0, 0.55) !important;
-  box-shadow: inset 0 0 45px rgba(255, 68, 0, 0.5), 0 0 22px rgba(255, 68, 0, 0.3) !important;
-}
-
-.mini-bg-aurora_borealis,
-.mini-bg-aurora-borealis {
-  background: 
-    linear-gradient(125deg, rgba(0, 255, 179, 0.8) 0%, rgba(0, 212, 255, 0.8) 35%, rgba(192, 38, 211, 0.8) 75%, transparent 100%),
-    radial-gradient(2.5px 2.5px at 40px 30px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 135px 75px, #99ffff, rgba(0,0,0,0)),
-    linear-gradient(180deg, #011126 0%, #062a57 50%, #010d1c 100%) !important;
-  background-size: 200% 200%, 130px 130px, 150px 150px, 100% 100% !important;
-  animation: auroraRibbonFlow 5s ease infinite !important;
-  opacity: 0.98 !important;
-  border: 1.5px solid rgba(0, 255, 179, 0.5) !important;
-  box-shadow: inset 0 0 40px rgba(0, 255, 179, 0.4), 0 0 20px rgba(0, 255, 179, 0.25) !important;
-}
-
-.mini-bg-warp_drive,
-.mini-bg-warp-drive {
-  background: 
-    radial-gradient(circle at 50% 50%, #ffffff 0%, rgba(0, 240, 255, 0.95) 15%, rgba(147, 51, 234, 0.8) 38%, transparent 72%),
-    repeating-conic-gradient(from 0deg, rgba(0, 240, 255, 0.55) 0deg 10deg, transparent 10deg 20deg),
-    radial-gradient(circle at 50% 50%, transparent 28%, rgba(2, 4, 15, 0.96) 100%),
-    linear-gradient(180deg, #020114 0%, #0d054e 100%) !important;
-  animation: warpDriveFast 1.4s ease-in-out infinite !important;
-  opacity: 0.99 !important;
-  border: 1.5px solid rgba(0, 240, 255, 0.6) !important;
-  box-shadow: inset 0 0 50px rgba(0, 240, 255, 0.55), 0 0 25px rgba(0, 240, 255, 0.35) !important;
-}
 
 /* 4. ШАПКА И ОБЛОЖКА ПРОФИЛЯ ПО УМОЛЧАНИЮ (CLEAN DEFAULT HERO) */
 .profile-hero-card {
@@ -12649,18 +12516,6 @@ select:-webkit-autofill {
   letter-spacing: 0.4px;
 }
 
-.mini-bg-preview-canvas {
-  width: 100%;
-  height: 76px;
-  border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 12px;
-  box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
-}
-
-.mini-bg-preview-overlay,
 .banner-preview-overlay {
   position: absolute;
   bottom: 6px;
@@ -12668,7 +12523,6 @@ select:-webkit-autofill {
   z-index: 2;
 }
 
-.mini-bg-preview-tag,
 .banner-preview-tag {
   font-size: 0.68rem;
   font-weight: 700;
@@ -12691,7 +12545,6 @@ select:-webkit-autofill {
 
 /* Сетка гардероба для новых разделов */
 .custom-name-styles-grid,
-.custom-mini-bgs-grid,
 .custom-banners-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -12699,7 +12552,6 @@ select:-webkit-autofill {
 }
 
 .custom-name-style-card,
-.custom-mini-bg-card,
 .custom-banner-card {
   display: flex;
   flex-direction: column;
@@ -12715,7 +12567,6 @@ select:-webkit-autofill {
 }
 
 .custom-name-style-card:hover,
-.custom-mini-bg-card:hover,
 .custom-banner-card:hover {
   border-color: rgba(0, 212, 255, 0.4);
   background: rgba(12, 22, 44, 0.85);
@@ -12723,7 +12574,6 @@ select:-webkit-autofill {
 }
 
 .custom-name-style-card.active,
-.custom-mini-bg-card.active,
 .custom-banner-card.active {
   border-color: var(--neon-cyan);
   background: rgba(0, 212, 255, 0.1);
@@ -12731,7 +12581,6 @@ select:-webkit-autofill {
 }
 
 .name-style-title,
-.mini-bg-title,
 .banner-title {
   font-weight: 800;
   font-size: 0.95rem;
@@ -12740,7 +12589,6 @@ select:-webkit-autofill {
 }
 
 .name-style-desc,
-.mini-bg-desc,
 .banner-desc {
   font-size: 0.76rem;
   color: rgba(255, 255, 255, 0.6);
