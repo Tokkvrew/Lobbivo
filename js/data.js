@@ -140,14 +140,3 @@ const MINI_BG_DEFINITIONS = [
   { id: 'aurora_borealis', name: 'Celestial Aurora Borealis', desc: 'Северное сияние с изумрудно-фиолетовыми волнами и космической пылью', cost: 2000, previewClass: 'mini-bg-aurora-borealis', tag: 'Mythic' },
   { id: 'warp_drive', name: 'Hyperdrive Dimension Warp', desc: 'Сверхсветовой квантовый скачок сквозь пространственные туннели', cost: 4000, previewClass: 'mini-bg-warp-drive', tag: 'ULTRA MYTHIC' }
 ];
-
-const BANNER_DEFINITIONS = [
-  { id: 'default', name: 'Lobbivo Titanium Carbon', desc: 'Классический карбоновый градиент с бирюзовой подсветкой', cost: 0, previewClass: 'banner-default', tag: 'Базовый' },
-  { id: 'tokyo_night', name: 'Tokyo Neon Metropolis', desc: 'Ночной неоновый мегаполис, влажный асфальт и киберпанк-свет', cost: 250, previewClass: 'banner-tokyo-night', tag: 'Epic' },
-  { id: 'synthwave_highway', name: 'Outrun 80s Horizon', desc: 'Ретро-хайвей, закатное неоновое солнце и бесконечная трасса', cost: 400, previewClass: 'banner-synthwave-highway', tag: 'Epic' },
-  { id: 'matrix_nexus', name: 'Quantum Matrix Grid', desc: 'Высокотехнологичный нейросетевой хаб и светящиеся цепи данных', cost: 600, previewClass: 'banner-matrix-nexus', tag: 'Legendary' },
-  { id: 'crimson_dragon', name: 'Crimson Dragon Forge', desc: 'Мифический драконий алтарь, багровое пламя и золотые искры', cost: 1000, previewClass: 'banner-crimson-dragon', tag: 'Legendary' },
-  { id: 'cosmic_supernova', name: 'Cosmic Supernova Burst', desc: 'Взрыв сверхновой звезды с кольцами плазмы и звездной пылью', cost: 1800, previewClass: 'banner-cosmic-supernova', tag: 'Mythic' },
-  { id: 'cyberpunk_edge', name: 'Titan Combat HUD Matrix', desc: 'Тактический боевой интерфейс с голографическими элементами', cost: 3000, previewClass: 'banner-cyberpunk-edge', tag: 'Mythic' },
-  { id: 'immortal_monarch', name: 'Immortal Celestial Zenith', desc: 'Императорский золотой трон, лучи превосходства и солнечная корона', cost: 6000, previewClass: 'banner-immortal-monarch', tag: 'CELESTIAL PRESTIGE' }
-];

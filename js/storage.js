@@ -43,8 +43,8 @@ function compressImage(file, maxSize = 256, quality = 0.85) {
 
     const isGif = file.type === 'image/gif' || fileName.endsWith('.gif');
     if (isGif) {
-      if (file.size > 4 * 1024 * 1024) {
-        return reject(new Error('Размер GIF-аватарки не должен превышать 4 МБ'));
+      if (file.size > 1.5 * 1024 * 1024) {
+        return reject(new Error('Размер GIF-аватарки не должен превышать 1.5 МБ для надежной синхронизации между всеми устройствами'));
       }
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Не удалось прочитать GIF файл'));

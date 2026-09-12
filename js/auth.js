@@ -82,44 +82,91 @@ function loginUser(username, password) {
   const trimmedUser = (username || '').trim();
   const trimmedPass = (password || '').trim();
 
-  const user = AppState.users[trimmedUser];
-
   if (!trimmedUser || !trimmedPass) {
     setErrorMessage(loginErr, 'Заполните логин и пароль');
     return false;
   }
 
-  if (!user || user.password !== trimmedPass) {
+  let user = AppState.users[trimmedUser];
+
+  const proceedLogin = (authenticatedUser) => {
+    if (typeof isUserBanned === 'function' && isUserBanned(trimmedUser)) {
+      const banInfo = typeof getBanInfo === 'function' ? getBanInfo(trimmedUser) : null;
+      hideAuthModal();
+      if (typeof renderWelcomeBanNotice === 'function' && banInfo) {
+        renderWelcomeBanNotice(banInfo);
+      }
+      switchPage('pageWelcome');
+      showNotification('Аккаунт заблокирован', `Доступ ограничен: ${banInfo?.banReason || 'Блокировка'}`);
+      return;
+    }
+
+    // Очищаем баннер бана если вход успешен
+    const banCard = document.getElementById('welcomeBanNoticeCard');
+    if (banCard) banCard.style.display = 'none';
+
+    hideAuthModal();
+    showSystemLoader('Вход в аккаунт...', 650, () => {
+      AppState.currentUser = trimmedUser;
+      localStorage.setItem('squad_session', trimmedUser);
+      if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+        FirebaseSync.startPresenceHeartbeat(trimmedUser);
+        // Запрашиваем свежий снимок пользователя из Firebase RTDB для моментальной синхронизации между устройствами
+        try {
+          FirebaseSync.rtdb.ref('users/' + trimmedUser).once('value').then((snap) => {
+            const cloudUser = snap.val();
+            if (cloudUser && typeof cloudUser === 'object') {
+              AppState.users[trimmedUser] = {
+                ...(AppState.users[trimmedUser] || {}),
+                ...cloudUser
+              };
+              try {
+                localStorage.setItem('squad_users', JSON.stringify(AppState.users));
+              } catch (e) {}
+              if (typeof updateUI === 'function') updateUI();
+              if (typeof renderProfile === 'function' && document.getElementById('pageProfile')?.classList.contains('active')) {
+                renderProfile();
+              }
+            }
+          }).catch(() => {});
+        } catch (e) {}
+      }
+      updateUI();
+      switchPage('pageGames');
+      showNotification('Добро пожаловать!', `Привет, ${trimmedUser}! Рады видеть тебя снова.`);
+    });
+  };
+
+  if (!user) {
+    // Попытка найти пользователя в облаке Firebase RTDB при входе с нового устройства/браузера
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
+      FirebaseSync.rtdb.ref('users/' + trimmedUser).once('value').then((snap) => {
+        const cloudUser = snap.val();
+        if (cloudUser && typeof cloudUser === 'object' && cloudUser.password === trimmedPass) {
+          AppState.users[trimmedUser] = cloudUser;
+          try {
+            localStorage.setItem('squad_users', JSON.stringify(AppState.users));
+          } catch (e) {}
+          proceedLogin(cloudUser);
+        } else {
+          setErrorMessage(loginErr, 'Неверный логин или пароль');
+        }
+      }).catch(() => {
+        setErrorMessage(loginErr, 'Неверный логин или пароль');
+      });
+      return false;
+    } else {
+      setErrorMessage(loginErr, 'Неверный логин или пароль');
+      return false;
+    }
+  }
+
+  if (user.password !== trimmedPass) {
     setErrorMessage(loginErr, 'Неверный логин или пароль');
     return false;
   }
 
-  if (typeof isUserBanned === 'function' && isUserBanned(trimmedUser)) {
-    const banInfo = typeof getBanInfo === 'function' ? getBanInfo(trimmedUser) : null;
-    hideAuthModal();
-    if (typeof renderWelcomeBanNotice === 'function' && banInfo) {
-      renderWelcomeBanNotice(banInfo);
-    }
-    switchPage('pageWelcome');
-    showNotification('Аккаунт заблокирован', `Доступ ограничен: ${banInfo?.banReason || 'Блокировка'}`);
-    return false;
-  }
-
-  // Очищаем баннер бана если вход успешен
-  const banCard = document.getElementById('welcomeBanNoticeCard');
-  if (banCard) banCard.style.display = 'none';
-
-  hideAuthModal();
-  showSystemLoader('Вход в аккаунт...', 650, () => {
-    AppState.currentUser = trimmedUser;
-    localStorage.setItem('squad_session', trimmedUser);
-    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
-      FirebaseSync.startPresenceHeartbeat(trimmedUser);
-    }
-    updateUI();
-    switchPage('pageGames');
-    showNotification('Добро пожаловать!', `Привет, ${trimmedUser}! Рады видеть тебя снова.`);
-  });
+  proceedLogin(user);
   return true;
 }
 

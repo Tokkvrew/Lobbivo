@@ -225,11 +225,10 @@ function renderProfile() {
     karmaValEl.textContent = `${userKarma}`;
   }
 
-  // Обновление шапки профиля (Hero Banner Cover)
-  const equippedBanner = getUserEquippedBanner(current) || 'default';
+  // Обновление шапки профиля (Стандартный классический вид)
   const heroBannerEl = document.getElementById('profileHeroBannerCover');
   if (heroBannerEl) {
-    heroBannerEl.className = `profile-hero-banner-cover banner-${equippedBanner}`;
+    heroBannerEl.className = 'profile-hero-banner-cover';
   }
 
   // 5. Заполнение формы редактирования анкеты
@@ -467,60 +466,7 @@ function renderProfileCustomization() {
     miniBgsGrid.innerHTML = html;
   }
 
-  // 5. Сетка шапок и обложек профиля (Только купленные и базовые)
-  const bannersGrid = document.getElementById('profileBannersGrid');
-  if (bannersGrid) {
-    let html = '';
-    const ownedBanners = BANNER_DEFINITIONS.filter(banner => {
-      if (banner.id === 'default') return true;
-      return inventory.banners.includes(banner.id);
-    });
-
-    ownedBanners.forEach(banner => {
-      const isEquipped = equippedBanner === banner.id;
-      const activeClass = isEquipped ? ' active' : '';
-
-      let btnHtml = '';
-      if (isEquipped) {
-        btnHtml = `<div class="btn-custom-action btn-active"><svg><use href="#icon-check-circle"/></svg> <span>Выбрано</span></div>`;
-      } else {
-        btnHtml = `<button type="button" class="btn-custom-action btn-equip" onclick="equipBannerFromProfile('${banner.id}')"><span>Надеть</span></button>`;
-      }
-
-      html += `
-        <div class="custom-banner-card${activeClass}" data-banner-id="${banner.id}" onclick="equipBannerFromProfile('${banner.id}')">
-          <div class="banner-preview-box banner-${banner.id}">
-            <div class="banner-preview-overlay">
-              <span class="banner-preview-tag">${escapeHtml(banner.name)}</span>
-            </div>
-          </div>
-          <div class="banner-card-info">
-            <div class="banner-title">${banner.name}</div>
-            <div class="banner-desc">${banner.desc}</div>
-            ${banner.tag ? `<div class="frame-tag-box"><span class="item-tag-pill tag-${(banner.tag || '').toLowerCase().replace(/\s+/g, '-')}">${escapeHtml(banner.tag)}</span></div>` : ''}
-          </div>
-          ${btnHtml}
-        </div>
-      `;
-    });
-
-    html += `
-      <div class="custom-banner-card custom-shop-link-card" onclick="openShopForCustomization('shop')">
-        <div class="banner-preview-box add-more-box" style="display:flex;align-items:center;justify-content:center;background:rgba(0,212,255,0.06);">
-          <svg class="add-more-svg"><use href="#icon-game"/></svg>
-        </div>
-        <div class="banner-card-info">
-          <div class="banner-title">Магазин шапок</div>
-          <div class="banner-desc">Выбрать панорамные арты для профиля</div>
-        </div>
-        <button type="button" class="btn-custom-action btn-buy-link"><span>Купить ещё</span></button>
-      </div>
-    `;
-
-    bannersGrid.innerHTML = html;
-  }
-
-  // 6. Сетка тем (Только купленные и базовые)
+  // 4. Сетка тем (Только купленные и базовые)
   const themesGrid = document.getElementById('profileThemesGrid');
   if (themesGrid) {
     let html = '';
@@ -680,22 +626,6 @@ function equipMiniBgFromProfile(bgId) {
 }
 window.equipMiniBgFromProfile = equipMiniBgFromProfile;
 
-function equipBannerFromProfile(bannerId) {
-  const current = AppState.currentUser;
-  if (!current || !AppState.users[current]) return;
-
-  const user = AppState.users[current];
-  user.equippedBanner = bannerId;
-  saveUsers(current);
-
-  renderProfile();
-  renderProfileCustomization();
-
-  const bannerDef = BANNER_DEFINITIONS.find(b => b.id === bannerId);
-  showNotification('Шапка профиля обновлена', bannerId === 'default' ? 'Установлена стандартная шапка' : `Активирована обложка: ${bannerDef?.name || bannerId}`);
-}
-window.equipBannerFromProfile = equipBannerFromProfile;
-
 function applyNameStyleFromProfile(styleId) {
   const current = AppState.currentUser;
   if (!current || !AppState.users[current]) return;
@@ -789,6 +719,11 @@ async function saveProfile() {
     if (isGif && !isUserPremium(current)) {
       showNotification('Lobbivo Premium', 'Для установки GIF-аватарок необходим статус Lobbivo Premium! Перейдите во вкладку Магазин.');
       if (typeof openCoinModal === 'function') openCoinModal('shop');
+      return;
+    }
+
+    if (isGif && file.size > 1.5 * 1024 * 1024) {
+      showNotification('Размер GIF', 'Размер GIF-аватарки не должен превышать 1.5 МБ для надежной синхронизации');
       return;
     }
 

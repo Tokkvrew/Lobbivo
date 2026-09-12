@@ -130,12 +130,15 @@ const FirebaseSync = {
                 const localAvatarTs = Number(localUser.avatarUpdatedAt || localUser.updatedAt || 0);
                 const cloudAvatarTs = Number(cloudUser.avatarUpdatedAt || cloudUser.updatedAt || 0);
 
-                let resolvedAvatar = cloudUser.avatar;
-                let resolvedAvatarTs = cloudAvatarTs;
+                let resolvedAvatar = cloudUser.avatar || localUser.avatar || '';
+                let resolvedAvatarTs = Math.max(localAvatarTs, cloudAvatarTs);
 
-                // Если у нас локально есть аватар и он новее или в облаке пусто/старо
-                if (localUser.avatar && (!cloudUser.avatar || localAvatarTs >= cloudAvatarTs)) {
+                // Если у нас локально есть аватар и он СТРОГО новее, чем в облаке (только что загружен в этой сессии), либо в облаке пусто
+                if (localUser.avatar && (!cloudUser.avatar || localAvatarTs > cloudAvatarTs)) {
                   resolvedAvatar = localUser.avatar;
+                  resolvedAvatarTs = Math.max(localAvatarTs, cloudAvatarTs);
+                } else if (cloudUser.avatar) {
+                  resolvedAvatar = cloudUser.avatar;
                   resolvedAvatarTs = Math.max(localAvatarTs, cloudAvatarTs);
                 }
 
