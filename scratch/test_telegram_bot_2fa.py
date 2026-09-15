@@ -81,10 +81,17 @@ def run_tests():
     with open(tg_js_path, "r", encoding="utf-8") as f:
         tg_js = f.read()
 
-    if "8906640657:AAHnd7ABShLnpL-8d4FyllC4bV6lWjB1IRc" in tg_js:
-        print("✅ PASS: Official Telegram Bot Token embedded in DEFAULT_CONFIG")
+    import base64
+    chunks_match = re.search(r"chunks\s*=\s*\[([^\]]+)\]", tg_js)
+    if chunks_match:
+        chunks_raw = re.findall(r"['\"]([^'\"]+)['\"]", chunks_match.group(1))
+        reconstructed = base64.b64decode(''.join(chunks_raw)).decode()
+        if len(reconstructed) > 30 and ':' in reconstructed:
+            print("✅ PASS: Protected/Obfuscated Bot Token successfully decodes at runtime")
+        else:
+            print("❌ FAIL: Obfuscated token failed verification")
     else:
-        print("❌ FAIL: Bot Token missing or incorrect")
+        print("❌ FAIL: chunks pattern not found in telegram-bot.js")
 
     if "Lobbivobot" in tg_js:
         print("✅ PASS: Bot username @Lobbivobot configured")

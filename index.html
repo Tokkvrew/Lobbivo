@@ -1480,16 +1480,35 @@
                 <div class="tg-code-info">
                   <span>Ваш персональный код связки: </span>
                   <code class="tg-link-code" id="tgBotLinkCode">---</code>
-                  <span class="tg-code-hint">(отправьте команду <code>/start [код]</code> боту)</span>
+                  <span class="tg-code-hint">(отправьте боту команду <code>/start [код]</code>)</span>
                 </div>
                 <div class="tg-manual-input-row" style="margin-top: 10px;">
                   <div class="cyber-input-wrapper">
-                    <input type="text" id="tgBotManualChatId" placeholder="Или укажите ваш Chat ID / @username">
+                    <input type="text" id="tgBotManualChatId" placeholder="Ваш числовой Chat ID (из @userinfobot) или @username">
                   </div>
                   <button type="button" class="btn btn-sm btn-primary" id="saveTgManualChatIdBtn">
                     <svg style="width:14px;height:14px;"><use href="#icon-check"/></svg>
                     <span>Сохранить ID</span>
                   </button>
+                </div>
+              </div>
+
+              <!-- БЛОК НАСТРОЙКИ ТОКЕНА БОТА -->
+              <div class="tg-token-config-box" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,0.85);">🔑 Токен бота @BotFather:</span>
+                  <span id="tgBotHealthStatus" style="font-size: 0.78rem; font-weight: 600; color: #ff9800;">Проверка связи...</span>
+                </div>
+                <div class="tg-manual-input-row">
+                  <div class="cyber-input-wrapper">
+                    <input type="password" id="tgBotCustomTokenInput" placeholder="Вставьте новый токен из @BotFather">
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline" id="saveTgCustomTokenBtn">
+                    <span>Сохранить токен</span>
+                  </button>
+                </div>
+                <div style="font-size: 0.76rem; color: rgba(255,255,255,0.45); margin-top: 5px;">
+                  Если GitHub отозвал токен, напишите в @BotFather команду <code>/token</code>, скопируйте новый токен и сохраните его здесь.
                 </div>
               </div>
             </div>
