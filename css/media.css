@@ -1381,17 +1381,41 @@
    ПК и iPhone/iOS остаются нетронутыми со всеми эффектами.
    ============================================================ */
 
-/* 1. Глобальное отключение тяжелого real-time блюра и размытия */
-html.android-device *,
-html.android-device *::before,
-html.android-device *::after,
-html.is-android *,
-html.is-android *::before,
-html.is-android *::after {
+/* 1. Глобальное отключение тяжелого real-time блюра и размытия (кроме цензуры чата) */
+html.android-device *:not(.censored-word),
+html.android-device *:not(.censored-word)::before,
+html.android-device *:not(.censored-word)::after,
+html.is-android *:not(.censored-word),
+html.is-android *:not(.censored-word)::before,
+html.is-android *:not(.censored-word)::after {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   text-shadow: none !important;
   filter: none !important;
+}
+
+/* 1.1 Надежная модерация и цензура на Android (надежное скрытие и размытие мата) */
+html.android-device .censored-word:not(.revealed),
+html.is-android .censored-word:not(.revealed) {
+  filter: blur(5px) !important;
+  -webkit-filter: blur(5px) !important;
+  color: transparent !important;
+  text-shadow: 0 0 7px rgba(255, 45, 85, 0.95) !important;
+  background: rgba(255, 45, 85, 0.22) !important;
+  border: 1px dashed rgba(255, 45, 85, 0.6) !important;
+  user-select: none !important;
+  cursor: pointer !important;
+  display: inline-block !important;
+}
+
+html.android-device .censored-word.revealed,
+html.is-android .censored-word.revealed {
+  filter: none !important;
+  -webkit-filter: none !important;
+  color: #00e5ff !important;
+  text-shadow: none !important;
+  background: rgba(0, 229, 255, 0.15) !important;
+  border: 1px solid rgba(0, 229, 255, 0.4) !important;
 }
 
 /* 2. Сплошной непрозрачный фон без тяжелых радиальных градиентов */

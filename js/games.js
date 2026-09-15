@@ -853,7 +853,13 @@ function showUserProfileModal(username) {
       const karmaActionBtn = overlay.querySelector('#modalKarmaActionBtn');
       if (karmaActionBtn) {
         karmaActionBtn.classList.add('voted');
-        karmaActionBtn.innerHTML = `<svg class="mini-svg" style="width:13px;height:13px;"><use href="#icon-check"/></svg><span>Похвалено!</span>`;
+        karmaActionBtn.innerHTML = `<svg class="mini-svg" style="width:13px;height:13px;"><use href="#icon-check"/></svg><span>+1 Похвалено!</span>`;
+        setTimeout(() => {
+          if (karmaActionBtn && overlay.contains(karmaActionBtn)) {
+            karmaActionBtn.classList.remove('voted');
+            karmaActionBtn.innerHTML = `<svg class="mini-svg" style="width:13px;height:13px;"><use href="#icon-thumbs-up"/></svg><span>Похвалить (+1)</span>`;
+          }
+        }, 3000);
       }
     }
   };

@@ -470,6 +470,21 @@ function createParticles(theme) {
       p.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
       frag.appendChild(p);
     }
+  } else if (currentTheme === 'carbon') {
+    // Белые сияющие микро-частицы и карбоновое мерцание
+    const count = 28;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle particle-carbon';
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.animationDuration = `${10 + Math.random() * 14}s`;
+      p.style.animationDelay = `${(Math.random() * 8).toFixed(2)}s`;
+      const size = 2.5 + Math.random() * 5;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.opacity = `${0.3 + Math.random() * 0.55}`;
+      frag.appendChild(p);
+    }
   } else {
     // Дефолтные неоновые циановые сферы
     for (let i = 0; i < 22; i++) {
@@ -810,7 +825,9 @@ function renderShopItems() {
 
     } else if (shopState.category === 'themes') {
       let previewChipHtml = '';
-      if (item.id === 'nebula') {
+      if (item.id === 'carbon') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-sparkles"/></svg><span class="preview-theme-tag">CARBON</span></div>`;
+      } else if (item.id === 'nebula') {
         previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-palette-shop"/></svg><span class="preview-theme-tag">NEBULA</span></div>`;
       } else if (item.id === 'crimson') {
         previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-flame"/></svg><span class="preview-theme-tag">CRIMSON</span></div>`;

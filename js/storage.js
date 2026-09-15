@@ -675,6 +675,8 @@ function loadUsers() {
     if (!Array.isArray(u.inventory.miniBgs)) u.inventory.miniBgs = [];
     if (!Array.isArray(u.inventory.banners)) u.inventory.banners = [];
     if (typeof u.nameStyle !== 'string') u.nameStyle = 'default';
+    if (typeof u.karma !== 'number') u.karma = Number(u.karma) || 0;
+    if (!Array.isArray(u.karmaGivenTo)) u.karmaGivenTo = [];
     if (!u.chatDeletedTimestamps || typeof u.chatDeletedTimestamps !== 'object') {
       u.chatDeletedTimestamps = {};
     }
@@ -1240,7 +1242,7 @@ function saveComplaints() {
 // Тема оформления
 function loadTheme() {
   const saved = localStorage.getItem('squad_theme');
-  const validThemes = ['default', 'lobbivo', 'finder', 'nebula', 'crimson', 'matrix'];
+  const validThemes = ['default', 'lobbivo', 'finder', 'carbon', 'nebula', 'crimson', 'matrix'];
   if (saved && validThemes.includes(saved)) {
     AppState.currentTheme = (saved === 'finder') ? 'lobbivo' : saved;
   } else {

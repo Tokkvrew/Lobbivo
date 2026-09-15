@@ -214,6 +214,7 @@ function registerUser(username, password, game, device) {
   }
 
   AppState.users[trimmedUser] = {
+    username: trimmedUser,
     password: trimmedPass,
     game: game || 'csgo',
     rank: '',
@@ -222,6 +223,8 @@ function registerUser(username, password, game, device) {
     device: device || 'PC',
     created: Date.now(),
     id: generateUserId(),
+    karma: 0,
+    karmaGivenTo: [],
     squads: [],
     lookingForTeam: false,
     hasCreatedSquad: false,

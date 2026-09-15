@@ -438,6 +438,8 @@ function renderProfileCustomization() {
         previewChipHtml = `<div class="preview-theme-chip"><span class="preview-l-glyph">L</span><span class="preview-theme-tag">GLASS</span></div>`;
       } else if (theme.id === 'default') {
         previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-sparkles"/></svg><span class="preview-theme-tag">CYBER</span></div>`;
+      } else if (theme.id === 'carbon') {
+        previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-sparkles"/></svg><span class="preview-theme-tag">CARBON</span></div>`;
       } else if (theme.id === 'nebula') {
         previewChipHtml = `<div class="preview-theme-chip"><svg class="preview-theme-icon"><use href="#icon-palette-shop"/></svg><span class="preview-theme-tag">NEBULA</span></div>`;
       } else if (theme.id === 'crimson') {

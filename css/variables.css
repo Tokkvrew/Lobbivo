@@ -258,3 +258,54 @@
   --brand-mid: #10b981;
   --brand-end: #06d6a0;
 }
+
+/* ============================================================
+   ТЕМА 5: CARBON STEALTH (КАРБОНОВЫЙ МОНОХРОМ И БЕЛЫЙ НЕОН)
+   Глубокий карбоново-черный, графит и сияющие белые кнопки с ореолом
+   ============================================================ */
+[data-theme="carbon"] {
+  --neon-blue: #ffffff;
+  --neon-cyan: #f8fafc;
+  --neon-purple: #e2e8f0;
+  --neon-pink: #cbd5e1;
+  --neon-green: #22c55e;
+  --neon-gold: #fbbf24;
+  --neon-orange: #f1f5f9;
+  --neon-red: #ff4d4d;
+
+  --bg-dark: #060608;
+  --bg-darker: #020203;
+  --bg-space-gradient: radial-gradient(ellipse at 50% -10%, #1c1d24 0%, #0c0d10 45%, #030304 100%);
+
+  --bg-card: rgba(18, 19, 24, 0.82);
+  --bg-card-hover: rgba(28, 29, 36, 0.92);
+  --bg-capsule: rgba(16, 17, 22, 0.85);
+  --bg-input: rgba(12, 13, 16, 0.88);
+
+  --glass-bg: rgba(18, 19, 24, 0.82);
+  --glass-bg-subtle: rgba(24, 25, 32, 0.65);
+  --glass-bg-modal: linear-gradient(145deg, rgba(32, 33, 40, 0.96) 0%, rgba(12, 13, 17, 0.98) 100%);
+  --glass-bg-input: rgba(10, 11, 14, 0.88);
+  --glass-bg-panel: linear-gradient(145deg, rgba(28, 29, 36, 0.97) 0%, rgba(10, 11, 15, 0.99) 100%);
+
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-border-subtle: rgba(255, 255, 255, 0.15);
+  --glass-border-highlight: rgba(255, 255, 255, 0.88);
+  --glass-blur: blur(30px) saturate(160%);
+  --glass-blur-modal: blur(36px) saturate(170%);
+  --glass-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 255, 255, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.45);
+
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+
+  --shadow-neon-cyan: 0 0 25px rgba(255, 255, 255, 0.5);
+  --shadow-neon-gold: 0 0 25px rgba(251, 191, 36, 0.35);
+  --shadow-neon-red: 0 0 25px rgba(255, 77, 77, 0.4);
+  --shadow-card: 0 16px 45px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+  --shadow-dropdown: 0 24px 70px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 255, 255, 0.3);
+
+  --brand-start: #ffffff;
+  --brand-mid: #94a3b8;
+  --brand-end: #475569;
+}

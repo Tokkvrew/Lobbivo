@@ -2008,6 +2008,12 @@
   box-shadow: 0 4px 16px rgba(0, 255, 136, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.4);
 }
 
+.theme-carbon-preview {
+  background: linear-gradient(135deg, #050507 0%, #1c1d24 45%, #0a0a0d 80%, #ffffff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.8), 0 0 14px rgba(255, 255, 255, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
 .preview-theme-chip {
   display: flex;
   flex-direction: column;
@@ -10032,6 +10038,11 @@ select:-webkit-autofill {
   color: #00ff88;
 }
 
+.item-title-icon.carbon-icon {
+  color: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+}
+
 .tag-svg {
   width: 12px;
   height: 12px;
@@ -10590,15 +10601,16 @@ select:-webkit-autofill {
 .censored-word {
   filter: blur(5.5px);
   -webkit-filter: blur(5.5px);
-  background: rgba(255, 45, 85, 0.16);
-  border: 1px dashed rgba(255, 45, 85, 0.45);
+  background: rgba(255, 45, 85, 0.18);
+  border: 1px dashed rgba(255, 45, 85, 0.48);
   border-radius: 5px;
   padding: 0 6px;
   margin: 0 2px;
   display: inline-block;
   user-select: none;
   cursor: pointer;
-  color: #ff6b8b !important;
+  color: transparent !important;
+  text-shadow: 0 0 6px rgba(255, 107, 139, 0.95) !important;
   font-weight: 600;
   letter-spacing: 0.2px;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -10607,11 +10619,12 @@ select:-webkit-autofill {
 }
 
 .censored-word:hover {
-  background: rgba(255, 45, 85, 0.3);
+  background: rgba(255, 45, 85, 0.32);
   border-color: #ff2d55;
   box-shadow: 0 0 10px rgba(255, 45, 85, 0.35);
   filter: blur(3.5px);
   -webkit-filter: blur(3.5px);
+  text-shadow: 0 0 5px rgba(255, 107, 139, 0.95) !important;
 }
 
 .censored-word.revealed {
@@ -10620,6 +10633,7 @@ select:-webkit-autofill {
   background: rgba(0, 229, 255, 0.12) !important;
   border: 1px solid rgba(0, 229, 255, 0.38) !important;
   color: #00e5ff !important;
+  text-shadow: none !important;
   box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
 }
 
@@ -13791,4 +13805,155 @@ select:-webkit-autofill {
   color: #ffffff !important;
   border-color: transparent !important;
   box-shadow: 0 0 16px rgba(0, 212, 255, 0.5) !important;
+}
+
+/* ============================================================
+   КАСТОМИЗАЦИЯ И СТИЛИ ТЕМЫ CARBON (CARBON FIBER & WHITE GLOW)
+   ============================================================ */
+
+/* 1. Карбоновые карточки и шапка с белой неоновой каймой */
+[data-theme="carbon"] .capsule-header {
+  background: rgba(14, 15, 19, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 255, 255, 0.08), inset 0 1px 1.5px rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="carbon"] .game-poster-card,
+[data-theme="carbon"] .player-card,
+[data-theme="carbon"] .glass-panel,
+[data-theme="carbon"] .chat-container,
+[data-theme="carbon"] .modal-box,
+[data-theme="carbon"] .shop-item-card,
+[data-theme="carbon"] .custom-theme-card {
+  background: rgba(16, 17, 22, 0.82) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+}
+
+[data-theme="carbon"] .game-poster-card:hover,
+[data-theme="carbon"] .player-card:hover,
+[data-theme="carbon"] .shop-item-card:hover,
+[data-theme="carbon"] .custom-theme-card:hover {
+  border-color: rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 255, 255, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 2. Сияющие белые кнопки с ореолом (White Neon Glow Buttons) */
+[data-theme="carbon"] .btn-primary,
+[data-theme="carbon"] .btn-gradient,
+[data-theme="carbon"] .btn-create-squad-floating,
+[data-theme="carbon"] .btn-find-party,
+[data-theme="carbon"] .btn-find-party.cyan,
+[data-theme="carbon"] .btn-shop-buy-action.can-buy,
+[data-theme="carbon"] .send-btn,
+[data-theme="carbon"] .btn-cta-glow,
+[data-theme="carbon"] .btn-equip {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 55%, #cbd5e1 100%) !important;
+  color: #050507 !important;
+  font-weight: 800 !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.55), 0 4px 14px rgba(0, 0, 0, 0.7) !important;
+  text-shadow: none !important;
+}
+
+[data-theme="carbon"] .btn-primary:hover,
+[data-theme="carbon"] .btn-gradient:hover,
+[data-theme="carbon"] .btn-create-squad-floating:hover,
+[data-theme="carbon"] .btn-find-party:hover,
+[data-theme="carbon"] .btn-find-party.cyan:hover,
+[data-theme="carbon"] .btn-shop-buy-action.can-buy:hover,
+[data-theme="carbon"] .send-btn:hover,
+[data-theme="carbon"] .btn-cta-glow:hover,
+[data-theme="carbon"] .btn-equip:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.85), 0 6px 20px rgba(0, 0, 0, 0.85) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+[data-theme="carbon"] .btn-outline {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.15) !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="carbon"] .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important;
+  color: #ffffff !important;
+}
+
+/* 3. Белое свечение надписей, заголовков и логотипа (Luminous White Typography) */
+[data-theme="carbon"] .capsule-brand-title,
+[data-theme="carbon"] .logo-text,
+[data-theme="carbon"] .page-title,
+[data-theme="carbon"] .section-title,
+[data-theme="carbon"] .hero-title,
+[data-theme="carbon"] .stat-val,
+[data-theme="carbon"] .stat-num,
+[data-theme="carbon"] .profile-hero-name,
+[data-theme="carbon"] .shop-header-title {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3) !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+[data-theme="carbon"] .capsule-brand-dot,
+[data-theme="carbon"] .logo-dot {
+  background: #ffffff !important;
+  box-shadow: 0 0 12px #ffffff, 0 0 20px #ffffff !important;
+}
+
+/* 4. Активные вкладки, фильтры и навигация с белым неоновым свечением */
+[data-theme="carbon"] .capsule-nav-item.active,
+[data-theme="carbon"] .filter-btn.active,
+[data-theme="carbon"] .shop-cat-btn.active,
+[data-theme="carbon"] .tab-btn.active,
+[data-theme="carbon"] .chat-cat-tab.active,
+[data-theme="carbon"] .nav-bottom-item.active {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="carbon"] .capsule-coin-btn {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="carbon"] .capsule-coin-btn:hover {
+  border-color: #ffffff !important;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.45) !important;
+}
+
+/* 5. Предосмотр темы Carbon в модалке магазина */
+.preview-theme-showcase-wrap.theme-carbon-preview .mini-ui-mockup {
+  background: #090a0d !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 255, 255, 0.2) !important;
+}
+
+.preview-theme-showcase-wrap.theme-carbon-preview .mini-ui-logo-badge {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8) !important;
+}
+
+.preview-theme-showcase-wrap.theme-carbon-preview .mini-ui-nav-link.active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  text-shadow: 0 0 8px #ffffff !important;
+}
+
+.preview-theme-showcase-wrap.theme-carbon-preview .mini-ui-btn.primary {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.7) !important;
 }

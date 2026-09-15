@@ -22,7 +22,7 @@ function _computeUsersFingerprint(usersObj) {
     const u = usersObj[k];
     if (!u) continue;
     const squadListStr = Array.isArray(u.squads) ? u.squads.map(s => `${s.id || ''}:${s.game || ''}:${s.active !== false ? 1 : 0}:${s.updatedAt || ''}`).join(',') : '';
-    fp += `${k}:${u.avatar || ''}:${u.frame || ''}:${u.coins || 0}:${u.game || ''}:${u.nameStyle || ''}:${u.banned ? 1 : 0}:${u.isMuted ? 1 : 0}:${u.lookingForTeam ? 1 : 0}:${squadListStr}:${(u.customTags || []).join(',')};`;
+    fp += `${k}:${u.karma || 0}:${u.avatar || ''}:${u.frame || ''}:${u.coins || 0}:${u.game || ''}:${u.nameStyle || ''}:${u.banned ? 1 : 0}:${u.isMuted ? 1 : 0}:${u.lookingForTeam ? 1 : 0}:${squadListStr}:${(u.customTags || []).join(',')};`;
   }
   return fp;
 }
@@ -117,6 +117,8 @@ const FirebaseSync = {
                 cloudUser.inventory = { frames: [], themes: [], nameStyles: [], banners: [], boosts: 0 };
               }
 
+              cloudUser.karma = typeof cloudUser.karma === 'number' ? cloudUser.karma : (Number(cloudUser.karma) || 0);
+
               const localUser = AppState.users[username];
               if (!cloudUser.privacy && localUser?.privacy) {
                 cloudUser.privacy = localUser.privacy;
@@ -142,6 +144,7 @@ const FirebaseSync = {
                 AppState.users[username] = {
                   ...localUser,
                   ...cloudUser,
+                  karma: cloudUser.karma,
                   squads: cloudUser.squads,
                   lookingForTeam: cloudUser.lookingForTeam,
                   hasCreatedSquad: cloudUser.hasCreatedSquad,
@@ -158,6 +161,7 @@ const FirebaseSync = {
                 AppState.users[username] = {
                   ...localUser,
                   ...cloudUser,
+                  karma: cloudUser.karma,
                   squads: cloudUser.squads,
                   lookingForTeam: cloudUser.lookingForTeam,
                   hasCreatedSquad: cloudUser.hasCreatedSquad,
@@ -452,6 +456,11 @@ const FirebaseSync = {
           userData.avatarUpdatedAt = Date.now();
         }
         const payload = JSON.parse(JSON.stringify(userData));
+        if (!payload.username) payload.username = username;
+        if (!payload.game) payload.game = userData.game || 'csgo';
+        if (!payload.device) payload.device = userData.device || 'PC';
+        if (typeof payload.karma !== 'number') payload.karma = Number(userData.karma) || 0;
+
         if (payload.squads && !Array.isArray(payload.squads) && typeof payload.squads === 'object') {
           payload.squads = Object.values(payload.squads);
         }

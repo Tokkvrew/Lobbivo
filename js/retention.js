@@ -163,36 +163,45 @@ const RetentionEngine = (function() {
     }
 
     const lastGiven = me.karmaGivenTo.find(item => item && item.username === targetUsername);
-    const ONE_DAY = 24 * 60 * 60 * 1000;
+    const COOLDOWN_MS = 3000;
 
-    if (lastGiven && (Date.now() - lastGiven.timestamp < ONE_DAY)) {
-      const remainingHours = Math.ceil((ONE_DAY - (Date.now() - lastGiven.timestamp)) / (60 * 60 * 1000));
-      showNotification('Кулдаун', `Вы уже хвалили этого игрока. Повторно можно через ${remainingHours} ч.`);
+    if (lastGiven && (Date.now() - (lastGiven.timestamp || 0) < COOLDOWN_MS)) {
+      const remainingSec = Math.ceil((COOLDOWN_MS - (Date.now() - lastGiven.timestamp)) / 1000);
+      showNotification('Подождите', `Следующий лайк можно поставить через ${remainingSec} сек.`);
       return;
     }
 
-    // Добавляем карму
-    targetUser.karma = (targetUser.karma || 0) + 1;
+    // Увеличиваем карму
+    const currentKarma = typeof targetUser.karma === 'number' ? targetUser.karma : (Number(targetUser.karma) || 0);
+    targetUser.karma = currentKarma + 1;
     
     // Записываем историю
     if (lastGiven) {
       lastGiven.timestamp = Date.now();
+      lastGiven.count = (lastGiven.count || 1) + 1;
     } else {
-      me.karmaGivenTo.push({ username: targetUsername, timestamp: Date.now() });
+      me.karmaGivenTo.push({ username: targetUsername, timestamp: Date.now(), count: 1 });
     }
 
     saveUsers(AppState.currentUser, true);
-    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
-      FirebaseSync.saveUser(targetUsername, targetUser);
+    saveUsers(targetUsername, true);
+
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
+      try {
+        FirebaseSync.rtdb.ref('users/' + targetUsername + '/karma').set(targetUser.karma).catch(() => {});
+      } catch (e) {}
     }
 
     playCyberSound('karma');
     triggerHaptic('success');
-    showNotification('Репутация повышена!', `Вы поставили +1 к карме игроку ${targetUsername}`);
+    showNotification('Репутация повышена!', `+1 к карме игроку ${targetUsername} (Всего: ${targetUser.karma})`);
 
     // Перерисовываем карточки и профиль
     if (typeof renderPlayers === 'function') {
       renderPlayers(AppState.selectedGameFilter || 'all');
+    }
+    if (typeof renderProfile === 'function' && AppState.currentUser && document.getElementById('pageProfile')?.classList.contains('active')) {
+      renderProfile();
     }
   }
 

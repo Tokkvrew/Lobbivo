@@ -112,6 +112,7 @@ const FRAME_DEFINITIONS = [
 const THEME_DEFINITIONS = [
   { id: 'default', name: 'Neon Cyber', previewClass: 'theme-default-preview', icon: 'icon-sparkles', desc: 'Классический неоново-голубой стиль', cost: 0 },
   { id: 'lobbivo', name: 'Liquid Glass', previewClass: 'theme-lobbivo-preview', icon: 'icon-palette-shop', desc: 'Фирменный фиолетовый кибер-интерфейс', cost: 0 },
+  { id: 'carbon', name: 'Carbon Stealth', previewClass: 'theme-carbon-preview', icon: 'icon-sparkles', desc: 'Глубокий карбоновый монохром и белое неоновое свечение', cost: 100, tag: 'Exclusive' },
   { id: 'nebula', name: 'Deep Nebula', previewClass: 'theme-nebula-preview', icon: 'icon-palette-shop', desc: 'Космический ультра-фиолет и звезды', cost: 80 },
   { id: 'crimson', name: 'Crimson Red', previewClass: 'theme-crimson-preview', icon: 'icon-flame', desc: 'Огненно-бордовый с искрами', cost: 80 },
   { id: 'matrix', name: 'Matrix Emerald', previewClass: 'theme-matrix-preview', icon: 'icon-nodes-menu', desc: 'Изумрудный кибернетический код', cost: 80 }
