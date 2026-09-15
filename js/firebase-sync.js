@@ -388,6 +388,16 @@ const FirebaseSync = {
     } catch (e) {
       console.warn('Complaints listener setup failed:', e);
     }
+
+    // 7. Слушатель глобальной конфигурации Telegram-бота (синхронизация настроек создателя для всех пользователей)
+    try {
+      this.rtdb.ref('system/tgBotConfig').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data && typeof data === 'object' && typeof TelegramBotService !== 'undefined') {
+          TelegramBotService.saveConfig(data);
+        }
+      });
+    } catch (e) {}
   },
 
   _userSaveTimers: {},

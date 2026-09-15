@@ -83,9 +83,27 @@ function switchAdminTab(tab = 'complaints') {
     const tokenInput = document.getElementById('adminTgBotTokenInput');
     const usernameInput = document.getElementById('adminTgBotUsernameInput');
     const enabledToggle = document.getElementById('adminTgBotEnabledToggle');
+    const badge = document.getElementById('adminTgBotStatusBadge');
+
     if (tokenInput) tokenInput.value = config.botToken || '';
-    if (usernameInput) usernameInput.value = config.botUsername || 'LobbivoBot';
+    if (usernameInput) usernameInput.value = config.botUsername || 'Lobbivobot';
     if (enabledToggle) enabledToggle.checked = config.enabled !== false;
+
+    if (badge) {
+      badge.textContent = 'Проверка связи...';
+      badge.style.color = '#ff9800';
+    }
+
+    TelegramBotService.checkBotHealth().then((health) => {
+      if (!badge) return;
+      if (health.ok) {
+        badge.style.color = '#00f0ff';
+        badge.textContent = `🟢 Онлайн (@${health.botUsername || 'Lobbivobot'})`;
+      } else {
+        badge.style.color = '#ff4655';
+        badge.textContent = `🔴 ${health.error || 'Токен отозван / недействителен'}`;
+      }
+    });
   }
 }
 

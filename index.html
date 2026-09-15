@@ -1492,25 +1492,6 @@
                   </button>
                 </div>
               </div>
-
-              <!-- БЛОК НАСТРОЙКИ ТОКЕНА БОТА -->
-              <div class="tg-token-config-box" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                  <span style="font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,0.85);">🔑 Токен бота @BotFather:</span>
-                  <span id="tgBotHealthStatus" style="font-size: 0.78rem; font-weight: 600; color: #ff9800;">Проверка связи...</span>
-                </div>
-                <div class="tg-manual-input-row">
-                  <div class="cyber-input-wrapper">
-                    <input type="password" id="tgBotCustomTokenInput" placeholder="Вставьте новый токен из @BotFather">
-                  </div>
-                  <button type="button" class="btn btn-sm btn-outline" id="saveTgCustomTokenBtn">
-                    <span>Сохранить токен</span>
-                  </button>
-                </div>
-                <div style="font-size: 0.76rem; color: rgba(255,255,255,0.45); margin-top: 5px;">
-                  Если GitHub отозвал токен, напишите в @BotFather команду <code>/token</code>, скопируйте новый токен и сохраните его здесь.
-                </div>
-              </div>
             </div>
 
             <!-- ТИПЫ УВЕДОМЛЕНИЙ -->
@@ -2995,20 +2976,22 @@
                 </div>
               </div>
 
-              <div class="field" style="margin-top: 12px;">
-                <label for="adminTgBotTokenInput">Bot API Token (из @BotFather):</label>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <label for="adminTgBotTokenInput">Bot API Token (из @BotFather):</label>
+                  <span id="adminTgBotStatusBadge" style="font-size: 0.8rem; font-weight: 700; color: #ff9800;">Проверка связи...</span>
+                </div>
                 <div class="input-cyber-wrapper">
                   <svg class="input-cyber-icon"><use href="#icon-lock"/></svg>
                   <input type="password" id="adminTgBotTokenInput" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
                 </div>
-                <span class="field-hint">Токен сохраняется локально и используется для прямых вызовов Telegram Bot API</span>
+                <span class="field-hint">Токен сохраняется в защищенном облаке Firebase и мгновенно активируется для всех пользователей платформы</span>
               </div>
             </div>
 
             <div class="admin-badge-actions">
               <button type="button" class="btn btn-save-clean" id="saveAdminTgBotConfigBtn">
                 <svg><use href="#icon-check"/></svg>
-                <span>Сохранить настройки Telegram-бота</span>
+                <span>Проверить и сохранить настройки бота</span>
               </button>
             </div>
           </div>

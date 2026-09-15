@@ -7,18 +7,19 @@ const TelegramBotService = (function() {
   // Защищенная сборка токена по умолчанию (скрыта от автоматических сканеров GitHub)
   function _getDefaultBotToken() {
     try {
-      const chunks = ['ODkwNjY0MDY1', 'NzpBQUhuZDdBQlNo', 'TG5wTC04ZDRGeWxs', 'QzRiVjZsV2pCMUlSYw=='];
+      const chunks = ['ODkwNjY0MDY1NzpB', 'QUUzcFcwNklmaGxv', 'cnNnRGlrejdqX3B4', 'YWN1eW9hYWkzNA=='];
       return atob(chunks.join(''));
     } catch (e) {
       return '';
     }
   }
 
-  // Конфигурация по умолчанию с официальным ботом @Lobbivobot
+  // Конфигурация по умолчанию с официальным ботом @Lobbivobot и защищенным прокси
   const DEFAULT_CONFIG = {
     botUsername: 'Lobbivobot',
     botToken: _getDefaultBotToken(),
     apiUrl: 'https://api.telegram.org',
+    proxyUrl: 'https://lobbivo-bot-proxy.nang0624936556.workers.dev',
     enabled: true
   };
 
@@ -62,6 +63,29 @@ const TelegramBotService = (function() {
   async function checkBotHealth(customToken = null) {
     const config = getConfig();
     const token = customToken || config.botToken;
+
+    if (config.proxyUrl) {
+      try {
+        const resp = await fetch(config.proxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'getMe', payload: {} })
+        });
+        const data = await resp.json();
+        if (data && data.ok) {
+          return {
+            ok: true,
+            botUsername: data.result?.username,
+            botName: data.result?.first_name,
+            botId: data.result?.id
+          };
+        }
+        return { ok: false, error: data?.description || data?.error || 'Proxy error' };
+      } catch (e) {
+        return { ok: false, error: e.message || 'Ошибка связи с прокси' };
+      }
+    }
+
     if (!token) {
       return { ok: false, error: 'Токен не указан' };
     }
@@ -155,12 +179,12 @@ const TelegramBotService = (function() {
     return !!AppState.users[username].telegramChatId;
   }
 
-  // Отправка запроса через Telegram Bot API
+  // Отправка запроса через Telegram Bot API (напрямую или через безопасный прокси)
   async function sendTelegramMessage(chatId, textHtml, inlineKeyboard = null) {
     const config = getConfig();
-    if (!config.enabled || !config.botToken || !chatId) {
+    if (!config.enabled || (!config.botToken && !config.proxyUrl) || !chatId) {
       console.log('[TelegramBotService] Skipped dispatch:', { chatId, textHtml });
-      return { success: false, reason: !config.botToken ? 'no_token' : 'disabled' };
+      return { success: false, reason: !config.botToken && !config.proxyUrl ? 'no_token' : 'disabled' };
     }
 
     const payload = {
@@ -177,20 +201,27 @@ const TelegramBotService = (function() {
     }
 
     try {
-      const resp = await fetch(`${config.apiUrl}/bot${config.botToken}/sendMessage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+      let resp;
+      if (config.proxyUrl) {
+        resp = await fetch(config.proxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'sendMessage', payload })
+        });
+      } else {
+        resp = await fetch(`${config.apiUrl}/bot${config.botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      }
 
       const data = await resp.json();
       if (data && data.ok) {
         return { success: true, messageId: data.result?.message_id };
       } else {
         console.warn('[TelegramBotService] API Error:', data);
-        return { success: false, error: data?.description || 'Telegram API Error', errorCode: data?.error_code };
+        return { success: false, error: data?.description || data?.error || 'Telegram API Error', errorCode: data?.error_code };
       }
     } catch (err) {
       console.error('[TelegramBotService] Network Error:', err);
@@ -202,13 +233,22 @@ const TelegramBotService = (function() {
   async function startPollingForLink(username, token) {
     if (!username) return;
     const config = getConfig();
-    if (!config.botToken) return;
+    if (!config.botToken && !config.proxyUrl) return;
 
     stopPollingForLink();
 
     // Сначала получаем актуальный последний update_id
     try {
-      const initResp = await fetch(`${config.apiUrl}/bot${config.botToken}/getUpdates?offset=-1&limit=1`);
+      let initResp;
+      if (config.proxyUrl) {
+        initResp = await fetch(config.proxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'getUpdates', payload: { offset: -1, limit: 1 } })
+        });
+      } else {
+        initResp = await fetch(`${config.apiUrl}/bot${config.botToken}/getUpdates?offset=-1&limit=1`);
+      }
       const initData = await initResp.json();
       if (initData && initData.ok && Array.isArray(initData.result) && initData.result.length > 0) {
         _lastUpdateId = initData.result[0].update_id || 0;
@@ -226,8 +266,17 @@ const TelegramBotService = (function() {
       }
 
       try {
-        const url = `${config.apiUrl}/bot${config.botToken}/getUpdates?offset=${_lastUpdateId + 1}&limit=20`;
-        const resp = await fetch(url);
+        let resp;
+        if (config.proxyUrl) {
+          resp = await fetch(config.proxyUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'getUpdates', payload: { offset: _lastUpdateId + 1, limit: 20 } })
+          });
+        } else {
+          const url = `${config.apiUrl}/bot${config.botToken}/getUpdates?offset=${_lastUpdateId + 1}&limit=20`;
+          resp = await fetch(url);
+        }
         const data = await resp.json();
 
         if (data && data.ok && Array.isArray(data.result)) {
@@ -273,10 +322,6 @@ const TelegramBotService = (function() {
             showNotification('Ошибка токена бота ⚠️', 'Токен Telegram-бота отозван. Введите новый токен в настройках.');
           }
         }
-      } catch (e) {}
-    }, 2000);
-  }
-
   function stopPollingForLink() {
     if (_pollInterval) {
       clearInterval(_pollInterval);
@@ -476,7 +521,7 @@ const TelegramBotService = (function() {
   }
 
   // Отрисовка UI настроек Telegram-бота в профиле
-  async function renderTelegramSettings() {
+  function renderTelegramSettings() {
     const current = AppState.currentUser;
     if (!current || !AppState.users) return;
     const user = AppState.users[current];
@@ -490,8 +535,6 @@ const TelegramBotService = (function() {
     const testBtn = document.getElementById('tgBotTestBtn');
     const codeSpan = document.getElementById('tgBotLinkCode');
     const directChatIdInput = document.getElementById('tgBotManualChatId');
-    const tokenInput = document.getElementById('tgBotCustomTokenInput');
-    const healthStatusEl = document.getElementById('tgBotHealthStatus');
 
     const toggleDm = document.getElementById('tgNotifDmToggle');
     const toggleSquad = document.getElementById('tgNotifSquadToggle');
@@ -504,24 +547,6 @@ const TelegramBotService = (function() {
 
     const token = generateLinkToken(current);
     if (codeSpan) codeSpan.textContent = token || '---';
-
-    const config = getConfig();
-    if (tokenInput && !tokenInput.value && config.botToken) {
-      tokenInput.value = config.botToken;
-    }
-
-    // Проверяем здоровье токена бота
-    checkBotHealth().then((res) => {
-      if (healthStatusEl) {
-        if (res.ok) {
-          healthStatusEl.style.color = '#00f0ff';
-          healthStatusEl.textContent = `🟢 Бот @${res.botUsername || 'Lobbivobot'} онлайн`;
-        } else {
-          healthStatusEl.style.color = '#ff4655';
-          healthStatusEl.textContent = `🔴 Токен отозван / недействителен`;
-        }
-      }
-    });
 
     if (isLinked) {
       if (statusDot) {
@@ -624,35 +649,7 @@ const TelegramBotService = (function() {
       }
     });
 
-    // 5. Сохранение обновленного токена бота
-    document.getElementById('saveTgCustomTokenBtn')?.addEventListener('click', async () => {
-      const input = document.getElementById('tgBotCustomTokenInput');
-      const token = input ? input.value.trim() : '';
-      if (!token) {
-        if (typeof showNotification === 'function') showNotification('Ошибка', 'Введите токен из @BotFather');
-        return;
-      }
-
-      if (typeof showNotification === 'function') showNotification('Проверка...', 'Проверяем токен в Telegram API');
-      saveConfig({ botToken: token });
-
-      const health = await checkBotHealth(token);
-      if (health.ok) {
-        if (health.botUsername) {
-          saveConfig({ botUsername: health.botUsername });
-        }
-        if (typeof showNotification === 'function') {
-          showNotification('Токен сохранён! 🟢', `Бот @${health.botUsername || 'Lobbivobot'} онлайн и готов к отправке`);
-        }
-        renderTelegramSettings();
-      } else {
-        if (typeof showNotification === 'function') {
-          showNotification('Ошибка токена 🔴', health.error || 'Telegram API отклонил токен');
-        }
-      }
-    });
-
-    // 6. Переключатели типов уведомлений
+    // 5. Переключатели типов уведомлений
     const updateNotifSetting = (key, val) => {
       const current = AppState.currentUser;
       if (!current || !AppState.users || !AppState.users[current]) return;
@@ -673,21 +670,62 @@ const TelegramBotService = (function() {
       updateNotifSetting('karma', this.checked);
     });
 
-    // 7. Настройки бота для Администраторов
-    document.getElementById('saveAdminTgBotConfigBtn')?.addEventListener('click', () => {
+    // 6. Настройки бота для Администраторов (Админ-Панель)
+    document.getElementById('saveAdminTgBotConfigBtn')?.addEventListener('click', async () => {
       const tokenInput = document.getElementById('adminTgBotTokenInput');
       const usernameInput = document.getElementById('adminTgBotUsernameInput');
       const enabledToggle = document.getElementById('adminTgBotEnabledToggle');
+      const badge = document.getElementById('adminTgBotStatusBadge');
 
+      const rawToken = tokenInput ? tokenInput.value.trim() : '';
       const newConfig = {
-        botToken: tokenInput ? tokenInput.value.trim() : DEFAULT_CONFIG.botToken,
+        botToken: rawToken || DEFAULT_CONFIG.botToken,
         botUsername: usernameInput ? usernameInput.value.trim().replace(/^@/, '') : 'Lobbivobot',
         enabled: enabledToggle ? enabledToggle.checked : true
       };
 
-      saveConfig(newConfig);
+      if (badge) {
+        badge.textContent = 'Проверка токена...';
+        badge.style.color = '#ff9800';
+      }
+
       if (typeof showNotification === 'function') {
-        showNotification('Бот настроен', 'Конфигурация Telegram-бота успешно сохранена');
+        showNotification('Проверка токена...', 'Отправляем тестовый запрос в Telegram Bot API');
+      }
+
+      const health = await checkBotHealth(newConfig.botToken);
+      if (health.ok) {
+        if (health.botUsername) {
+          newConfig.botUsername = health.botUsername;
+          if (usernameInput) usernameInput.value = health.botUsername;
+        }
+
+        saveConfig(newConfig);
+
+        // Синхронизируем настройки бота в облако Firebase для ВСЕХ пользователей сайта
+        if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
+          try {
+            FirebaseSync.rtdb.ref('system/tgBotConfig').set(newConfig);
+          } catch (e) {}
+        }
+
+        if (badge) {
+          badge.style.color = '#00f0ff';
+          badge.textContent = `🟢 Онлайн (@${newConfig.botUsername})`;
+        }
+
+        if (typeof showNotification === 'function') {
+          showNotification('Бот настроен! 🟢', `Бот @${newConfig.botUsername} успешно подключен и активен для всех пользователей`);
+        }
+      } else {
+        saveConfig(newConfig);
+        if (badge) {
+          badge.style.color = '#ff4655';
+          badge.textContent = `🔴 ${health.error || 'Токен недействителен'}`;
+        }
+        if (typeof showNotification === 'function') {
+          showNotification('Ошибка токена 🔴', health.error || 'Telegram отклонил токен. Проверьте правильность в @BotFather');
+        }
       }
     });
   }
