@@ -137,6 +137,18 @@ function loginUser(username, password) {
     });
   };
 
+  const handleAuthenticated = (authenticatedUser) => {
+    // Если у аккаунта привязан Telegram, запрашиваем 2FA код подтверждения
+    if (typeof TelegramBotService !== 'undefined' && TelegramBotService.isTelegramLinked(trimmedUser)) {
+      hideAuthModal();
+      showTg2faModal(trimmedUser, () => {
+        proceedLogin(authenticatedUser);
+      });
+      return;
+    }
+    proceedLogin(authenticatedUser);
+  };
+
   if (!user) {
     // Попытка найти пользователя в облаке Firebase RTDB при входе с нового устройства/браузера
     if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
@@ -147,7 +159,7 @@ function loginUser(username, password) {
           try {
             localStorage.setItem('squad_users', JSON.stringify(AppState.users));
           } catch (e) {}
-          proceedLogin(cloudUser);
+          handleAuthenticated(cloudUser);
         } else {
           setErrorMessage(loginErr, 'Неверный логин или пароль');
         }
@@ -166,8 +178,138 @@ function loginUser(username, password) {
     return false;
   }
 
-  proceedLogin(user);
+  handleAuthenticated(user);
   return true;
+}
+
+// ============================================================
+//  2FA АУТЕНТИФИКАЦИЯ ЧЕРЕЗ TELEGRAM BOT
+// ============================================================
+
+let _tg2faSuccessCallback = null;
+let _tg2faPendingUsername = null;
+let _tg2faCooldownTimer = null;
+let _tg2faCooldownSec = 0;
+
+function showTg2faModal(username, onSuccess) {
+  _tg2faPendingUsername = username;
+  _tg2faSuccessCallback = onSuccess;
+
+  const modal = document.getElementById('tg2faModal');
+  const userLabel = document.getElementById('tg2faUsernameLabel');
+  const input = document.getElementById('tg2faCodeInput');
+  const errEl = document.getElementById('tg2faError');
+
+  if (userLabel) userLabel.textContent = username;
+  if (input) {
+    input.value = '';
+    setTimeout(() => input.focus(), 150);
+  }
+  if (errEl) errEl.classList.remove('show');
+
+  if (modal) modal.classList.add('show');
+
+  // Отправляем 2FA код в Telegram
+  if (typeof TelegramBotService !== 'undefined') {
+    TelegramBotService.send2faLoginCode(username).then((res) => {
+      if (res && res.success) {
+        if (typeof showNotification === 'function') {
+          showNotification('Код отправлен в Telegram', 'Проверьте сообщения от бота @Lobbivobot');
+        }
+      } else {
+        const msg = res?.error || 'Не удалось отправить код в Telegram';
+        if (errEl) setErrorMessage(errEl, msg);
+      }
+    });
+  }
+
+  startTg2faResendTimer(60);
+}
+
+function hideTg2faModal() {
+  const modal = document.getElementById('tg2faModal');
+  if (modal) modal.classList.remove('show');
+  _tg2faSuccessCallback = null;
+  _tg2faPendingUsername = null;
+  if (_tg2faCooldownTimer) {
+    clearInterval(_tg2faCooldownTimer);
+    _tg2faCooldownTimer = null;
+  }
+}
+
+function startTg2faResendTimer(seconds = 60) {
+  _tg2faCooldownSec = seconds;
+  const resendBtn = document.getElementById('tg2faResendBtn');
+  const timerSpan = document.getElementById('tg2faTimerSpan');
+
+  if (_tg2faCooldownTimer) clearInterval(_tg2faCooldownTimer);
+
+  if (resendBtn) resendBtn.disabled = true;
+
+  const updateDisplay = () => {
+    if (_tg2faCooldownSec <= 0) {
+      if (_tg2faCooldownTimer) clearInterval(_tg2faCooldownTimer);
+      if (resendBtn) resendBtn.disabled = false;
+      if (timerSpan) timerSpan.textContent = '';
+      return;
+    }
+    if (timerSpan) timerSpan.textContent = `(${_tg2faCooldownSec}с)`;
+    _tg2faCooldownSec--;
+  };
+
+  updateDisplay();
+  _tg2faCooldownTimer = setInterval(updateDisplay, 1000);
+}
+
+function submitTg2faCode() {
+  if (!_tg2faPendingUsername) return;
+  const input = document.getElementById('tg2faCodeInput');
+  const errEl = document.getElementById('tg2faError');
+  const code = input ? input.value.trim() : '';
+
+  if (!code || code.length < 6) {
+    if (errEl) setErrorMessage(errEl, 'Введите 6-значный код из Telegram');
+    return;
+  }
+
+  if (typeof TelegramBotService !== 'undefined') {
+    const isValid = TelegramBotService.verify2faLoginCode(_tg2faPendingUsername, code);
+    if (!isValid) {
+      if (errEl) setErrorMessage(errEl, 'Неверный или истёкший код подтверждения');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      return;
+    }
+
+    // Код верный!
+    const cb = _tg2faSuccessCallback;
+    hideTg2faModal();
+    if (typeof cb === 'function') {
+      cb();
+    }
+  }
+}
+
+function resendTg2faCode() {
+  if (!_tg2faPendingUsername) return;
+  const errEl = document.getElementById('tg2faError');
+  if (errEl) errEl.classList.remove('show');
+
+  if (typeof TelegramBotService !== 'undefined') {
+    TelegramBotService.send2faLoginCode(_tg2faPendingUsername).then((res) => {
+      if (res && res.success) {
+        if (typeof showNotification === 'function') {
+          showNotification('Новый код отправлен', 'Проверьте сообщения от @Lobbivobot в Telegram');
+        }
+        startTg2faResendTimer(60);
+      } else {
+        const msg = res?.error || 'Не удалось отправить код';
+        if (errEl) setErrorMessage(errEl, msg);
+      }
+    });
+  }
 }
 
 function registerUser(username, password, game, device) {

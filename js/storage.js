@@ -1078,6 +1078,71 @@ function getChatMessages(user1, user2) {
   return allMsgs;
 }
 
+// Проверка: разблокирован ли платный ЛС для пользователя
+function isDmUnlockedForUser(targetUser, currentUsername) {
+  if (!targetUser || !currentUsername) return true;
+  if (targetUser === currentUsername) return true;
+
+  // 1. Персонал (CEO / Администраторы / Модераторы) пишут свободно
+  if (typeof isUserAdmin === 'function' && isUserAdmin(currentUsername)) return true;
+  if (typeof isUserCEO === 'function' && isUserCEO(currentUsername)) return true;
+  if (typeof isUserModerator === 'function' && isUserModerator(currentUsername)) return true;
+
+  // 2. Друзьям писать всегда бесплатно
+  if (typeof areFriends === 'function' && areFriends(currentUsername, targetUser)) return true;
+
+  const targetData = AppState.users ? AppState.users[targetUser] : null;
+  if (!targetData) return true;
+
+  // Платный ЛС применяется ТОЛЬКО если у целевого пользователя включен режим 'coins'
+  const dmAccess = targetData.privacy?.dmAccess || 'all';
+  if (dmAccess !== 'coins' && dmAccess !== 'paid') return true;
+
+  const currentUserData = AppState.users ? AppState.users[currentUsername] : null;
+
+  // 3. Проверка в профиле текущего пользователя (отправителя)
+  if (Array.isArray(currentUserData?.unlockedDms) && currentUserData.unlockedDms.includes(targetUser)) {
+    return true;
+  }
+
+  // 4. Проверка в профиле целевого пользователя (получателя)
+  if (Array.isArray(targetData?.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername)) {
+    return true;
+  }
+
+  // 5. Проверка в локальном хранилище браузера (localStorage fallback)
+  try {
+    const localKey = `lobbivo_unlocked_dms_${currentUsername}`;
+    const saved = localStorage.getItem(localKey);
+    if (saved) {
+      const list = JSON.parse(saved);
+      if (Array.isArray(list) && list.includes(targetUser)) {
+        if (currentUserData) {
+          if (!Array.isArray(currentUserData.unlockedDms)) currentUserData.unlockedDms = [];
+          if (!currentUserData.unlockedDms.includes(targetUser)) currentUserData.unlockedDms.push(targetUser);
+        }
+        return true;
+      }
+    }
+  } catch (e) {}
+
+  // 6. Проверка: если в этом диалоге уже есть отправленные сообщения, доступ открыт
+  try {
+    if (typeof getChatMessages === 'function') {
+      const msgs = getChatMessages(currentUsername, targetUser);
+      if (Array.isArray(msgs) && msgs.length > 0) {
+        if (currentUserData) {
+          if (!Array.isArray(currentUserData.unlockedDms)) currentUserData.unlockedDms = [];
+          if (!currentUserData.unlockedDms.includes(targetUser)) currentUserData.unlockedDms.push(targetUser);
+        }
+        return true;
+      }
+    }
+  } catch (e) {}
+
+  return false;
+}
+
 function addMessage(from, to, text, replyTo = null) {
   if (isUserBanned(from)) {
     throw new Error('Ваш аккаунт заблокирован');
@@ -1086,7 +1151,7 @@ function addMessage(from, to, text, replyTo = null) {
     const info = getMuteInfo(from);
     throw new Error(`Вам ограничен доступ к чату: ${info?.muteReason || 'Блокировка'} (${info?.remainingFormatted || ''})`);
   }
-  if (typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(to, from)) {
+  if (!isDmUnlockedForUser(to, from)) {
     throw new Error('Требуется оплата за отправку личного сообщения');
   }
   const key = getMessagesKey(from, to);

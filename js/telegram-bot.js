@@ -1,18 +1,33 @@
 // ============================================================
-//  LOBBIVO 2.0 — TELEGRAM BOT NOTIFICATION SERVICE
-//  Мгновенные уведомления в Telegram о заявках на игру и ЛС
+//  LOBBIVO 2.0 — TELEGRAM BOT NOTIFICATION & 2FA SERVICE
+//  Мгновенные уведомления в Telegram о заявках на игру, ЛС и 2FA коды
 // ============================================================
 
 const TelegramBotService = (function() {
-  // Конфигурация по умолчанию (может быть переопределена через Админ-панель или localStorage)
+  // Конфигурация по умолчанию с официальным токеном @Lobbivobot
   const DEFAULT_CONFIG = {
-    botUsername: 'LobbivoBot',
-    botToken: '', // Вводится администратором в настройках платформы
+    botUsername: 'Lobbivobot',
+    botToken: '8906640657:AAHnd7ABShLnpL-8d4FyllC4bV6lWjB1IRc',
     apiUrl: 'https://api.telegram.org',
     enabled: true
   };
 
   const STORAGE_KEY_CONFIG = 'lobbivo_tg_bot_config';
+
+  let _pollInterval = null;
+  let _lastUpdateId = 0;
+  let _active2faCodes = {}; // { username: { code, expiresAt, chatId } }
+
+  function _safeEscape(str) {
+    if (typeof escapeHtml === 'function') return escapeHtml(str);
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
   function getConfig() {
     try {
@@ -50,7 +65,7 @@ const TelegramBotService = (function() {
   function getBotDeepLink(username) {
     const config = getConfig();
     const token = generateLinkToken(username);
-    const botName = (config.botUsername || 'LobbivoBot').replace(/^@/, '');
+    const botName = (config.botUsername || 'Lobbivobot').replace(/^@/, '');
     return `https://t.me/${botName}?start=${encodeURIComponent(token || username)}`;
   }
 
@@ -105,7 +120,7 @@ const TelegramBotService = (function() {
   async function sendTelegramMessage(chatId, textHtml, inlineKeyboard = null) {
     const config = getConfig();
     if (!config.enabled || !config.botToken || !chatId) {
-      console.log('[TelegramBotService] Simulation / Skipped dispatch:', { chatId, textHtml });
+      console.log('[TelegramBotService] Skipped dispatch:', { chatId, textHtml });
       return { success: false, reason: !config.botToken ? 'no_token' : 'disabled' };
     }
 
@@ -144,6 +159,131 @@ const TelegramBotService = (function() {
     }
   }
 
+  // Автоматический опрос Telegram Bot API (getUpdates) при открытии ссылки привязки
+  function startPollingForLink(username, token) {
+    if (!username || !token) return;
+    const config = getConfig();
+    if (!config.botToken) return;
+
+    stopPollingForLink();
+
+    let attempts = 0;
+    const maxAttempts = 60; // 60 * 2 сек = 2 минуты активного опроса
+
+    _pollInterval = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        stopPollingForLink();
+        return;
+      }
+
+      try {
+        const url = `${config.apiUrl}/bot${config.botToken}/getUpdates?offset=${_lastUpdateId + 1}&limit=20`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        if (data && data.ok && Array.isArray(data.result)) {
+          for (const update of data.result) {
+            _lastUpdateId = Math.max(_lastUpdateId, update.update_id || 0);
+            const msg = update.message;
+            if (!msg || !msg.text) continue;
+
+            const text = msg.text.trim();
+            // Проверяем /start с токеном: /start link_XXXXXX или просто link_XXXXXX
+            if (text.includes(token) || text.includes(username)) {
+              const chatId = msg.chat?.id || msg.from?.id;
+              const tgUser = msg.from?.username ? `@${msg.from.username}` : (msg.from?.first_name || '');
+
+              if (chatId) {
+                linkTelegramAccount(username, chatId, tgUser);
+                stopPollingForLink();
+
+                // Отправляем приветственное подтверждение в Telegram
+                sendTelegramMessage(
+                  chatId,
+                  `✅ <b>LOBBIVO | Бот успешно подключен!</b>\n\n` +
+                  `Вы привязали Telegram к аккаунту <b>${_safeEscape(username)}</b> на платформе Lobbivo.\n\n` +
+                  `🔔 Теперь вы будете получать уведомления о заявках на игру, личных сообщениях и защитные 2FA коды для безопасного входа в аккаунт! 🚀`
+                );
+
+                if (typeof showNotification === 'function') {
+                  showNotification('Telegram привязан! 🟢', `Бот успешно подключен к аккаунту ${username}`);
+                }
+                if (typeof RetentionEngine !== 'undefined') {
+                  RetentionEngine.playSound('success');
+                  RetentionEngine.haptic('success');
+                }
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    }, 2000);
+  }
+
+  function stopPollingForLink() {
+    if (_pollInterval) {
+      clearInterval(_pollInterval);
+      _pollInterval = null;
+    }
+  }
+
+  // ============================================================
+  //  2FA АУТЕНТИФИКАЦИЯ ЧЕРЕЗ TELEGRAM ПРИ ВХОДЕ
+  // ============================================================
+
+  // Генерация и отправка 6-значного 2FA кода подтверждения
+  async function send2faLoginCode(username) {
+    if (!username) return { success: false, error: 'Пользователь не указан' };
+    const user = AppState.users ? AppState.users[username] : null;
+    if (!user || !user.telegramChatId) {
+      return { success: false, error: 'У пользователя не привязан Telegram' };
+    }
+
+    // Генерируем случайный 6-значный код
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 минут
+
+    _active2faCodes[username] = {
+      code,
+      expiresAt,
+      chatId: user.telegramChatId
+    };
+
+    const textHtml = `🔐 <b>LOBBIVO | Код подтверждения входа</b>\n\n` +
+      `Код для авторизации в аккаунт <b>${_safeEscape(user.name || username)}</b>:\n\n` +
+      `<code>${code}</code>\n\n` +
+      `⏱ Код действителен в течение <b>5 минут</b>.\n` +
+      `⚠️ Если вы не пытались войти в аккаунт, срочно смените пароль в настройках!`;
+
+    const res = await sendTelegramMessage(user.telegramChatId, textHtml);
+    return { success: res.success, error: res.error, codeDebug: code };
+  }
+
+  // Проверка введенного 2FA кода
+  function verify2faLoginCode(username, inputCode) {
+    if (!username || !inputCode) return false;
+    const item = _active2faCodes[username];
+    if (!item) return false;
+
+    if (Date.now() > item.expiresAt) {
+      delete _active2faCodes[username];
+      return false;
+    }
+
+    const cleanInput = String(inputCode).trim();
+    if (cleanInput === String(item.code)) {
+      delete _active2faCodes[username];
+      return true;
+    }
+    return false;
+  }
+
+  // ============================================================
+  //  УВЕДОМЛЕНИЯ О СОБЫТИЯХ
+  // ============================================================
+
   // 1. Уведомление о заявке на совместную игру / в друзья
   async function notifyFriendRequest(fromUsername, toUsername, initialMsg = '') {
     if (!fromUsername || !toUsername || fromUsername === toUsername) return;
@@ -151,18 +291,17 @@ const TelegramBotService = (function() {
     const fromUser = AppState.users ? AppState.users[fromUsername] : null;
     if (!toUser || !toUser.telegramChatId) return;
 
-    // Проверяем настройки уведомлений получателя
     if (toUser.telegramNotifs && toUser.telegramNotifs.squad === false) return;
 
     const fromName = fromUser?.name || fromUsername;
     const gameName = fromUser?.game ? (typeof getGameNameById === 'function' ? getGameNameById(fromUser.game) : fromUser.game.toUpperCase()) : 'онлайн-игру';
-    const rankInfo = fromUser?.rank ? ` · <b>${escapeHtml(fromUser.rank)}</b>` : '';
+    const rankInfo = fromUser?.rank ? ` · <b>${_safeEscape(fromUser.rank)}</b>` : '';
 
     let html = `🎮 <b>LOBBIVO | Новая заявка на игру!</b>\n\n`;
-    html += `Игрок <b>${escapeHtml(fromName)}</b> хочет сыграть с вами в <b>${escapeHtml(gameName)}</b>${rankInfo}!\n`;
+    html += `Игрок <b>${_safeEscape(fromName)}</b> хочет сыграть с вами в <b>${_safeEscape(gameName)}</b>${rankInfo}!\n`;
 
     if (initialMsg && initialMsg.trim()) {
-      html += `\n💬 <i>«${escapeHtml(initialMsg.trim().slice(0, 200))}»</i>\n`;
+      html += `\n💬 <i>«${_safeEscape(initialMsg.trim().slice(0, 200))}»</i>\n`;
     }
 
     html += `\n⚡ <i>Откройте платформу Lobbivo, чтобы принять заявку и начать игру:</i>`;
@@ -184,19 +323,17 @@ const TelegramBotService = (function() {
     const fromUser = AppState.users ? AppState.users[fromUsername] : null;
     if (!toUser || !toUser.telegramChatId) return;
 
-    // Проверяем настройки уведомлений получателя
     if (toUser.telegramNotifs && toUser.telegramNotifs.dm === false) return;
 
-    // Не спамим, если получатель прямо сейчас в сети и держит открытым чат с отправителем
-    if (AppState.currentUser === toUsername && isChatOpen && AppState.chatPartner === fromUsername) {
+    if (AppState.currentUser === toUsername && typeof isChatOpen !== 'undefined' && isChatOpen && AppState.chatPartner === fromUsername) {
       return;
     }
 
     const fromName = fromUser?.name || fromUsername;
-    const safeSnippet = escapeHtml(text.trim().slice(0, 250));
+    const safeSnippet = _safeEscape(text.trim().slice(0, 250));
 
     let html = `💬 <b>LOBBIVO | Новое личное сообщение</b>\n\n`;
-    html += `От: <b>${escapeHtml(fromName)}</b>\n`;
+    html += `От: <b>${_safeEscape(fromName)}</b>\n`;
     html += `<i>«${safeSnippet}»</i>\n\n`;
     html += `⚡ <i>Нажмите кнопку ниже, чтобы ответить:</i>`;
 
@@ -221,7 +358,7 @@ const TelegramBotService = (function() {
 
     const fromName = fromUser?.name || fromUsername;
     let html = `🤝 <b>LOBBIVO | Заявка в команду принята!</b>\n\n`;
-    html += `Игрок <b>${escapeHtml(fromName)}</b> принял вашу заявку в друзья и готов играть!\n\n`;
+    html += `Игрок <b>${_safeEscape(fromName)}</b> принял вашу заявку в друзья и готов играть!\n\n`;
     html += `🎯 <i>Договоритесь о времени матча или перейдите в войс-чат.</i>`;
 
     const appUrl = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : 'https://lobbivo.ru';
@@ -247,7 +384,7 @@ const TelegramBotService = (function() {
     const totalKarma = toUser.karma || 1;
 
     let html = `🏆 <b>LOBBIVO | Вам повысили репутацию!</b>\n\n`;
-    html += `Тиммейт <b>${escapeHtml(fromName)}</b> похвалил вас за хорошую игру и адекватность (+1 к карме).\n`;
+    html += `Тиммейт <b>${_safeEscape(fromName)}</b> похвалил вас за хорошую игру и адекватность (+1 к карме).\n`;
     html += `Ваша общая репутация: <b>${totalKarma} 👍</b>\n`;
 
     const appUrl = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : 'https://lobbivo.ru';
@@ -269,9 +406,9 @@ const TelegramBotService = (function() {
     }
 
     let html = `🔔 <b>LOBBIVO | Тестовое уведомление</b>\n\n`;
-    html += `Привет, <b>${escapeHtml(user.name || username)}</b>!\n`;
-    html += `Telegram-бот Lobbivo успешно подключен к вашему аккаунту.\n\n`;
-    html += `Теперь вы будете мгновенно узнавать, когда вам пишут тиммейты или кидают заявки на игру! 🚀`;
+    html += `Привет, <b>${_safeEscape(user.name || username)}</b>!\n`;
+    html += `Telegram-бот Lobbivo (@${(getConfig().botUsername || 'Lobbivobot').replace(/^@/, '')}) успешно подключен к вашему аккаунту.\n\n`;
+    html += `Теперь вы будете мгновенно узнавать о заявках на игру, личных сообщениях и 2FA кодах! 🚀`;
 
     const appUrl = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : 'https://lobbivo.ru';
     const inlineKeyboard = [
@@ -316,7 +453,7 @@ const TelegramBotService = (function() {
         statusDot.className = 'tg-status-dot online';
       }
       if (statusText) {
-        statusText.innerHTML = `Подключен: <strong>${escapeHtml(user.telegram || `ID: ${user.telegramChatId}`)}</strong>`;
+        statusText.innerHTML = `Подключен: <strong>${_safeEscape(user.telegram || `ID: ${user.telegramChatId}`)}</strong> (2FA активна)`;
       }
       if (linkBtn) linkBtn.style.display = 'none';
       if (unlinkBtn) unlinkBtn.style.display = 'inline-flex';
@@ -345,21 +482,26 @@ const TelegramBotService = (function() {
         if (typeof showNotification === 'function') showNotification('Требуется авторизация', 'Войдите в профиль');
         return;
       }
+      const token = generateLinkToken(current);
       const url = getBotDeepLink(current);
       window.open(url, '_blank');
+
+      // Запускаем фоновый поллинг getUpdates для мгновенного захвата /start
+      startPollingForLink(current, token);
+
       if (typeof showNotification === 'function') {
-        showNotification('Открытие бота', 'Нажмите "Запустить" (Start) в открывшемся боте Telegram');
+        showNotification('Открытие бота @Lobbivobot', 'Нажмите "Запустить" (Start) в Telegram для авто-привязки');
       }
     });
 
-    // 2. Кнопка отвязки
+    // 2. Кнопка отвязки Telegram
     document.getElementById('tgBotUnlinkBtn')?.addEventListener('click', () => {
       const current = AppState.currentUser;
       if (!current) return;
-      if (confirm('Отключить получение уведомлений в Telegram?')) {
+      if (confirm('Отключить Telegram-бота от аккаунта? (Уведомления и 2FA будут отключены)')) {
         unlinkTelegramAccount(current);
         if (typeof showNotification === 'function') {
-          showNotification('Telegram отключен', 'Уведомления больше не будут приходить в Telegram');
+          showNotification('Telegram отвязан', 'Telegram-бот успешно отключен от профиля');
         }
       }
     });
@@ -371,12 +513,12 @@ const TelegramBotService = (function() {
       const input = document.getElementById('tgBotManualChatId');
       const val = input ? input.value.trim() : '';
       if (!val) {
-        if (typeof showNotification === 'function') showNotification('Ошибка', 'Введите ваш Telegram Chat ID или Username');
+        if (typeof showNotification === 'function') showNotification('Ошибка', 'Введите ваш Telegram Chat ID или @username');
         return;
       }
       linkTelegramAccount(current, val, val.startsWith('@') ? val : '');
       if (typeof showNotification === 'function') {
-        showNotification('Telegram привязан', `Chat ID ${escapeHtml(val)} успешно сохранён!`);
+        showNotification('Telegram привязан', `Chat ID ${_safeEscape(val)} успешно сохранён!`);
       }
     });
 
@@ -387,9 +529,9 @@ const TelegramBotService = (function() {
       if (typeof showNotification === 'function') showNotification('Отправка...', 'Отправляем тестовое уведомление в Telegram');
       const res = await sendTestNotification(current);
       if (res && res.success) {
-        if (typeof showNotification === 'function') showNotification('Успешно!', 'Проверьте сообщения от бота в Telegram');
+        if (typeof showNotification === 'function') showNotification('Успешно!', 'Проверьте сообщения от @Lobbivobot в Telegram');
       } else {
-        const err = res?.error || 'Проверьте токен бота в админ-панели или статус привязки';
+        const err = res?.error || 'Проверьте статус привязки к боту';
         if (typeof showNotification === 'function') showNotification('Ошибка отправки', err);
       }
     });
@@ -422,8 +564,8 @@ const TelegramBotService = (function() {
       const enabledToggle = document.getElementById('adminTgBotEnabledToggle');
 
       const newConfig = {
-        botToken: tokenInput ? tokenInput.value.trim() : '',
-        botUsername: usernameInput ? usernameInput.value.trim().replace(/^@/, '') : 'LobbivoBot',
+        botToken: tokenInput ? tokenInput.value.trim() : DEFAULT_CONFIG.botToken,
+        botUsername: usernameInput ? usernameInput.value.trim().replace(/^@/, '') : 'Lobbivobot',
         enabled: enabledToggle ? enabledToggle.checked : true
       };
 
@@ -443,6 +585,10 @@ const TelegramBotService = (function() {
     unlinkTelegramAccount,
     isTelegramLinked,
     sendTelegramMessage,
+    startPollingForLink,
+    stopPollingForLink,
+    send2faLoginCode,
+    verify2faLoginCode,
     notifyFriendRequest,
     notifyDirectMessage,
     notifyFriendAccept,

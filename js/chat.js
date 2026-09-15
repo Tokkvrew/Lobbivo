@@ -1014,35 +1014,76 @@ function updateChatList() {
 function isDmUnlockedForUser(targetUser, currentUsername) {
   if (!targetUser || !currentUsername) return true;
   if (targetUser === currentUsername) return true;
-  // Персонал (CEO/модераторы) пишут друг другу свободно
+
+  // 1. Персонал (CEO / Администраторы / Модераторы) пишут свободно
   if (typeof isUserAdmin === 'function' && isUserAdmin(currentUsername)) return true;
   if (typeof isUserCEO === 'function' && isUserCEO(currentUsername)) return true;
   if (typeof isUserModerator === 'function' && isUserModerator(currentUsername)) return true;
-  // Друзьям писать бесплатно (обоюдная дружба)
+
+  // 2. Друзьям писать всегда бесплатно
   if (typeof areFriends === 'function' && areFriends(currentUsername, targetUser)) return true;
 
   const targetData = AppState.users ? AppState.users[targetUser] : null;
   if (!targetData) return true;
 
-  // Платный ЛС доступен ТОЛЬКО для персонала (CEO / Модераторы)
-  const isTargetStaff = (typeof isUserCEO === 'function' && isUserCEO(targetUser)) || 
-                        (typeof isUserModerator === 'function' && isUserModerator(targetUser)) ||
-                        (typeof isUserAdmin === 'function' && isUserAdmin(targetUser));
-  if (!isTargetStaff) return true;
-
+  // Платный ЛС применяется ТОЛЬКО если у целевого пользователя включен режим 'coins'
   const dmAccess = targetData.privacy?.dmAccess || 'all';
   if (dmAccess !== 'coins' && dmAccess !== 'paid') return true;
 
-  // Проверка: оплачен ли доступ пользователем в профиле целевого стаффа
-  const hasPaid = Array.isArray(targetData.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername);
+  const currentUserData = AppState.users ? AppState.users[currentUsername] : null;
 
-  return !!hasPaid;
+  // 3. Проверка в профиле текущего пользователя (отправителя)
+  if (Array.isArray(currentUserData?.unlockedDms) && currentUserData.unlockedDms.includes(targetUser)) {
+    return true;
+  }
+
+  // 4. Проверка в профиле целевого пользователя (получателя)
+  if (Array.isArray(targetData?.paidDmUsers) && targetData.paidDmUsers.includes(currentUsername)) {
+    return true;
+  }
+
+  // 5. Проверка в локальном хранилище браузера (localStorage fallback)
+  try {
+    const localKey = `lobbivo_unlocked_dms_${currentUsername}`;
+    const saved = localStorage.getItem(localKey);
+    if (saved) {
+      const list = JSON.parse(saved);
+      if (Array.isArray(list) && list.includes(targetUser)) {
+        if (currentUserData) {
+          if (!Array.isArray(currentUserData.unlockedDms)) currentUserData.unlockedDms = [];
+          if (!currentUserData.unlockedDms.includes(targetUser)) currentUserData.unlockedDms.push(targetUser);
+        }
+        return true;
+      }
+    }
+  } catch (e) {}
+
+  // 6. Проверка: если в этом диалоге уже есть отправленные сообщения, доступ открыт
+  try {
+    if (typeof getChatMessages === 'function') {
+      const msgs = getChatMessages(currentUsername, targetUser);
+      if (Array.isArray(msgs) && msgs.length > 0) {
+        if (currentUserData) {
+          if (!Array.isArray(currentUserData.unlockedDms)) currentUserData.unlockedDms = [];
+          if (!currentUserData.unlockedDms.includes(targetUser)) currentUserData.unlockedDms.push(targetUser);
+        }
+        return true;
+      }
+    }
+  } catch (e) {}
+
+  return false;
 }
 
 let pendingPaidDmUser = null;
 let pendingPaidDmCost = 50;
 
 function openPaidDmModal(username, cost) {
+  if (isDmUnlockedForUser(username, AppState.currentUser)) {
+    openChatWith(username);
+    return;
+  }
+
   pendingPaidDmUser = username;
   pendingPaidDmCost = cost || 50;
 
@@ -1127,18 +1168,26 @@ function confirmPaidDm() {
   // Начисление целевому пользователю (CEO/модератору)
   targetData.coins = (typeof targetData.coins === 'number' ? targetData.coins : 0) + cost;
 
-  // Разблокировка в обоих профилях для надежности
-  if (!Array.isArray(targetData.paidDmUsers)) targetData.paidDmUsers = [];
-  if (!targetData.paidDmUsers.includes(AppState.currentUser)) {
-    targetData.paidDmUsers.push(AppState.currentUser);
-  }
-
+  // Разблокировка в профиле отправителя
   if (!Array.isArray(currentUserData.unlockedDms)) currentUserData.unlockedDms = [];
   if (!currentUserData.unlockedDms.includes(targetUser)) {
     currentUserData.unlockedDms.push(targetUser);
   }
 
-  saveUsers();
+  // Разблокировка в профиле получателя
+  if (!Array.isArray(targetData.paidDmUsers)) targetData.paidDmUsers = [];
+  if (!targetData.paidDmUsers.includes(AppState.currentUser)) {
+    targetData.paidDmUsers.push(AppState.currentUser);
+  }
+
+  // Сохранение в локальное хранилище браузера (гарантированное сохранение)
+  try {
+    const localKey = `lobbivo_unlocked_dms_${AppState.currentUser}`;
+    localStorage.setItem(localKey, JSON.stringify(currentUserData.unlockedDms));
+  } catch (e) {}
+
+  saveUsers(AppState.currentUser, true);
+  saveUsers(targetUser, true);
 
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
     FirebaseSync.saveUser(AppState.currentUser, true);

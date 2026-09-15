@@ -2247,6 +2247,30 @@ function init() {
     registerUser(u, p, g, d);
   });
 
+  // Telegram 2FA модальное окно подтверждения входа
+  document.getElementById('tg2faModalClose')?.addEventListener('click', hideTg2faModal);
+  document.getElementById('tg2faCancelBtn')?.addEventListener('click', () => {
+    hideTg2faModal();
+    showAuthModal('login');
+  });
+  document.getElementById('tg2faModal')?.addEventListener('click', function(e) {
+    if (e.target === this) hideTg2faModal();
+  });
+  document.getElementById('tg2faSubmitBtn')?.addEventListener('click', submitTg2faCode);
+  document.getElementById('tg2faResendBtn')?.addEventListener('click', resendTg2faCode);
+  document.getElementById('tg2faCodeInput')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitTg2faCode();
+    }
+  });
+  document.getElementById('tg2faCodeInput')?.addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    if (this.value.length === 6) {
+      setTimeout(submitTg2faCode, 150);
+    }
+  });
+
   // Навигация "Назад"
   document.getElementById('backToGamesBtn')?.addEventListener('click', () => {
     switchPage('pageGames');
