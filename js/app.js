@@ -2295,6 +2295,7 @@ function init() {
   // Чат 2.0: Вкладки и управление
   document.getElementById('chatFab')?.addEventListener('click', toggleChat);
   document.getElementById('chatCloseBtn')?.addEventListener('click', closeChat);
+  document.getElementById('chatBackdrop')?.addEventListener('click', closeChat);
   document.getElementById('chatTabWorld')?.addEventListener('click', () => switchChatTab('world'));
   document.getElementById('chatTabDirect')?.addEventListener('click', () => switchChatTab('direct'));
 

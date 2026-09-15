@@ -2646,6 +2646,10 @@
   justify-content: center;
 }
 
+.chat-backdrop {
+  display: none;
+}
+
 .chat-container {
   position: fixed;
   bottom: 90px;
@@ -2663,6 +2667,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   opacity: 0;
   transform: translateY(20px) scale(0.95);
   pointer-events: none;
@@ -2914,6 +2920,10 @@
 .chat-list {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   padding: 8px 0;
   display: none;
 }
@@ -3032,6 +3042,10 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -3470,6 +3484,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   height: 100%;
 }
 
@@ -3478,6 +3494,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   height: 100%;
 }
 
@@ -3485,6 +3503,10 @@
 .world-chat-messages {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   padding: 14px 12px;
   display: flex;
   flex-direction: column;
@@ -11602,12 +11624,9 @@ select:-webkit-autofill {
   flex-shrink: 0;
 }
 
-.category-tab .cat-label-full {
+.category-tab .category-tab-text {
   display: inline;
-}
-
-.category-tab .cat-label-short {
-  display: none;
+  white-space: nowrap;
 }
 
 /* Стандартная подсветка для дефолтной темы */

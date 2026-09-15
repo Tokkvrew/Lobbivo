@@ -170,6 +170,29 @@ function renderDirectTypingIndicator() {
 //  4. УПРАВЛЕНИЕ ОКНОМ И ВКЛАДКАМИ ЧАТА
 // ============================================================
 
+let _chatSavedScrollY = 0;
+
+function lockBodyScrollForChat() {
+  if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+    _chatSavedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.classList.add('chat-open');
+    document.documentElement.classList.add('chat-open');
+    const backdrop = document.getElementById('chatBackdrop');
+    if (backdrop) backdrop.classList.add('show');
+  }
+}
+
+function unlockBodyScrollForChat() {
+  document.body.classList.remove('chat-open');
+  document.documentElement.classList.remove('chat-open');
+  const backdrop = document.getElementById('chatBackdrop');
+  if (backdrop) backdrop.classList.remove('show');
+  if (_chatSavedScrollY > 0) {
+    window.scrollTo(0, _chatSavedScrollY);
+    _chatSavedScrollY = 0;
+  }
+}
+
 function toggleChat() {
   const container = document.getElementById('chatContainer');
   if (!container) return;
@@ -194,6 +217,7 @@ function openChat(tab = 'world') {
   container.classList.add('open');
   isChatOpen = true;
 
+  lockBodyScrollForChat();
   switchChatTab(tab);
 }
 
@@ -211,6 +235,7 @@ function closeChat() {
   AppState.chatPartner = null;
   cancelReply();
   
+  unlockBodyScrollForChat();
   closeUserQuickPopover();
   updateChatBadge();
 
@@ -1287,6 +1312,7 @@ function openChatWith(username) {
     container.classList.add('open');
     isChatOpen = true;
   }
+  lockBodyScrollForChat();
 
   const tabWorld = document.getElementById('chatTabWorld');
   const tabDirect = document.getElementById('chatTabDirect');

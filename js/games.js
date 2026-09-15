@@ -31,6 +31,7 @@ function renderGames(searchQuery = '', force = false, category = null) {
   const isAuth = !!AppState.currentUser;
 
   // Обновляем визуальное состояние табов категорий
+  if (typeof updateCategoryTabLabels === 'function') updateCategoryTabLabels();
   document.querySelectorAll('#gameCategoryTabs .category-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.category === activeCategory);
   });
@@ -126,10 +127,25 @@ function renderGames(searchQuery = '', force = false, category = null) {
   });
 }
 
+// Динамическое обновление названий категорий для мобильных (<= 768px) и ПК
+function updateCategoryTabLabels() {
+  const isMobile = (window.innerWidth || document.documentElement.clientWidth || 1024) <= 768;
+  const labels = document.querySelectorAll('#gameCategoryTabs .category-tab-text');
+  labels.forEach(el => {
+    const text = isMobile ? el.dataset.short : el.dataset.full;
+    if (text && el.textContent !== text) {
+      el.textContent = text;
+    }
+  });
+}
+
 // Привязка кликов по табам категорий
 function initCategoryTabs() {
   const container = document.getElementById('gameCategoryTabs');
   if (!container) return;
+
+  updateCategoryTabLabels();
+  window.addEventListener('resize', updateCategoryTabLabels, { passive: true });
 
   container.querySelectorAll('.category-tab').forEach(tab => {
     tab.addEventListener('click', function() {

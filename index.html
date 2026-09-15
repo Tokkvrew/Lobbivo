@@ -68,12 +68,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" />
   </noscript>
 
-  <!-- CSS Стили (с авто-обновлением кэша v2.9.8) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.9.8" />
-  <link rel="stylesheet" href="css/base.css?v=2.9.8" />
-  <link rel="stylesheet" href="css/components.css?v=2.9.8" />
-  <link rel="stylesheet" href="css/animations.css?v=2.9.8" />
-  <link rel="stylesheet" href="css/media.css?v=2.9.8" />
+  <!-- CSS Стили (с авто-обновлением кэша v2.9.10) -->
+  <link rel="stylesheet" href="css/variables.css?v=2.9.10" />
+  <link rel="stylesheet" href="css/base.css?v=2.9.10" />
+  <link rel="stylesheet" href="css/components.css?v=2.9.10" />
+  <link rel="stylesheet" href="css/animations.css?v=2.9.10" />
+  <link rel="stylesheet" href="css/media.css?v=2.9.10" />
 </head>
 <body>
 
@@ -853,28 +853,23 @@
       <div class="game-category-tabs" id="gameCategoryTabs">
         <button class="category-tab active" data-category="popular" type="button">
           <svg><use href="#icon-flame"/></svg>
-          <span class="cat-label-full">Популярное</span>
-          <span class="cat-label-short">Топ</span>
+          <span class="category-tab-text" data-full="Популярное" data-short="Топ">Популярное</span>
         </button>
         <button class="category-tab" data-category="competitive" type="button">
           <svg><use href="#icon-trophy"/></svg>
-          <span class="cat-label-full">Киберспорт и Рейтинг</span>
-          <span class="cat-label-short">Ранг</span>
+          <span class="category-tab-text" data-full="Киберспорт и Рейтинг" data-short="Ранг">Киберспорт и Рейтинг</span>
         </button>
         <button class="category-tab" data-category="sandbox" type="button">
           <svg><use href="#icon-blocks"/></svg>
-          <span class="cat-label-full">Песочницы и Кооп</span>
-          <span class="cat-label-short">Песочницы и Кооп</span>
+          <span class="category-tab-text" data-full="Песочницы и Кооп" data-short="Песочницы и Кооп">Песочницы и Кооп</span>
         </button>
         <button class="category-tab" data-category="action_rp" type="button">
           <svg><use href="#icon-bolt-fast"/></svg>
-          <span class="cat-label-full">Экшен, Баттл-Рояль и RP</span>
-          <span class="cat-label-short">Экшен & RP</span>
+          <span class="category-tab-text" data-full="Экшен, Баттл-Рояль и RP" data-short="Экшен & RP">Экшен, Баттл-Рояль и RP</span>
         </button>
         <button class="category-tab" data-category="all" type="button">
           <svg><use href="#icon-game"/></svg>
-          <span class="cat-label-full">Все игры (25+)</span>
-          <span class="cat-label-short">Все игры</span>
+          <span class="category-tab-text" data-full="Все игры (25+)" data-short="Все игры">Все игры (25+)</span>
         </button>
       </div>
 
@@ -1489,6 +1484,9 @@
       <svg><use href="#icon-chat"/></svg>
       <span class="badge" id="chatBadge" style="display:none;">0</span>
     </button>
+
+    <!-- БЭКДРОП МОБИЛЬНОГО ЧАТА -->
+    <div class="chat-backdrop" id="chatBackdrop"></div>
 
     <!-- ОКНО ЧАТА LOBBIVO 2.0 -->
     <div class="chat-container" id="chatContainer">
@@ -2992,17 +2990,17 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (v2.9.4) -->
-  <script src="js/data.js?v=2.9.4"></script>
-  <script src="js/security-shield.js?v=2.9.4"></script>
-  <script src="js/firebase-sync.js?v=2.9.4"></script>
-  <script src="js/storage.js?v=2.9.4"></script>
-  <script src="js/retention.js?v=2.9.4"></script>
-  <script src="js/auth.js?v=2.9.4"></script>
-  <script src="js/games.js?v=2.9.4"></script>
-  <script src="js/chat.js?v=2.9.4"></script>
-  <script src="js/profile.js?v=2.9.4"></script>
-  <script src="js/admin.js?v=2.9.4"></script>
-  <script src="js/app.js?v=2.9.4"></script>
+  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (v2.9.10) -->
+  <script src="js/data.js?v=2.9.10"></script>
+  <script src="js/security-shield.js?v=2.9.10"></script>
+  <script src="js/firebase-sync.js?v=2.9.10"></script>
+  <script src="js/storage.js?v=2.9.10"></script>
+  <script src="js/retention.js?v=2.9.10"></script>
+  <script src="js/auth.js?v=2.9.10"></script>
+  <script src="js/games.js?v=2.9.10"></script>
+  <script src="js/chat.js?v=2.9.10"></script>
+  <script src="js/profile.js?v=2.9.10"></script>
+  <script src="js/admin.js?v=2.9.10"></script>
+  <script src="js/app.js?v=2.9.10"></script>
 </body>
 </html>
