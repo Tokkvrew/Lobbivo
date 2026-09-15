@@ -381,11 +381,21 @@
   }
 
   .category-tab {
-    padding: 8px 14px;
+    padding: 8px 13px;
     font-size: 0.82rem;
     border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
     outline: none !important;
     -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .category-tab .cat-label-full {
+    display: none !important;
+  }
+
+  .category-tab .cat-label-short {
+    display: inline !important;
   }
 
   .category-tab:focus,

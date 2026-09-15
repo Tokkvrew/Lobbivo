@@ -11602,6 +11602,14 @@ select:-webkit-autofill {
   flex-shrink: 0;
 }
 
+.category-tab .cat-label-full {
+  display: inline;
+}
+
+.category-tab .cat-label-short {
+  display: none;
+}
+
 /* Стандартная подсветка для дефолтной темы */
 .category-tab:hover {
   background: rgba(0, 212, 255, 0.14);
