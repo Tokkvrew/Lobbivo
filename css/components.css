@@ -13908,7 +13908,7 @@ select:-webkit-autofill {
   box-shadow: 0 0 12px #ffffff, 0 0 20px #ffffff !important;
 }
 
-/* 4. Активные вкладки, фильтры и навигация с белым неоновым свечением */
+/* 4. Активные вкладки, фильтры и навигация */
 [data-theme="carbon"] .capsule-nav-item.active,
 [data-theme="carbon"] .filter-btn.active,
 [data-theme="carbon"] .shop-cat-btn.active,
@@ -13922,17 +13922,108 @@ select:-webkit-autofill {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
 }
 
+/* 5. Кнопка чата (Chat FAB) для Carbon */
+[data-theme="carbon"] .chat-fab,
+[data-theme="carbon"] .chat-fab-button {
+  background: rgba(18, 19, 24, 0.94) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="carbon"] .chat-fab:hover,
+[data-theme="carbon"] .chat-fab-button:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.95), 0 0 38px rgba(255, 255, 255, 0.95), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+  transform: translateY(-3px) scale(1.08) !important;
+}
+
+[data-theme="carbon"] .chat-fab svg,
+[data-theme="carbon"] .chat-fab-button svg {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.85)) !important;
+}
+
+[data-theme="carbon"] .chat-fab:hover svg,
+[data-theme="carbon"] .chat-fab-button:hover svg {
+  filter: none !important;
+  stroke: #000000 !important;
+}
+
+[data-theme="carbon"] .chat-fab .badge,
+[data-theme="carbon"] .chat-fab-badge {
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%) !important;
+  color: #000000 !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid #ffffff !important;
+}
+
+/* 6. Логотип и плашка BETA для Carbon */
+[data-theme="carbon"] .l-badge-glow,
+[data-theme="carbon"] .welcome-badge-glow {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.75) 0%, rgba(180, 185, 200, 0.45) 60%, transparent 100%) !important;
+  filter: blur(8px) !important;
+}
+
+[data-theme="carbon"] .l-badge-glass,
+[data-theme="carbon"] .welcome-badge-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(26, 27, 34, 0.92) 100%) !important;
+  border: 1.2px solid rgba(255, 255, 255, 0.65) !important;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.7), 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 255, 255, 0.3) !important;
+}
+
+[data-theme="carbon"] .header-logo-l,
+[data-theme="carbon"] .welcome-badge-l {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95)) !important;
+}
+
+[data-theme="carbon"] .beta-badge,
+[data-theme="carbon"] .welcome-beta-badge {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 7. Монеты для Carbon */
 [data-theme="carbon"] .capsule-coin-btn {
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.22) !important;
 }
 
 [data-theme="carbon"] .capsule-coin-btn:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
   border-color: #ffffff !important;
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* 5. Предосмотр темы Carbon в модалке магазина */
+[data-theme="carbon"] .capsule-coin-icon {
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #e2e8f0 45%, #94a3b8 85%, #334155 100%) !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="carbon"] .coin-l-letter {
+  color: #000000 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme="carbon"] .capsule-coin-amount {
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="carbon"] .capsule-coin-currency {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 8. Предосмотр темы Carbon в модалке магазина */
 .preview-theme-showcase-wrap.theme-carbon-preview .mini-ui-mockup {
   background: #090a0d !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
@@ -13956,4 +14047,379 @@ select:-webkit-autofill {
   background: #ffffff !important;
   color: #000000 !important;
   box-shadow: 0 0 18px rgba(255, 255, 255, 0.7) !important;
+}
+
+/* ============================================================
+   АДАПТАЦИЯ ТЕМЫ LOBBIVO / LIQUID GLASS
+   ============================================================ */
+[data-theme="lobbivo"] .chat-fab,
+[data-theme="finder"] .chat-fab,
+[data-theme="lobbivo"] .chat-fab-button,
+[data-theme="finder"] .chat-fab-button {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1.2px solid rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65), 0 0 25px rgba(180, 77, 255, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+}
+
+[data-theme="lobbivo"] .chat-fab:hover,
+[data-theme="finder"] .chat-fab:hover,
+[data-theme="lobbivo"] .chat-fab-button:hover,
+[data-theme="finder"] .chat-fab-button:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75), 0 0 35px rgba(180, 77, 255, 0.6), inset 0 1.5px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme="lobbivo"] .chat-fab svg,
+[data-theme="finder"] .chat-fab svg,
+[data-theme="lobbivo"] .chat-fab-button svg,
+[data-theme="finder"] .chat-fab-button svg {
+  filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.85)) !important;
+}
+
+[data-theme="lobbivo"] .chat-fab .badge,
+[data-theme="finder"] .chat-fab .badge {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.8) !important;
+}
+
+[data-theme="lobbivo"] .l-badge-glow,
+[data-theme="finder"] .l-badge-glow {
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.65) 0%, rgba(244, 114, 182, 0.45) 60%, transparent 100%) !important;
+}
+
+[data-theme="lobbivo"] .l-badge-glass,
+[data-theme="finder"] .l-badge-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(168, 85, 247, 0.25) 50%, rgba(18, 18, 26, 0.9) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+[data-theme="lobbivo"] .header-logo-l,
+[data-theme="finder"] .header-logo-l {
+  background: linear-gradient(135deg, #ffffff 0%, #c084fc 45%, #f472b6 90%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.85)) !important;
+}
+
+[data-theme="lobbivo"] .beta-badge,
+[data-theme="finder"] .beta-badge,
+[data-theme="lobbivo"] .welcome-beta-badge,
+[data-theme="finder"] .welcome-beta-badge {
+  color: #c084fc !important;
+  background: rgba(192, 132, 252, 0.15) !important;
+  border-color: rgba(192, 132, 252, 0.5) !important;
+  box-shadow: 0 0 12px rgba(192, 132, 252, 0.3) !important;
+}
+
+[data-theme="lobbivo"] .capsule-coin-btn,
+[data-theme="finder"] .capsule-coin-btn {
+  background: rgba(192, 132, 252, 0.12) !important;
+  border-color: rgba(192, 132, 252, 0.4) !important;
+  box-shadow: 0 0 18px rgba(192, 132, 252, 0.25) !important;
+}
+
+[data-theme="lobbivo"] .capsule-coin-btn:hover,
+[data-theme="finder"] .capsule-coin-btn:hover {
+  background: rgba(192, 132, 252, 0.22) !important;
+  border-color: rgba(244, 114, 182, 0.7) !important;
+  box-shadow: 0 0 28px rgba(192, 132, 252, 0.45) !important;
+}
+
+[data-theme="lobbivo"] .capsule-coin-icon,
+[data-theme="finder"] .capsule-coin-icon {
+  background: radial-gradient(circle at 35% 30%, #f5d0fe 0%, #c084fc 45%, #9333ea 85%, #581c87 100%) !important;
+  border: 1px solid rgba(245, 208, 254, 0.9) !important;
+  box-shadow: 0 0 14px rgba(192, 132, 252, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="lobbivo"] .coin-l-letter,
+[data-theme="finder"] .coin-l-letter {
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="lobbivo"] .capsule-coin-amount,
+[data-theme="finder"] .capsule-coin-amount {
+  color: #f5d0fe !important;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.6) !important;
+}
+
+[data-theme="lobbivo"] .capsule-coin-currency,
+[data-theme="finder"] .capsule-coin-currency {
+  color: rgba(245, 208, 254, 0.8) !important;
+}
+
+/* ============================================================
+   АДАПТАЦИЯ ТЕМЫ DEEP NEBULA
+   ============================================================ */
+[data-theme="nebula"] .chat-fab,
+[data-theme="nebula"] .chat-fab-button {
+  background: rgba(36, 14, 60, 0.88) !important;
+  border: 1.2px solid rgba(217, 70, 239, 0.5) !important;
+  color: #f472b6 !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.8), 0 0 25px rgba(217, 70, 239, 0.4), inset 0 1px 2px rgba(244, 114, 182, 0.4) !important;
+}
+
+[data-theme="nebula"] .chat-fab:hover,
+[data-theme="nebula"] .chat-fab-button:hover {
+  background: rgba(56, 20, 92, 0.95) !important;
+  border-color: #e879f9 !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 35px rgba(217, 70, 239, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="nebula"] .chat-fab svg,
+[data-theme="nebula"] .chat-fab-button svg {
+  filter: drop-shadow(0 0 8px rgba(217, 70, 239, 0.9)) !important;
+}
+
+[data-theme="nebula"] .chat-fab .badge,
+[data-theme="nebula"] .chat-fab-badge {
+  background: linear-gradient(135deg, #d946ef 0%, #f43f5e 100%) !important;
+  box-shadow: 0 0 12px rgba(217, 70, 239, 0.85) !important;
+}
+
+[data-theme="nebula"] .l-badge-glow,
+[data-theme="nebula"] .welcome-badge-glow {
+  background: radial-gradient(circle, rgba(217, 70, 239, 0.7) 0%, rgba(139, 92, 246, 0.45) 60%, transparent 100%) !important;
+}
+
+[data-theme="nebula"] .l-badge-glass,
+[data-theme="nebula"] .welcome-badge-glass {
+  background: linear-gradient(135deg, rgba(217, 70, 239, 0.28) 0%, rgba(139, 92, 246, 0.3) 50%, rgba(20, 8, 36, 0.95) 100%) !important;
+  border-color: rgba(217, 70, 239, 0.6) !important;
+}
+
+[data-theme="nebula"] .header-logo-l,
+[data-theme="nebula"] .welcome-badge-l {
+  background: linear-gradient(135deg, #ffffff 0%, #e879f9 50%, #d946ef 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 8px rgba(217, 70, 239, 0.9)) !important;
+}
+
+[data-theme="nebula"] .beta-badge,
+[data-theme="nebula"] .welcome-beta-badge {
+  color: #e879f9 !important;
+  background: rgba(217, 70, 239, 0.16) !important;
+  border-color: rgba(217, 70, 239, 0.5) !important;
+  box-shadow: 0 0 12px rgba(217, 70, 239, 0.35) !important;
+  text-shadow: 0 0 8px rgba(217, 70, 239, 0.7) !important;
+}
+
+[data-theme="nebula"] .capsule-coin-btn {
+  background: rgba(217, 70, 239, 0.12) !important;
+  border-color: rgba(217, 70, 239, 0.45) !important;
+  box-shadow: 0 0 18px rgba(217, 70, 239, 0.3) !important;
+}
+
+[data-theme="nebula"] .capsule-coin-btn:hover {
+  background: rgba(217, 70, 239, 0.22) !important;
+  border-color: #e879f9 !important;
+  box-shadow: 0 0 28px rgba(217, 70, 239, 0.5) !important;
+}
+
+[data-theme="nebula"] .capsule-coin-icon {
+  background: radial-gradient(circle at 35% 30%, #fdf4ff 0%, #e879f9 45%, #a855f7 85%, #581c87 100%) !important;
+  border: 1px solid rgba(253, 244, 255, 0.9) !important;
+  box-shadow: 0 0 14px rgba(217, 70, 239, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="nebula"] .coin-l-letter {
+  color: #3b0764 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="nebula"] .capsule-coin-amount {
+  color: #fae8ff !important;
+  text-shadow: 0 0 10px rgba(217, 70, 239, 0.7) !important;
+}
+
+[data-theme="nebula"] .capsule-coin-currency {
+  color: rgba(250, 232, 255, 0.8) !important;
+}
+
+/* ============================================================
+   АДАПТАЦИЯ ТЕМЫ CRIMSON RED
+   ============================================================ */
+[data-theme="crimson"] .chat-fab,
+[data-theme="crimson"] .chat-fab-button {
+  background: rgba(48, 10, 16, 0.88) !important;
+  border: 1.2px solid rgba(255, 42, 75, 0.55) !important;
+  color: #ff2a4b !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 42, 75, 0.45), inset 0 1px 2px rgba(255, 87, 34, 0.4) !important;
+}
+
+[data-theme="crimson"] .chat-fab:hover,
+[data-theme="crimson"] .chat-fab-button:hover {
+  background: rgba(72, 14, 24, 0.95) !important;
+  border-color: #ff5722 !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 35px rgba(255, 42, 75, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="crimson"] .chat-fab svg,
+[data-theme="crimson"] .chat-fab-button svg {
+  filter: drop-shadow(0 0 8px rgba(255, 42, 75, 0.9)) !important;
+}
+
+[data-theme="crimson"] .chat-fab .badge,
+[data-theme="crimson"] .chat-fab-badge {
+  background: linear-gradient(135deg, #ff0033 0%, #ff6f00 100%) !important;
+  box-shadow: 0 0 12px rgba(255, 42, 75, 0.85) !important;
+}
+
+[data-theme="crimson"] .l-badge-glow,
+[data-theme="crimson"] .welcome-badge-glow {
+  background: radial-gradient(circle, rgba(255, 42, 75, 0.75) 0%, rgba(255, 87, 34, 0.45) 60%, transparent 100%) !important;
+}
+
+[data-theme="crimson"] .l-badge-glass,
+[data-theme="crimson"] .welcome-badge-glass {
+  background: linear-gradient(135deg, rgba(255, 42, 75, 0.28) 0%, rgba(255, 87, 34, 0.25) 50%, rgba(28, 7, 10, 0.95) 100%) !important;
+  border-color: rgba(255, 42, 75, 0.65) !important;
+}
+
+[data-theme="crimson"] .header-logo-l,
+[data-theme="crimson"] .welcome-badge-l {
+  background: linear-gradient(135deg, #ffffff 0%, #ff2a4b 50%, #ff5722 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 8px rgba(255, 42, 75, 0.95)) !important;
+}
+
+[data-theme="crimson"] .beta-badge,
+[data-theme="crimson"] .welcome-beta-badge {
+  color: #ff4d6d !important;
+  background: rgba(255, 42, 75, 0.16) !important;
+  border-color: rgba(255, 42, 75, 0.55) !important;
+  box-shadow: 0 0 12px rgba(255, 42, 75, 0.35) !important;
+  text-shadow: 0 0 8px rgba(255, 42, 75, 0.7) !important;
+}
+
+[data-theme="crimson"] .capsule-coin-btn {
+  background: rgba(255, 42, 75, 0.12) !important;
+  border-color: rgba(255, 42, 75, 0.45) !important;
+  box-shadow: 0 0 18px rgba(255, 42, 75, 0.35) !important;
+}
+
+[data-theme="crimson"] .capsule-coin-btn:hover {
+  background: rgba(255, 42, 75, 0.22) !important;
+  border-color: #ff5722 !important;
+  box-shadow: 0 0 28px rgba(255, 42, 75, 0.55) !important;
+}
+
+[data-theme="crimson"] .capsule-coin-icon {
+  background: radial-gradient(circle at 35% 30%, #fff1f2 0%, #ff2a4b 45%, #b91c1c 85%, #450a0a 100%) !important;
+  border: 1px solid rgba(255, 241, 242, 0.9) !important;
+  box-shadow: 0 0 14px rgba(255, 42, 75, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="crimson"] .coin-l-letter {
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="crimson"] .capsule-coin-amount {
+  color: #ffe4e6 !important;
+  text-shadow: 0 0 10px rgba(255, 42, 75, 0.7) !important;
+}
+
+[data-theme="crimson"] .capsule-coin-currency {
+  color: rgba(255, 228, 230, 0.8) !important;
+}
+
+/* ============================================================
+   АДАПТАЦИЯ ТЕМЫ MATRIX EMERALD
+   ============================================================ */
+[data-theme="matrix"] .chat-fab,
+[data-theme="matrix"] .chat-fab-button {
+  background: rgba(6, 32, 16, 0.9) !important;
+  border: 1.2px solid rgba(0, 255, 136, 0.5) !important;
+  color: #00ff88 !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 255, 136, 0.4), inset 0 1px 2px rgba(0, 255, 157, 0.4) !important;
+}
+
+[data-theme="matrix"] .chat-fab:hover,
+[data-theme="matrix"] .chat-fab-button:hover {
+  background: rgba(10, 48, 24, 0.95) !important;
+  border-color: #00ff88 !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 255, 136, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="matrix"] .chat-fab svg,
+[data-theme="matrix"] .chat-fab-button svg {
+  filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.9)) !important;
+}
+
+[data-theme="matrix"] .chat-fab .badge,
+[data-theme="matrix"] .chat-fab-badge {
+  background: linear-gradient(135deg, #00ff88 0%, #059669 100%) !important;
+  color: #020e06 !important;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.85) !important;
+}
+
+[data-theme="matrix"] .l-badge-glow,
+[data-theme="matrix"] .welcome-badge-glow {
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.7) 0%, rgba(16, 185, 129, 0.45) 60%, transparent 100%) !important;
+}
+
+[data-theme="matrix"] .l-badge-glass,
+[data-theme="matrix"] .welcome-badge-glass {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.25) 0%, rgba(16, 185, 129, 0.25) 50%, rgba(3, 20, 10, 0.95) 100%) !important;
+  border-color: rgba(0, 255, 136, 0.6) !important;
+}
+
+[data-theme="matrix"] .header-logo-l,
+[data-theme="matrix"] .welcome-badge-l {
+  background: linear-gradient(135deg, #ffffff 0%, #00ff88 50%, #10b981 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.95)) !important;
+}
+
+[data-theme="matrix"] .beta-badge,
+[data-theme="matrix"] .welcome-beta-badge {
+  color: #00ff88 !important;
+  background: rgba(0, 255, 136, 0.16) !important;
+  border-color: rgba(0, 255, 136, 0.5) !important;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.35) !important;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.7) !important;
+}
+
+[data-theme="matrix"] .capsule-coin-btn {
+  background: rgba(0, 255, 136, 0.12) !important;
+  border-color: rgba(0, 255, 136, 0.45) !important;
+  box-shadow: 0 0 18px rgba(0, 255, 136, 0.3) !important;
+}
+
+[data-theme="matrix"] .capsule-coin-btn:hover {
+  background: rgba(0, 255, 136, 0.22) !important;
+  border-color: #00ff88 !important;
+  box-shadow: 0 0 28px rgba(0, 255, 136, 0.55) !important;
+}
+
+[data-theme="matrix"] .capsule-coin-icon {
+  background: radial-gradient(circle at 35% 30%, #f0fdf4 0%, #00ff88 45%, #059669 85%, #022c22 100%) !important;
+  border: 1px solid rgba(240, 253, 244, 0.9) !important;
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="matrix"] .coin-l-letter {
+  color: #022c22 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="matrix"] .capsule-coin-amount {
+  color: #dcfce7 !important;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.7) !important;
+}
+
+[data-theme="matrix"] .capsule-coin-currency {
+  color: rgba(220, 252, 231, 0.8) !important;
 }
