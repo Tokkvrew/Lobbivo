@@ -376,18 +376,26 @@
   /* Категории на мобильных */
   .game-category-tabs {
     gap: 8px;
-    margin: -4px 0 14px 0;
-    padding: 10px 4px 12px 4px;
+    margin: -6px -6px 10px -6px;
+    padding: 12px 8px 16px 8px;
   }
 
   .category-tab {
     padding: 8px 14px;
     font-size: 0.82rem;
     border-radius: 10px;
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .category-tab:focus,
+  .category-tab:focus-visible,
+  .category-tab:active {
+    outline: none !important;
   }
 
   .category-tab:hover {
-    transform: translateY(-2px) scale(1.01);
+    transform: translateY(-2px);
   }
 
   .category-tab svg {
