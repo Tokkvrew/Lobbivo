@@ -141,6 +141,11 @@ const FirebaseSync = {
                   resolvedAvatarTs = Math.max(localAvatarTs, cloudAvatarTs);
                 }
 
+                const resolvedChatId = cloudUser.telegramChatId || localUser?.telegramChatId || '';
+                const resolvedTg = cloudUser.telegram || localUser?.telegram || '';
+                const resolvedNotifs = cloudUser.telegramNotifs || localUser?.telegramNotifs || { dm: true, squad: true, karma: true };
+                const resolvedLinkToken = cloudUser.tgLinkToken || localUser?.tgLinkToken || '';
+
                 AppState.users[username] = {
                   ...localUser,
                   ...cloudUser,
@@ -154,10 +159,19 @@ const FirebaseSync = {
                   customTags: cloudUser.customTags,
                   paidDmUsers: cloudUser.paidDmUsers,
                   unlockedDms: cloudUser.unlockedDms,
+                  telegramChatId: resolvedChatId,
+                  telegram: resolvedTg,
+                  telegramNotifs: resolvedNotifs,
+                  tgLinkToken: resolvedLinkToken,
                   avatar: resolvedAvatar,
                   avatarUpdatedAt: resolvedAvatarTs
                 };
               } else {
+                const resolvedChatId = cloudUser.telegramChatId || localUser?.telegramChatId || '';
+                const resolvedTg = cloudUser.telegram || localUser?.telegram || '';
+                const resolvedNotifs = cloudUser.telegramNotifs || localUser?.telegramNotifs || { dm: true, squad: true, karma: true };
+                const resolvedLinkToken = cloudUser.tgLinkToken || localUser?.tgLinkToken || '';
+
                 AppState.users[username] = {
                   ...localUser,
                   ...cloudUser,
@@ -170,7 +184,11 @@ const FirebaseSync = {
                   friendRequests: cloudUser.friendRequests,
                   customTags: cloudUser.customTags,
                   paidDmUsers: cloudUser.paidDmUsers,
-                  unlockedDms: cloudUser.unlockedDms
+                  unlockedDms: cloudUser.unlockedDms,
+                  telegramChatId: resolvedChatId,
+                  telegram: resolvedTg,
+                  telegramNotifs: resolvedNotifs,
+                  tgLinkToken: resolvedLinkToken
                 };
               }
             }
@@ -206,6 +224,9 @@ const FirebaseSync = {
                 renderFriendsPage();
               }
               if (typeof updateAdminBadges === 'function') updateAdminBadges();
+              if (typeof TelegramBotService !== 'undefined' && typeof TelegramBotService.renderTelegramSettings === 'function') {
+                TelegramBotService.renderTelegramSettings();
+              }
               if (AppState.chatPartner && typeof checkFriendBannerStatus === 'function') {
                 checkFriendBannerStatus(AppState.chatPartner);
               }

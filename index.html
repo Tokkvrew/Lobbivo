@@ -2788,10 +2788,6 @@
             <svg style="width:14px;height:14px;"><use href="#icon-admin-shield"/></svg>
             <span>Тег администратора</span>
           </button>
-          <button type="button" class="admin-tab-btn" data-tab="tgbot">
-            <svg style="width:14px;height:14px;"><use href="#icon-telegram-plane"/></svg>
-            <span>Telegram Бот</span>
-          </button>
         </div>
 
         <!-- Контент 1: Жалобы -->
@@ -2945,55 +2941,6 @@
               </button>
             </div>
 
-          </div>
-        </div>
-
-        <!-- Контент 5: Настройки Telegram-бота -->
-        <div class="admin-tab-content" id="adminTgbotView" style="display:none;">
-          <div class="admin-badge-settings-wrap">
-            <div class="admin-badge-toggle-card">
-              <div class="badge-toggle-info">
-                <div class="badge-toggle-title">
-                  <svg style="width:16px;height:16px;color:var(--neon-cyan);display:inline-block;vertical-align:-2px;"><use href="#icon-telegram-plane"/></svg>
-                  <span>Интеграция Telegram Bot API</span>
-                </div>
-                <div class="badge-toggle-desc">
-                  Включите отправку Push-уведомлений пользователям в Telegram о заявках на игру, новых личных сообщениях и похвале репутации.
-                </div>
-              </div>
-              <label class="cyber-switch" title="Включить / Выключить отправку в Telegram">
-                <input type="checkbox" id="adminTgBotEnabledToggle" checked>
-                <span class="cyber-switch-slider"></span>
-              </label>
-            </div>
-
-            <div class="admin-badge-custom-card">
-              <div class="field">
-                <label for="adminTgBotUsernameInput">Имя Telegram-бота (@username):</label>
-                <div class="input-cyber-wrapper">
-                  <svg class="input-cyber-icon"><use href="#icon-telegram-plane"/></svg>
-                  <input type="text" id="adminTgBotUsernameInput" placeholder="LobbivoBot" value="LobbivoBot">
-                </div>
-              </div>
-
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <label for="adminTgBotTokenInput">Bot API Token (из @BotFather):</label>
-                  <span id="adminTgBotStatusBadge" style="font-size: 0.8rem; font-weight: 700; color: #ff9800;">Проверка связи...</span>
-                </div>
-                <div class="input-cyber-wrapper">
-                  <svg class="input-cyber-icon"><use href="#icon-lock"/></svg>
-                  <input type="password" id="adminTgBotTokenInput" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
-                </div>
-                <span class="field-hint">Токен сохраняется в защищенном облаке Firebase и мгновенно активируется для всех пользователей платформы</span>
-              </div>
-            </div>
-
-            <div class="admin-badge-actions">
-              <button type="button" class="btn btn-save-clean" id="saveAdminTgBotConfigBtn">
-                <svg><use href="#icon-check"/></svg>
-                <span>Проверить и сохранить настройки бота</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>

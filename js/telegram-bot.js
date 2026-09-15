@@ -147,7 +147,10 @@ const TelegramBotService = (function() {
     }
 
     if (typeof saveUsers === 'function') saveUsers(username, true);
-    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
+      FirebaseSync.rtdb.ref('users/' + username + '/telegramChatId').set(user.telegramChatId);
+      if (user.telegram) FirebaseSync.rtdb.ref('users/' + username + '/telegram').set(user.telegram);
+      FirebaseSync.rtdb.ref('users/' + username + '/telegramNotifs').set(user.telegramNotifs);
       FirebaseSync.saveUser(username, true);
     }
 
@@ -162,10 +165,14 @@ const TelegramBotService = (function() {
     if (!user) return false;
 
     delete user.telegramChatId;
+    delete user.telegram;
     delete user.tgLinkToken;
 
     if (typeof saveUsers === 'function') saveUsers(username, true);
-    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
+      FirebaseSync.rtdb.ref('users/' + username + '/telegramChatId').remove();
+      FirebaseSync.rtdb.ref('users/' + username + '/telegram').remove();
+      FirebaseSync.rtdb.ref('users/' + username + '/tgLinkToken').remove();
       FirebaseSync.saveUser(username, true);
     }
 
@@ -322,6 +329,10 @@ const TelegramBotService = (function() {
             showNotification('Ошибка токена бота ⚠️', 'Токен Telegram-бота отозван. Введите новый токен в настройках.');
           }
         }
+      } catch (e) {}
+    }, 2000);
+  }
+
   function stopPollingForLink() {
     if (_pollInterval) {
       clearInterval(_pollInterval);
@@ -668,65 +679,6 @@ const TelegramBotService = (function() {
     });
     document.getElementById('tgNotifKarmaToggle')?.addEventListener('change', function() {
       updateNotifSetting('karma', this.checked);
-    });
-
-    // 6. Настройки бота для Администраторов (Админ-Панель)
-    document.getElementById('saveAdminTgBotConfigBtn')?.addEventListener('click', async () => {
-      const tokenInput = document.getElementById('adminTgBotTokenInput');
-      const usernameInput = document.getElementById('adminTgBotUsernameInput');
-      const enabledToggle = document.getElementById('adminTgBotEnabledToggle');
-      const badge = document.getElementById('adminTgBotStatusBadge');
-
-      const rawToken = tokenInput ? tokenInput.value.trim() : '';
-      const newConfig = {
-        botToken: rawToken || DEFAULT_CONFIG.botToken,
-        botUsername: usernameInput ? usernameInput.value.trim().replace(/^@/, '') : 'Lobbivobot',
-        enabled: enabledToggle ? enabledToggle.checked : true
-      };
-
-      if (badge) {
-        badge.textContent = 'Проверка токена...';
-        badge.style.color = '#ff9800';
-      }
-
-      if (typeof showNotification === 'function') {
-        showNotification('Проверка токена...', 'Отправляем тестовый запрос в Telegram Bot API');
-      }
-
-      const health = await checkBotHealth(newConfig.botToken);
-      if (health.ok) {
-        if (health.botUsername) {
-          newConfig.botUsername = health.botUsername;
-          if (usernameInput) usernameInput.value = health.botUsername;
-        }
-
-        saveConfig(newConfig);
-
-        // Синхронизируем настройки бота в облако Firebase для ВСЕХ пользователей сайта
-        if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
-          try {
-            FirebaseSync.rtdb.ref('system/tgBotConfig').set(newConfig);
-          } catch (e) {}
-        }
-
-        if (badge) {
-          badge.style.color = '#00f0ff';
-          badge.textContent = `🟢 Онлайн (@${newConfig.botUsername})`;
-        }
-
-        if (typeof showNotification === 'function') {
-          showNotification('Бот настроен! 🟢', `Бот @${newConfig.botUsername} успешно подключен и активен для всех пользователей`);
-        }
-      } else {
-        saveConfig(newConfig);
-        if (badge) {
-          badge.style.color = '#ff4655';
-          badge.textContent = `🔴 ${health.error || 'Токен недействителен'}`;
-        }
-        if (typeof showNotification === 'function') {
-          showNotification('Ошибка токена 🔴', health.error || 'Telegram отклонил токен. Проверьте правильность в @BotFather');
-        }
-      }
     });
   }
 
