@@ -887,6 +887,12 @@ function sendFriendRequest(from, to, initialMessage = '') {
     if (uFrom) FirebaseSync.saveUser(from, true);
     if (uTo) FirebaseSync.saveUser(to, true);
   }
+
+  // Мгновенное оповещение в Telegram-бот о новой заявке на игру
+  if (typeof TelegramBotService !== 'undefined' && typeof TelegramBotService.notifyFriendRequest === 'function') {
+    TelegramBotService.notifyFriendRequest(from, to, initialMessage);
+  }
+
   return req;
 }
 
@@ -918,6 +924,12 @@ function acceptFriendRequest(viewer, sender) {
     if (uViewer) FirebaseSync.saveUser(viewer, true);
     if (uSender) FirebaseSync.saveUser(sender, true);
   }
+
+  // Оповещение в Telegram о принятии заявки в команду
+  if (typeof TelegramBotService !== 'undefined' && typeof TelegramBotService.notifyFriendAccept === 'function') {
+    TelegramBotService.notifyFriendAccept(viewer, sender);
+  }
+
   return true;
 }
 

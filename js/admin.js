@@ -64,11 +64,13 @@ function switchAdminTab(tab = 'complaints') {
   const usersView = document.getElementById('adminUsersView');
   const punishmentsView = document.getElementById('adminPunishmentsView');
   const badgeView = document.getElementById('adminBadgeView');
+  const tgbotView = document.getElementById('adminTgbotView');
 
   if (complaintsView) complaintsView.style.display = tab === 'complaints' ? 'block' : 'none';
   if (usersView) usersView.style.display = tab === 'users' ? 'block' : 'none';
   if (punishmentsView) punishmentsView.style.display = tab === 'punishments' ? 'block' : 'none';
   if (badgeView) badgeView.style.display = tab === 'badge' ? 'block' : 'none';
+  if (tgbotView) tgbotView.style.display = tab === 'tgbot' ? 'block' : 'none';
 
   updateAdminStats();
 
@@ -76,6 +78,15 @@ function switchAdminTab(tab = 'complaints') {
   if (tab === 'users') renderAdminUsers();
   if (tab === 'punishments') renderAdminPunishments();
   if (tab === 'badge') renderAdminBadgeSettings();
+  if (tab === 'tgbot' && typeof TelegramBotService !== 'undefined') {
+    const config = TelegramBotService.getConfig();
+    const tokenInput = document.getElementById('adminTgBotTokenInput');
+    const usernameInput = document.getElementById('adminTgBotUsernameInput');
+    const enabledToggle = document.getElementById('adminTgBotEnabledToggle');
+    if (tokenInput) tokenInput.value = config.botToken || '';
+    if (usernameInput) usernameInput.value = config.botUsername || 'LobbivoBot';
+    if (enabledToggle) enabledToggle.checked = config.enabled !== false;
+  }
 }
 
 function updateAdminStats() {

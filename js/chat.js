@@ -1714,6 +1714,11 @@ function sendMessage() {
   const req = getFriendRequest(AppState.currentUser, partner);
   if (!isFriends && !req) {
     sendFriendRequest(AppState.currentUser, partner, text);
+  } else {
+    // Мгновенное оповещение в Telegram-бот о новом личном сообщении
+    if (typeof TelegramBotService !== 'undefined' && typeof TelegramBotService.notifyDirectMessage === 'function') {
+      TelegramBotService.notifyDirectMessage(AppState.currentUser, partner, text);
+    }
   }
 
   checkFriendBannerStatus(partner);

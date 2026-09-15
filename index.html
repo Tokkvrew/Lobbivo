@@ -68,12 +68,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" />
   </noscript>
 
-  <!-- CSS Стили (с авто-обновлением кэша v2.9.10) -->
-  <link rel="stylesheet" href="css/variables.css?v=2.9.10" />
-  <link rel="stylesheet" href="css/base.css?v=2.9.10" />
-  <link rel="stylesheet" href="css/components.css?v=2.9.10" />
-  <link rel="stylesheet" href="css/animations.css?v=2.9.10" />
-  <link rel="stylesheet" href="css/media.css?v=2.9.10" />
+  <!-- CSS Стили (с авто-обновлением кэша v2.9.11) -->
+  <link rel="stylesheet" href="css/variables.css?v=2.9.11" />
+  <link rel="stylesheet" href="css/base.css?v=2.9.11" />
+  <link rel="stylesheet" href="css/components.css?v=2.9.11" />
+  <link rel="stylesheet" href="css/animations.css?v=2.9.11" />
+  <link rel="stylesheet" href="css/media.css?v=2.9.11" />
 </head>
 <body>
 
@@ -1304,6 +1304,16 @@
                 <span class="settings-tab-desc">Доступ к ЛС, Push и черный список</span>
               </div>
             </button>
+
+            <button type="button" class="settings-category-tab" data-settings-tab="telegram" id="settingsTabTelegram">
+              <div class="settings-tab-icon tg-nav-icon">
+                <svg><use href="#icon-telegram-plane"/></svg>
+              </div>
+              <div class="settings-tab-text">
+                <span class="settings-tab-title">Telegram Бот</span>
+                <span class="settings-tab-desc">Оповещения о заявках и ЛС</span>
+              </div>
+            </button>
           </div>
 
           <!-- 1. ПАНЕЛЬ КАТЕГОРИИ: ЧАТЫ -->
@@ -1422,6 +1432,102 @@
                 В чёрном списке пока никого нет
               </div>
               <div class="blacklist-items-grid" id="blacklistItemsGrid"></div>
+            </div>
+          </div>
+
+          <!-- 3. ПАНЕЛЬ КАТЕГОРИИ: TELEGRAM БОТ УВЕДОМЛЕНИЯ -->
+          <div class="settings-category-panel" id="settingsPanelTelegram" style="display:none;">
+            <!-- КАРТОЧКА СТАТУСА И ПРИВЯЗКИ -->
+            <div class="privacy-settings-card tg-bot-settings-card">
+              <div class="tg-bot-header-row">
+                <div class="tg-bot-icon-badge">
+                  <svg><use href="#icon-telegram-plane"/></svg>
+                </div>
+                <div class="tg-bot-header-info">
+                  <div class="tg-bot-title">Telegram-бот оповещений Lobbivo</div>
+                  <div class="tg-bot-sub">Бот мгновенно уведомит вас в Telegram, если кто-то кинет заявку на игру или напишет вам в ЛС</div>
+                </div>
+              </div>
+
+              <div class="tg-bot-status-bar">
+                <span class="tg-status-dot offline" id="tgBotStatusDot"></span>
+                <span class="tg-status-text" id="tgBotStatusText">Бот не привязан. Нажмите кнопку для подключения</span>
+              </div>
+
+              <!-- БЛОК ДЕЙСТВИЙ И ПРИВЯЗКИ -->
+              <div class="tg-bot-actions-row">
+                <button type="button" class="btn btn-tg-connect" id="tgBotLinkBtn">
+                  <svg style="width:16px;height:16px;"><use href="#icon-telegram-plane"/></svg>
+                  <span>Подключить Telegram-бота в 1 клик</span>
+                </button>
+                <button type="button" class="btn btn-outline tg-test-btn" id="tgBotTestBtn" style="display:none;">
+                  <svg style="width:14px;height:14px;"><use href="#icon-bell"/></svg>
+                  <span>Отправить тест</span>
+                </button>
+                <button type="button" class="btn btn-danger-clean tg-unlink-btn" id="tgBotUnlinkBtn" style="display:none;">
+                  <svg style="width:14px;height:14px;"><use href="#icon-trash"/></svg>
+                  <span>Отвязать бота</span>
+                </button>
+              </div>
+
+              <!-- РУЧНАЯ ПРИВЯЗКА ПО ID ИЛИ КОДУ -->
+              <div class="tg-manual-link-box">
+                <div class="tg-code-info">
+                  <span>Ваш персональный код связки: </span>
+                  <code class="tg-link-code" id="tgBotLinkCode">---</code>
+                  <span class="tg-code-hint">(отправьте команду <code>/start [код]</code> боту)</span>
+                </div>
+                <div class="tg-manual-input-row" style="margin-top: 10px;">
+                  <div class="cyber-input-wrapper">
+                    <input type="text" id="tgBotManualChatId" placeholder="Или укажите ваш Chat ID / @username">
+                  </div>
+                  <button type="button" class="btn btn-sm btn-primary" id="saveTgManualChatIdBtn">
+                    <svg style="width:14px;height:14px;"><use href="#icon-check"/></svg>
+                    <span>Сохранить ID</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ТИПЫ УВЕДОМЛЕНИЙ -->
+            <div class="privacy-settings-card" style="margin-top: 14px;">
+              <div class="privacy-option-title">Какие уведомления отправлять в Telegram:</div>
+              <div class="tg-notif-toggles-list">
+                
+                <div class="push-toggle-row">
+                  <div class="push-toggle-info">
+                    <div class="push-toggle-title">🎮 Заявки на совместную игру и в друзья</div>
+                    <div class="push-toggle-sub">Оповещать, когда тиммейт откликается на поиск пати или кидает инвайт</div>
+                  </div>
+                  <label class="cyber-switch" title="Включить / Выключить заявки">
+                    <input type="checkbox" id="tgNotifSquadToggle" checked>
+                    <span class="cyber-switch-slider"></span>
+                  </label>
+                </div>
+
+                <div class="push-toggle-row" style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
+                  <div class="push-toggle-info">
+                    <div class="push-toggle-title">💬 Личные сообщения (ЛС)</div>
+                    <div class="push-toggle-sub">Оповещать о новых входящих сообщениях от игроков, когда вы оффлайн</div>
+                  </div>
+                  <label class="cyber-switch" title="Включить / Выключить ЛС">
+                    <input type="checkbox" id="tgNotifDmToggle" checked>
+                    <span class="cyber-switch-slider"></span>
+                  </label>
+                </div>
+
+                <div class="push-toggle-row" style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
+                  <div class="push-toggle-info">
+                    <div class="push-toggle-title">🏆 Похвала и повышение кармы (+1)</div>
+                    <div class="push-toggle-sub">Оповещать, когда тиммейты благодарят вас за хорошую игру</div>
+                  </div>
+                  <label class="cyber-switch" title="Включить / Выключить карму">
+                    <input type="checkbox" id="tgNotifKarmaToggle" checked>
+                    <span class="cyber-switch-slider"></span>
+                  </label>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
@@ -2619,6 +2725,10 @@
             <svg style="width:14px;height:14px;"><use href="#icon-admin-shield"/></svg>
             <span>Тег администратора</span>
           </button>
+          <button type="button" class="admin-tab-btn" data-tab="tgbot">
+            <svg style="width:14px;height:14px;"><use href="#icon-telegram-plane"/></svg>
+            <span>Telegram Бот</span>
+          </button>
         </div>
 
         <!-- Контент 1: Жалобы -->
@@ -2772,6 +2882,53 @@
               </button>
             </div>
 
+          </div>
+        </div>
+
+        <!-- Контент 5: Настройки Telegram-бота -->
+        <div class="admin-tab-content" id="adminTgbotView" style="display:none;">
+          <div class="admin-badge-settings-wrap">
+            <div class="admin-badge-toggle-card">
+              <div class="badge-toggle-info">
+                <div class="badge-toggle-title">
+                  <svg style="width:16px;height:16px;color:var(--neon-cyan);display:inline-block;vertical-align:-2px;"><use href="#icon-telegram-plane"/></svg>
+                  <span>Интеграция Telegram Bot API</span>
+                </div>
+                <div class="badge-toggle-desc">
+                  Включите отправку Push-уведомлений пользователям в Telegram о заявках на игру, новых личных сообщениях и похвале репутации.
+                </div>
+              </div>
+              <label class="cyber-switch" title="Включить / Выключить отправку в Telegram">
+                <input type="checkbox" id="adminTgBotEnabledToggle" checked>
+                <span class="cyber-switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="admin-badge-custom-card">
+              <div class="field">
+                <label for="adminTgBotUsernameInput">Имя Telegram-бота (@username):</label>
+                <div class="input-cyber-wrapper">
+                  <svg class="input-cyber-icon"><use href="#icon-telegram-plane"/></svg>
+                  <input type="text" id="adminTgBotUsernameInput" placeholder="LobbivoBot" value="LobbivoBot">
+                </div>
+              </div>
+
+              <div class="field" style="margin-top: 12px;">
+                <label for="adminTgBotTokenInput">Bot API Token (из @BotFather):</label>
+                <div class="input-cyber-wrapper">
+                  <svg class="input-cyber-icon"><use href="#icon-lock"/></svg>
+                  <input type="password" id="adminTgBotTokenInput" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
+                </div>
+                <span class="field-hint">Токен сохраняется локально и используется для прямых вызовов Telegram Bot API</span>
+              </div>
+            </div>
+
+            <div class="admin-badge-actions">
+              <button type="button" class="btn btn-save-clean" id="saveAdminTgBotConfigBtn">
+                <svg><use href="#icon-check"/></svg>
+                <span>Сохранить настройки Telegram-бота</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -2990,17 +3147,18 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (v2.9.10) -->
-  <script src="js/data.js?v=2.9.10"></script>
-  <script src="js/security-shield.js?v=2.9.10"></script>
-  <script src="js/firebase-sync.js?v=2.9.10"></script>
-  <script src="js/storage.js?v=2.9.10"></script>
-  <script src="js/retention.js?v=2.9.10"></script>
-  <script src="js/auth.js?v=2.9.10"></script>
-  <script src="js/games.js?v=2.9.10"></script>
-  <script src="js/chat.js?v=2.9.10"></script>
-  <script src="js/profile.js?v=2.9.10"></script>
-  <script src="js/admin.js?v=2.9.10"></script>
-  <script src="js/app.js?v=2.9.10"></script>
+  <!-- JS СКРИПТЫ ПРИЛОЖЕНИЯ (v2.9.11) -->
+  <script src="js/data.js?v=2.9.11"></script>
+  <script src="js/security-shield.js?v=2.9.11"></script>
+  <script src="js/firebase-sync.js?v=2.9.11"></script>
+  <script src="js/storage.js?v=2.9.11"></script>
+  <script src="js/telegram-bot.js?v=2.9.11"></script>
+  <script src="js/retention.js?v=2.9.11"></script>
+  <script src="js/auth.js?v=2.9.11"></script>
+  <script src="js/games.js?v=2.9.11"></script>
+  <script src="js/chat.js?v=2.9.11"></script>
+  <script src="js/profile.js?v=2.9.11"></script>
+  <script src="js/admin.js?v=2.9.11"></script>
+  <script src="js/app.js?v=2.9.11"></script>
 </body>
 </html>

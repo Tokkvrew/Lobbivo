@@ -196,6 +196,11 @@ const RetentionEngine = (function() {
     triggerHaptic('success');
     showNotification('Репутация повышена!', `+1 к карме игроку ${targetUsername} (Всего: ${targetUser.karma})`);
 
+    // Мгновенное оповещение в Telegram-бот о повышении репутации
+    if (typeof TelegramBotService !== 'undefined' && typeof TelegramBotService.notifyKarma === 'function') {
+      TelegramBotService.notifyKarma(AppState.currentUser, targetUsername);
+    }
+
     // Перерисовываем карточки и профиль
     if (typeof renderPlayers === 'function') {
       renderPlayers(AppState.selectedGameFilter || 'all');
@@ -274,38 +279,17 @@ const RetentionEngine = (function() {
 
   function copyDiscordTag(discordTag, event) {
     if (event) event.stopPropagation();
-    if (!discordTag || discordTag === 'Не указан') {
+    if (!discordTag) {
       showNotification('Контакт не указан', 'Пользователь не привязал Discord');
       return;
     }
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(discordTag).then(() => {
-        triggerHaptic('light');
-        playCyberSound('click');
-        showNotification('Discord скопирован', `Тег "${escapeHtml(discordTag)}" скопирован в буфер обмена`);
-      }).catch(() => {
-        fallbackCopy(discordTag);
-      });
-    } else {
-      fallbackCopy(discordTag);
-    }
-  }
-
-  function fallbackCopy(text) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand('copy');
-      showNotification('Скопировано', `"${escapeHtml(text)}" скопировано в буфер`);
-    } catch (err) {
-      prompt('Скопируйте контакт:', text);
-    }
-    document.body.removeChild(ta);
+    navigator.clipboard.writeText(discordTag).then(() => {
+      playCyberSound('click');
+      triggerHaptic('success');
+      showNotification('Скопировано!', `Discord тег ${discordTag} скопирован в буфер`);
+    }).catch(() => {
+      showNotification('Discord', discordTag);
+    });
   }
 
   function openTelegramContact(tgUsername, event) {
@@ -314,9 +298,11 @@ const RetentionEngine = (function() {
       showNotification('Контакт не указан', 'Пользователь не привязал Telegram');
       return;
     }
-    const cleanName = tgUsername.replace(/^@/, '').trim();
-    const url = `https://t.me/${cleanName}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    const cleanTag = tgUsername.replace(/^@/, '');
+    const url = `https://t.me/${cleanTag}`;
+    playCyberSound('click');
+    triggerHaptic('light');
+    window.open(url, '_blank');
   }
 
   // ============================================================
@@ -346,8 +332,8 @@ const RetentionEngine = (function() {
         }
       });
 
-      // Авто-вход по профилю Telegram если пользователь еще не авторизован
-      if (!AppState.currentUser && twa.initDataUnsafe && twa.initDataUnsafe.user) {
+      // Авто-вход по профилю Telegram и автоматическая привязка Chat ID бота
+      if (twa.initDataUnsafe && twa.initDataUnsafe.user) {
         const tgUser = twa.initDataUnsafe.user;
         const tgUsername = tgUser.username || `tg_${tgUser.id}`;
         
@@ -362,12 +348,11 @@ const RetentionEngine = (function() {
             squads: [],
             lookingForTeam: true,
             telegram: tgUser.username ? `@${tgUser.username}` : '',
+            telegramChatId: String(tgUser.id),
+            telegramNotifs: { dm: true, squad: true, karma: true },
             created: Date.now(),
             lastSeen: Date.now()
           };
-        }
-        
-        AppState.currentUser = tgUsername;
         saveUsers(tgUsername, true);
         if (typeof updateUI === 'function') updateUI();
         if (typeof renderProfile === 'function') renderProfile();

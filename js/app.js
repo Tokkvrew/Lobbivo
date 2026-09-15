@@ -74,6 +74,7 @@ function switchPage(pageId) {
   } else if (pageId === 'pageSettings') {
     if (typeof renderPrivacySettings === 'function') renderPrivacySettings();
     if (typeof renderBlacklistSettings === 'function') renderBlacklistSettings();
+    if (typeof TelegramBotService !== 'undefined') TelegramBotService.renderTelegramSettings();
   }
 
   // Скролл вверх при смене страницы
@@ -2760,6 +2761,15 @@ function init() {
         if (typeof renderPrivacySettings === 'function') {
           renderPrivacySettings();
         }
+      } else if (targetTab === 'telegram') {
+        const tgPanel = document.getElementById('settingsPanelTelegram');
+        if (tgPanel) {
+          tgPanel.classList.add('active');
+          tgPanel.style.display = 'block';
+        }
+        if (typeof TelegramBotService !== 'undefined') {
+          TelegramBotService.renderTelegramSettings();
+        }
       }
     });
   });
@@ -2827,6 +2837,9 @@ function init() {
   }
   if (typeof RetentionEngine !== 'undefined') {
     RetentionEngine.init();
+  }
+  if (typeof TelegramBotService !== 'undefined' && typeof TelegramBotService.initEvents === 'function') {
+    TelegramBotService.initEvents();
   }
 
   updateUI();

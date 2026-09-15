@@ -14925,3 +14925,164 @@ select:-webkit-autofill {
   color: #00ff88 !important;
   filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.95)) !important;
 }
+
+/* ============================================================
+   TELEGRAM BOT INTEGRATION UI STYLES
+   ============================================================ */
+
+.settings-category-tab .tg-nav-icon {
+  background: rgba(0, 136, 204, 0.15) !important;
+  color: #0088cc !important;
+}
+
+.settings-category-tab.active .tg-nav-icon {
+  background: #0088cc !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(0, 136, 204, 0.6) !important;
+}
+
+.tg-bot-settings-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(0, 136, 204, 0.08) 0%, rgba(10, 18, 36, 0.85) 100%);
+  border: 1px solid rgba(0, 136, 204, 0.28) !important;
+}
+
+.tg-bot-header-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tg-bot-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0088cc, #00c6ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 136, 204, 0.4);
+  flex-shrink: 0;
+}
+
+.tg-bot-icon-badge svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.tg-bot-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: var(--font-heading);
+  letter-spacing: 0.3px;
+}
+
+.tg-bot-sub {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.35;
+}
+
+.tg-bot-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.tg-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.tg-status-dot.online {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.tg-status-dot.offline {
+  background: #64748b;
+}
+
+.tg-bot-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.btn-tg-connect {
+  background: linear-gradient(135deg, #0088cc, #00a8ff);
+  color: #ffffff !important;
+  border: none;
+  padding: 10px 18px;
+  font-weight: 700;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(0, 136, 204, 0.35);
+  transition: all 0.22s ease;
+  cursor: pointer;
+}
+
+.btn-tg-connect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 136, 204, 0.55);
+}
+
+.tg-manual-link-box {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.tg-code-info {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.tg-link-code {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(0, 136, 204, 0.15);
+  color: #00d4ff;
+  font-weight: 700;
+  font-family: 'Fira Code', monospace;
+  letter-spacing: 1px;
+  margin: 0 4px;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.tg-code-hint {
+  opacity: 0.7;
+  font-size: 0.78rem;
+}
+
+.tg-manual-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tg-manual-input-row .cyber-input-wrapper {
+  flex: 1;
+  min-width: 220px;
+}
