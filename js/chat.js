@@ -1481,9 +1481,10 @@ function checkFriendBannerStatus(partner) {
 
   const targetData = AppState.users ? AppState.users[partner] : null;
   const targetDmAccess = targetData?.privacy?.dmAccess || 'all';
+  const isUnlocked = typeof isDmUnlockedForUser === 'function' && isDmUnlockedForUser(partner, AppState.currentUser);
 
   // ПЛАТНЫЙ ДОСТУП К ДИАЛОГУ (ДЛЯ CEO / МОДЕРАТОРОВ)
-  if (targetDmAccess === 'coins' && typeof isDmUnlockedForUser === 'function' && !isDmUnlockedForUser(partner, AppState.currentUser)) {
+  if (targetDmAccess === 'coins' && !isUnlocked && !isFriends) {
     const cost = Math.max(1, parseInt(targetData?.privacy?.dmCost, 10) || 50);
     banner.style.display = 'none';
     inputArea.style.display = 'none';
@@ -1496,7 +1497,8 @@ function checkFriendBannerStatus(partner) {
 
   const req = getFriendRequest(AppState.currentUser, partner);
 
-  if (isFriends || (req && req.status === 'accepted')) {
+  // Если пользователи друзья, заявка принята или ЛС оплачен/разблокирован:
+  if (isFriends || isUnlocked || (req && req.status === 'accepted')) {
     banner.style.display = 'none';
     inputArea.style.display = 'flex';
     lockedNotice.style.display = 'none';
@@ -1513,8 +1515,8 @@ function checkFriendBannerStatus(partner) {
     return;
   }
 
-  // Если мы отправили заявку и она ожидает подтверждения:
-  if (req && req.status === 'pending' && req.from === AppState.currentUser && req.to === partner) {
+  // Если мы отправили заявку и она ожидает подтверждения (ТОЛЬКО если у собеседника ЛС ограничен режимом "только друзья"):
+  if (req && req.status === 'pending' && req.from === AppState.currentUser && req.to === partner && targetDmAccess === 'friends') {
     banner.style.display = 'none';
     inputArea.style.display = 'none';
     lockedNotice.style.display = 'block';
@@ -1522,7 +1524,7 @@ function checkFriendBannerStatus(partner) {
     return;
   }
 
-  // Дефолтное состояние
+  // Дефолтное состояние: чат полностью открыт для общения
   banner.style.display = 'none';
   inputArea.style.display = 'flex';
   lockedNotice.style.display = 'none';

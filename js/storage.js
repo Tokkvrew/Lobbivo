@@ -832,29 +832,44 @@ function unblockUser(viewer, target) {
 }
 
 // ============================================================
+// ============================================================
 //  ДРУЗЬЯ И ЗАЯВКИ В ДРУЗЬЯ (FRIENDS & REQUESTS)
 // ============================================================
 function areFriends(user1, user2) {
   if (!user1 || !user2) return false;
-  const u1 = AppState.users[user1];
-  const u2 = AppState.users[user2];
-  if (!u1 || !Array.isArray(u1.friends) || !u1.friends.includes(user2)) return false;
-  if (!u2 || !Array.isArray(u2.friends) || !u2.friends.includes(user1)) return false;
-  return true;
+  if (user1 === user2) return false;
+  const u1 = AppState.users ? AppState.users[user1] : null;
+  const u2 = AppState.users ? AppState.users[user2] : null;
+  if (!u1 && !u2) return false;
+
+  const inU1 = Array.isArray(u1?.friends) && u1.friends.includes(user2);
+  const inU2 = Array.isArray(u2?.friends) && u2.friends.includes(user1);
+  return inU1 || inU2;
 }
 
 function getFriendRequest(user1, user2) {
-  const u1 = AppState.users[user1];
-  const u2 = AppState.users[user2];
+  if (!user1 || !user2) return null;
+  const u1 = AppState.users ? AppState.users[user1] : null;
+  const u2 = AppState.users ? AppState.users[user2] : null;
+
   const req1 = u1?.friendRequests?.find(r => (r.from === user1 && r.to === user2) || (r.from === user2 && r.to === user1));
   const req2 = u2?.friendRequests?.find(r => (r.from === user1 && r.to === user2) || (r.from === user2 && r.to === user1));
+
+  // Если хотя бы у одного пользователя статус принят, возвращаем принятую заявку
+  if (req1?.status === 'accepted') return req1;
+  if (req2?.status === 'accepted') return req2;
+
+  // Если статус отклонён
+  if (req1?.status === 'declined') return req1;
+  if (req2?.status === 'declined') return req2;
+
   return req1 || req2 || null;
 }
 
 function sendFriendRequest(from, to, initialMessage = '') {
   if (!from || !to || from === to) return null;
-  const uFrom = AppState.users[from];
-  const uTo = AppState.users[to];
+  const uFrom = AppState.users ? AppState.users[from] : null;
+  const uTo = AppState.users ? AppState.users[to] : null;
   if (!uFrom || !uTo) return null;
 
   if (!Array.isArray(uFrom.friendRequests)) uFrom.friendRequests = [];
@@ -897,8 +912,8 @@ function sendFriendRequest(from, to, initialMessage = '') {
 }
 
 function acceptFriendRequest(viewer, sender) {
-  const uViewer = AppState.users[viewer];
-  const uSender = AppState.users[sender];
+  const uViewer = AppState.users ? AppState.users[viewer] : null;
+  const uSender = AppState.users ? AppState.users[sender] : null;
   if (!uViewer || !uSender) return false;
 
   if (!Array.isArray(uViewer.friends)) uViewer.friends = [];
@@ -919,8 +934,20 @@ function acceptFriendRequest(viewer, sender) {
   updateStatus(uViewer);
   updateStatus(uSender);
 
+  // Сразу снимаем ограничения платных ЛС для обоих игроков
+  if (typeof unlockDmForUser === 'function') {
+    unlockDmForUser(viewer, sender);
+    unlockDmForUser(sender, viewer);
+  }
+
   saveUsers();
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+    if (FirebaseSync.rtdb) {
+      FirebaseSync.rtdb.ref('users/' + viewer + '/friends').set(uViewer.friends);
+      FirebaseSync.rtdb.ref('users/' + sender + '/friends').set(uSender.friends);
+      FirebaseSync.rtdb.ref('users/' + viewer + '/friendRequests').set(uViewer.friendRequests);
+      FirebaseSync.rtdb.ref('users/' + sender + '/friendRequests').set(uSender.friendRequests);
+    }
     if (uViewer) FirebaseSync.saveUser(viewer, true);
     if (uSender) FirebaseSync.saveUser(sender, true);
   }
