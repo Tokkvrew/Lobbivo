@@ -395,12 +395,41 @@ const TelegramBotService = (function() {
   //  УВЕДОМЛЕНИЯ О СОБЫТИЯХ
   // ============================================================
 
+  // Вспомогательная функция для получения пользователя с гарантированным считыванием telegramChatId из облака Firebase
+  async function _resolveUserWithTelegram(username) {
+    if (!username) return null;
+    let user = AppState.users ? AppState.users[username] : null;
+    if (user && user.telegramChatId) return user;
+
+    // Если в локальной памяти нет telegramChatId, подтягиваем свежие данные из Firebase RTDB
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized && FirebaseSync.rtdb) {
+      try {
+        const snap = await FirebaseSync.rtdb.ref('users/' + username).once('value');
+        const cloudData = snap.val();
+        if (cloudData) {
+          if (!AppState.users) AppState.users = {};
+          if (!AppState.users[username]) AppState.users[username] = cloudData;
+          else {
+            if (cloudData.telegramChatId) AppState.users[username].telegramChatId = cloudData.telegramChatId;
+            if (cloudData.telegram) AppState.users[username].telegram = cloudData.telegram;
+            if (cloudData.telegramNotifs) AppState.users[username].telegramNotifs = cloudData.telegramNotifs;
+          }
+          return AppState.users[username];
+        }
+      } catch (e) {}
+    }
+    return user;
+  }
+
   // 1. Уведомление о заявке на совместную игру / в друзья
   async function notifyFriendRequest(fromUsername, toUsername, initialMsg = '') {
-    if (!fromUsername || !toUsername || fromUsername === toUsername) return;
-    const toUser = AppState.users ? AppState.users[toUsername] : null;
-    const fromUser = AppState.users ? AppState.users[fromUsername] : null;
-    if (!toUser || !toUser.telegramChatId) return;
+    if (!fromUsername || !toUsername) return;
+    const toUser = await _resolveUserWithTelegram(toUsername);
+    const fromUser = await _resolveUserWithTelegram(fromUsername);
+    if (!toUser || !toUser.telegramChatId) {
+      console.log('[TelegramBotService] notifyFriendRequest: recipient has no telegramChatId', toUsername);
+      return;
+    }
 
     if (toUser.telegramNotifs && toUser.telegramNotifs.squad === false) return;
 
@@ -427,18 +456,17 @@ const TelegramBotService = (function() {
     return await sendTelegramMessage(toUser.telegramChatId, html, inlineKeyboard);
   }
 
-  // 2. Уведомление о новом личном сообщении
+  // 2. Уведомление о новом личном сообщении (ЛС)
   async function notifyDirectMessage(fromUsername, toUsername, text = '') {
-    if (!fromUsername || !toUsername || fromUsername === toUsername) return;
-    const toUser = AppState.users ? AppState.users[toUsername] : null;
-    const fromUser = AppState.users ? AppState.users[fromUsername] : null;
-    if (!toUser || !toUser.telegramChatId) return;
-
-    if (toUser.telegramNotifs && toUser.telegramNotifs.dm === false) return;
-
-    if (AppState.currentUser === toUsername && typeof isChatOpen !== 'undefined' && isChatOpen && AppState.chatPartner === fromUsername) {
+    if (!fromUsername || !toUsername) return;
+    const toUser = await _resolveUserWithTelegram(toUsername);
+    const fromUser = await _resolveUserWithTelegram(fromUsername);
+    if (!toUser || !toUser.telegramChatId) {
+      console.log('[TelegramBotService] notifyDirectMessage: recipient has no telegramChatId', toUsername);
       return;
     }
+
+    if (toUser.telegramNotifs && toUser.telegramNotifs.dm === false) return;
 
     const fromName = fromUser?.name || fromUsername;
     const safeSnippet = _safeEscape(text.trim().slice(0, 250));
@@ -460,9 +488,9 @@ const TelegramBotService = (function() {
 
   // 3. Уведомление о принятии заявки в друзья
   async function notifyFriendAccept(fromUsername, toUsername) {
-    if (!fromUsername || !toUsername || fromUsername === toUsername) return;
-    const toUser = AppState.users ? AppState.users[toUsername] : null;
-    const fromUser = AppState.users ? AppState.users[fromUsername] : null;
+    if (!fromUsername || !toUsername) return;
+    const toUser = await _resolveUserWithTelegram(toUsername);
+    const fromUser = await _resolveUserWithTelegram(fromUsername);
     if (!toUser || !toUser.telegramChatId) return;
 
     if (toUser.telegramNotifs && toUser.telegramNotifs.squad === false) return;
@@ -484,9 +512,9 @@ const TelegramBotService = (function() {
 
   // 4. Уведомление о похвале / карме (+1)
   async function notifyKarma(fromUsername, toUsername) {
-    if (!fromUsername || !toUsername || fromUsername === toUsername) return;
-    const toUser = AppState.users ? AppState.users[toUsername] : null;
-    const fromUser = AppState.users ? AppState.users[fromUsername] : null;
+    if (!fromUsername || !toUsername) return;
+    const toUser = await _resolveUserWithTelegram(toUsername);
+    const fromUser = await _resolveUserWithTelegram(fromUsername);
     if (!toUser || !toUser.telegramChatId) return;
 
     if (toUser.telegramNotifs && toUser.telegramNotifs.karma === false) return;
