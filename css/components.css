@@ -9804,6 +9804,128 @@ select:-webkit-autofill {
   height: 12px;
 }
 
+/* VIP Pinned Capsule Carousel & 10s Rotation */
+.vip-pinned-capsule {
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.vip-pinned-capsule.vip-switching {
+  opacity: 0.15;
+  transform: translateY(-3px) scale(0.99);
+}
+
+.vip-pinned-capsule.vip-fade-in {
+  animation: vipSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes vipSlideIn {
+  from {
+    opacity: 0.3;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vip-pinned-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ffd700, #ff8800, #00d4ff);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+  width: 0%;
+  animation: vipProgressFill 10s linear infinite;
+  pointer-events: none;
+}
+
+.vip-pinned-capsule:hover .vip-pinned-progress-bar {
+  animation-play-state: paused;
+}
+
+@keyframes vipProgressFill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.vip-carousel-counter {
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 3px;
+  color: #fff;
+  letter-spacing: 0.2px;
+}
+
+.vip-carousel-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 4px;
+}
+
+.vip-carousel-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.vip-carousel-btn:hover {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: #ffd700;
+  color: #ffd700;
+  transform: scale(1.1);
+}
+
+.vip-carousel-btn svg {
+  width: 11px;
+  height: 11px;
+}
+
+.vip-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.vip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vip-dot.active {
+  background: #ffd700;
+  box-shadow: 0 0 6px #ffd700;
+  transform: scale(1.2);
+  width: 14px;
+  border-radius: 3px;
+}
+
+.vip-dot:hover {
+  background: rgba(255, 215, 0, 0.7);
+}
+
 /* КАРТОЧКИ ИГРОКОВ С VIP БУСТОМ */
 .vip-boosted-card {
   border-color: rgba(255, 190, 30, 0.6) !important;
@@ -11040,6 +11162,17 @@ select:-webkit-autofill {
 
 .cyber-switch-sm input:checked + .cyber-switch-slider:before {
   transform: translateX(18px);
+}
+
+.cyber-switch-amber input:checked + .cyber-switch-slider {
+  background: linear-gradient(135deg, #ffaa00, #ff5500) !important;
+  border-color: #ffaa00 !important;
+  box-shadow: 0 0 12px rgba(255, 170, 0, 0.5) !important;
+}
+
+.fast-match-hero-bar.urgent-active {
+  border-color: rgba(255, 170, 0, 0.7) !important;
+  box-shadow: 0 0 24px rgba(255, 170, 0, 0.35) !important;
 }
 
 @media (max-width: 600px) {

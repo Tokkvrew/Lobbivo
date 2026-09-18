@@ -534,6 +534,7 @@ function banUser(target, durationMinutes, reason, adminName = null) {
   u.bannedBy = actor || (isUserCEO(actor) ? 'CEO' : 'Модератор');
   u.bannedAt = now;
   saveUsers(target);
+  resolveComplaintsForTarget(target);
   return true;
 }
 
@@ -571,6 +572,7 @@ function muteUser(target, durationMinutes, reason, adminName = null) {
   u.mutedBy = actor || (isUserCEO(actor) ? 'CEO' : 'Модератор');
   u.mutedAt = now;
   saveUsers(target);
+  resolveComplaintsForTarget(target);
   return true;
 }
 
@@ -606,6 +608,26 @@ function resolveComplaint(complaintId) {
     FirebaseSync.deleteComplaint(complaintId);
   }
   return true;
+}
+
+// Автоматическое закрытие всех жалоб на нарушителя при бане или муте
+function resolveComplaintsForTarget(targetUsername) {
+  if (!targetUsername) return 0;
+  if (!Array.isArray(AppState.complaints)) {
+    loadComplaints();
+  }
+  const complaintsToDelete = (AppState.complaints || []).filter(c => c && c.target === targetUsername);
+  if (complaintsToDelete.length === 0) return 0;
+
+  complaintsToDelete.forEach(c => {
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.initialized) {
+      FirebaseSync.deleteComplaint(c.id);
+    }
+  });
+
+  AppState.complaints = (AppState.complaints || []).filter(c => c && c.target !== targetUsername);
+  saveComplaints();
+  return complaintsToDelete.length;
 }
 
 // Загрузка пользователей

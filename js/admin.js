@@ -419,7 +419,7 @@ function submitBan() {
   const success = banUser(activeBanTarget, durationMinutes, reason, AppState.currentUser);
 
   if (success) {
-    showNotification('Пользователь забанен', `Игрок ${activeBanTarget} успешно заблокирован`);
+    showNotification('Пользователь забанен', `Игрок ${activeBanTarget} заблокирован. Все активные жалобы закрыты.`);
     closeBanModal();
     updateAdminStats();
     updateAdminBadges();
@@ -504,7 +504,7 @@ function submitMute() {
   const success = muteUser(activeMuteTarget, durationMinutes, reason, AppState.currentUser);
 
   if (success) {
-    showNotification('Чат заблокирован', `Игрок ${activeMuteTarget} замьючен на ${durationMinutes === -1 ? 'вечно' : durationMinutes + ' мин.'}`);
+    showNotification('Чат заблокирован', `Игрок ${activeMuteTarget} замьючен на ${durationMinutes === -1 ? 'вечно' : durationMinutes + ' мин.'}. Связанные жалобы закрыты.`);
     closeMuteModal();
     updateAdminStats();
     if (currentAdminTab === 'complaints') renderAdminComplaints();

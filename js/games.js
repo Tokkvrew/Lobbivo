@@ -331,10 +331,23 @@ function renderMySquads() {
             <div class="my-squad-pin-row">
               <div class="pin-toggle-info">
                 <svg style="width:14px;height:14px;color:var(--neon-cyan);display:inline-block;vertical-align:middle;margin-right:6px;"><use href="#icon-badge-vip"/></svg>
-                <span style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">Закрепить вашу анкету в чате</span>
+                <span style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">Закрепить анкету в чате</span>
               </div>
               <label class="cyber-switch cyber-switch-sm" title="Закрепить или открепить эту анкету в шапке мирового чата">
                 <input type="checkbox" onchange="toggleSquadPinInChat('${sq.id}', this.checked)" ${sq.pinnedInChat ? 'checked' : ''}>
+                <span class="cyber-switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- ТУМБЛЕР СРОЧНОГО СБОРА «ИЩУ ПАТИ СЕЙЧАС» -->
+            <div class="my-squad-pin-row my-squad-urgent-row" style="margin-top:6px;">
+              <div class="pin-toggle-info">
+                <svg style="width:14px;height:14px;color:#ffaa00;display:inline-block;vertical-align:middle;margin-right:6px;"><use href="#icon-bolt-fast"/></svg>
+                <span style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">Срочный сбор (Топ на 2ч)</span>
+                ${(typeof RetentionEngine !== 'undefined' && RetentionEngine.isUrgent(sq, current)) ? `<span class="urgent-squad-badge" style="margin-left:6px;padding:1px 6px;font-size:0.6rem;"><span class="urgent-card-timer-val">${RetentionEngine.formatUrgentRemaining(RetentionEngine.getUrgentRemainingMs(sq, current))}</span></span>` : ''}
+              </div>
+              <label class="cyber-switch cyber-switch-sm cyber-switch-amber" title="Включить или отключить срочный сбор для этой анкеты">
+                <input type="checkbox" onchange="toggleSquadUrgent('${sq.id}', this.checked)" ${(typeof RetentionEngine !== 'undefined' && RetentionEngine.isUrgent(sq, current)) ? 'checked' : ''}>
                 <span class="cyber-switch-slider"></span>
               </label>
             </div>
@@ -360,6 +373,47 @@ function renderMySquads() {
 
   if (listContainer) listContainer.innerHTML = squadsHtml;
   if (modalListContainer) modalListContainer.innerHTML = squadsHtml;
+}
+
+/**
+ * Переключение срочного сбора для конкретной анкеты из «Мои анкеты»
+ */
+function toggleSquadUrgent(squadId, isUrgent) {
+  if (!AppState.currentUser) return;
+  const user = AppState.users[AppState.currentUser];
+  if (!user) return;
+
+  const squads = getUserSquads(AppState.currentUser);
+  const targetSq = squads.find(s => s.id === squadId);
+  const TWO_HOURS = 2 * 60 * 60 * 1000;
+
+  if (isUrgent) {
+    const until = Date.now() + TWO_HOURS;
+    user.urgentUntil = until;
+    if (targetSq) targetSq.urgentUntil = until;
+    if (Array.isArray(user.squads)) {
+      user.squads.forEach(s => { s.urgentUntil = until; });
+    }
+    if (typeof RetentionEngine !== 'undefined') {
+      RetentionEngine.playSound('karma');
+      RetentionEngine.haptic('success');
+    }
+    showNotification('Срочный сбор включен!', 'Анкета поднята в самый верх каталога с таймером на 2 часа!');
+  } else {
+    user.urgentUntil = 0;
+    if (targetSq) targetSq.urgentUntil = 0;
+    if (Array.isArray(user.squads)) {
+      user.squads.forEach(s => { s.urgentUntil = 0; });
+    }
+    showNotification('Срочный сбор выключен', 'Анкета переведена в обычный режим');
+  }
+
+  saveUsers(AppState.currentUser, true);
+  if (typeof RetentionEngine !== 'undefined') {
+    RetentionEngine.updateFastMatchUI();
+  }
+  renderMySquads();
+  renderPlayers(AppState.selectedGameFilter || 'all');
 }
 
 /**
@@ -490,15 +544,15 @@ function renderPlayers(gameFilter = 'all') {
     }
   }
 
-  // Сортировка: VIP буст -> Срочный сбор -> Моя анкета -> Premium -> Онлайн -> Новые
+  // Сортировка: Срочный сбор -> VIP буст -> Моя анкета -> Premium -> Онлайн -> Новые
   squadCards.sort((a, b) => {
-    const boostA = isSquadVipBoosted(a.username) ? 1 : 0;
-    const boostB = isSquadVipBoosted(b.username) ? 1 : 0;
-    if (boostA !== boostB) return boostB - boostA;
-
     const urgA = (typeof RetentionEngine !== 'undefined' && RetentionEngine.isUrgent(a.squad, a.username)) ? 1 : 0;
     const urgB = (typeof RetentionEngine !== 'undefined' && RetentionEngine.isUrgent(b.squad, b.username)) ? 1 : 0;
     if (urgA !== urgB) return urgB - urgA;
+
+    const boostA = isSquadVipBoosted(a.username) ? 1 : 0;
+    const boostB = isSquadVipBoosted(b.username) ? 1 : 0;
+    if (boostA !== boostB) return boostB - boostA;
 
     const meA = a.isMe ? 1 : 0;
     const meB = b.isMe ? 1 : 0;
@@ -550,7 +604,12 @@ function renderPlayers(gameFilter = 'all') {
 
     const premiumCrownHtml = isPremium ? '<span class="premium-crown-badge" title="Lobbivo Premium"><svg><use href="#icon-crown"/></svg></span>' : '';
     const vipPillHtml = isBoosted ? '<span class="vip-squad-badge"><svg><use href="#icon-badge-vip"/></svg> VIP СБОР</span>' : '';
-    const urgentBadgeHtml = isUrgent ? '<span class="urgent-squad-badge"><svg><use href="#icon-bolt-fast"/></svg> СРОЧНО В КАТКУ</span>' : '';
+    let urgentBadgeHtml = '';
+    if (isUrgent) {
+      const remMs = typeof RetentionEngine !== 'undefined' ? RetentionEngine.getUrgentRemainingMs(squad, username) : 0;
+      const formattedTime = typeof RetentionEngine !== 'undefined' ? RetentionEngine.formatUrgentRemaining(remMs) : '';
+      urgentBadgeHtml = `<span class="urgent-squad-badge" title="Срочный сбор активен на 2 часа"><svg><use href="#icon-bolt-fast"/></svg><span>СРОЧНО В КАТКУ</span><span class="urgent-card-timer-val" style="margin-left:4px;font-variant-numeric:tabular-nums;opacity:0.9;">${formattedTime}</span></span>`;
+    }
     const mySquadBadgeHtml = isMe ? '<span class="my-squad-badge"><svg><use href="#icon-sparkles"/></svg> Ваша анкета</span>' : '';
     const adminBadge = typeof getUserAdminBadge === 'function' ? getUserAdminBadge(username) : null;
     const adminBadgeHtml = adminBadge ? `<span class="admin-custom-badge badge-style-${adminBadge.style}" style="font-size:0.62rem;padding:2px 6px;"><svg style="width:11px;height:11px;"><use href="#${adminBadge.icon}"/></svg><span>${escapeHtml(adminBadge.text)}</span></span>` : '';

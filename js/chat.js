@@ -303,72 +303,157 @@ function switchChatTab(tab) {
 //  5. МИРОВОЙ ЧАТ (WORLD CHAT STREAM)
 // ============================================================
 
-function renderVipSquadPinnedBar() {
+// ============================================================
+//  ЗАКРЕПЛЕННЫЕ VIP АНКЕТЫ В ЧАТЕ (КАРУСЕЛЬ И РОТАЦИЯ 10 СЕК)
+// ============================================================
+
+let vipPinnedSquads = [];
+let currentVipPinnedIndex = 0;
+let vipPinnedRotateTimer = null;
+let isVipPinnedHovered = false;
+
+function stopVipPinnedRotation() {
+  if (vipPinnedRotateTimer) {
+    clearInterval(vipPinnedRotateTimer);
+    vipPinnedRotateTimer = null;
+  }
+}
+
+function startVipPinnedRotation() {
+  stopVipPinnedRotation();
+  if (vipPinnedSquads.length <= 1) return;
+
+  vipPinnedRotateTimer = setInterval(() => {
+    if (!isVipPinnedHovered && vipPinnedSquads.length > 1) {
+      rotateVipPinnedCard(1);
+    }
+  }, 10000); // Ровно каждые 10 секунд!
+}
+
+function rotateVipPinnedCard(direction = 1) {
+  if (vipPinnedSquads.length <= 1) return;
   const bar = document.getElementById('vipSquadPinnedBar');
   if (!bar) return;
 
-  const current = AppState.currentUser;
-  const now = Date.now();
-  
-  // Ищем анкеты, которые пользователь ЯВНО закрепил через тумблер в «Мои анкеты»
-  let pinnedCandidate = null;
-
-  // 1. Сначала проверяем закреп текущего пользователя (чтобы он сразу видел свой закреп)
-  if (current && AppState.users[current]) {
-    const meSquads = Array.isArray(AppState.users[current].squads) ? AppState.users[current].squads : [];
-    const myPinned = meSquads.find(s => s && s.pinnedInChat === true && s.active !== false);
-    if (myPinned) {
-      pinnedCandidate = {
-        username: current,
-        data: AppState.users[current],
-        squad: myPinned,
-        isBoosted: isSquadVipBoosted(current)
-      };
-    }
+  const capsule = bar.querySelector('.vip-pinned-capsule');
+  if (capsule) {
+    capsule.classList.add('vip-switching');
   }
 
-  // 2. Если у текущего пользователя нет закрепа, ищем закрепленные анкеты других пользователей
-  if (!pinnedCandidate) {
-    for (const [name, data] of Object.entries(AppState.users)) {
-      if (name === current) continue;
-      if (!Array.isArray(data.squads)) continue;
-      const pinnedSq = data.squads.find(s => s && s.pinnedInChat === true && s.active !== false);
-      if (pinnedSq) {
-        pinnedCandidate = {
-          username: name,
-          data: data,
-          squad: pinnedSq,
-          isBoosted: isSquadVipBoosted(name)
-        };
-        break;
+  setTimeout(() => {
+    currentVipPinnedIndex = (currentVipPinnedIndex + direction + vipPinnedSquads.length) % vipPinnedSquads.length;
+    renderVipPinnedCardContent();
+  }, 180);
+}
+
+window.selectVipPinnedSlide = function(index) {
+  if (index >= 0 && index < vipPinnedSquads.length) {
+    currentVipPinnedIndex = index;
+    renderVipPinnedCardContent();
+    startVipPinnedRotation();
+  }
+};
+
+window.prevVipPinnedSlide = function(event) {
+  if (event) event.stopPropagation();
+  rotateVipPinnedCard(-1);
+  startVipPinnedRotation();
+};
+
+window.nextVipPinnedSlide = function(event) {
+  if (event) event.stopPropagation();
+  rotateVipPinnedCard(1);
+  startVipPinnedRotation();
+};
+
+function collectVipPinnedCandidates() {
+  const current = AppState.currentUser;
+  const candidates = [];
+  const seenUsers = new Set();
+
+  // 1. Закрепленная анкета текущего пользователя
+  if (current && AppState.users[current]) {
+    const meSquads = Array.isArray(AppState.users[current].squads) ? AppState.users[current].squads : (AppState.users[current].squads && typeof AppState.users[current].squads === 'object' ? Object.values(AppState.users[current].squads) : []);
+    const myPinned = meSquads.find(s => s && s.pinnedInChat === true && s.active !== false);
+    if (myPinned) {
+      const dismissKey = `lobbivo_dismissed_vip_${current}_${myPinned.id || 'sq'}`;
+      if (localStorage.getItem(dismissKey) !== 'true') {
+        candidates.push({
+          username: current,
+          data: AppState.users[current],
+          squad: myPinned,
+          isBoosted: isSquadVipBoosted(current),
+          isMe: true
+        });
+        seenUsers.add(current);
       }
     }
   }
 
-  // Если ни у кого не включен тумблер закрепления — по умолчанию ничего не закрепляется
-  if (!pinnedCandidate) {
+  // 2. Закрепленные анкеты других пользователей платформы
+  for (const [name, data] of Object.entries(AppState.users || {})) {
+    if (name === current || seenUsers.has(name) || !data) continue;
+    const squads = Array.isArray(data.squads) ? data.squads : (data.squads && typeof data.squads === 'object' ? Object.values(data.squads) : []);
+    const pinnedSq = squads.find(s => s && s.pinnedInChat === true && s.active !== false);
+    if (pinnedSq) {
+      const dismissKey = `lobbivo_dismissed_vip_${name}_${pinnedSq.id || 'sq'}`;
+      if (localStorage.getItem(dismissKey) !== 'true') {
+        candidates.push({
+          username: name,
+          data: data,
+          squad: pinnedSq,
+          isBoosted: isSquadVipBoosted(name),
+          isMe: false
+        });
+        seenUsers.add(name);
+      }
+    }
+  }
+
+  return candidates;
+}
+
+function renderVipSquadPinnedBar() {
+  const bar = document.getElementById('vipSquadPinnedBar');
+  if (!bar) return;
+
+  vipPinnedSquads = collectVipPinnedCandidates();
+
+  if (vipPinnedSquads.length === 0) {
+    stopVipPinnedRotation();
     bar.style.display = 'none';
     bar.innerHTML = '';
     return;
   }
 
-  const { username, data, squad, isBoosted } = pinnedCandidate;
-
-  // Проверка скрытия объявления пользователем в localStorage
-  const dismissKey = `lobbivo_dismissed_vip_${username}_${squad.id || 'sq'}`;
-  if (localStorage.getItem(dismissKey) === 'true') {
-    bar.style.display = 'none';
-    bar.innerHTML = '';
-    return;
+  if (currentVipPinnedIndex >= vipPinnedSquads.length) {
+    currentVipPinnedIndex = 0;
   }
 
+  renderVipPinnedCardContent();
+  startVipPinnedRotation();
+
+  // Пауза при наведении мыши
+  bar.onmouseenter = () => { isVipPinnedHovered = true; };
+  bar.onmouseleave = () => { isVipPinnedHovered = false; };
+}
+
+function renderVipPinnedCardContent() {
+  const bar = document.getElementById('vipSquadPinnedBar');
+  if (!bar || vipPinnedSquads.length === 0) return;
+
+  const current = AppState.currentUser;
+  const currentCandidate = vipPinnedSquads[currentVipPinnedIndex];
+  if (!currentCandidate) return;
+
+  const { username, data, squad, isBoosted, isMe } = currentCandidate;
   const safeName = escapeHtml(username);
   const targetGameId = squad.game || data.game || 'csgo';
   const gameObj = GAMES.find(g => g.id === targetGameId) || GAMES[0];
   const frameId = getUserEquippedFrame(username);
   const safeDesc = escapeHtml(squad.desc || data.desc || 'Ищу тиммейтов для совместной игры и побед!');
   const safeRank = escapeHtml(squad.rank || data.rank || '');
-  const isMe = current === username;
+  const totalCount = vipPinnedSquads.length;
 
   let avatarHtml;
   if (data.avatar) {
@@ -382,12 +467,37 @@ function renderVipSquadPinnedBar() {
     avatarHtml = `<div class="avatar-frame-wrap frame-${frameId}">${avatarHtml}</div>`;
   }
 
+  // Индикаторы пагинации и переключатели (если 2 и более VIP закрепов)
+  const dotsHtml = totalCount > 1 ? `
+    <div class="vip-carousel-nav">
+      <button type="button" class="vip-carousel-btn prev" onclick="prevVipPinnedSlide(event)" title="Предыдущая анкета">
+        <svg><use href="#icon-chevron-left"/></svg>
+      </button>
+      <div class="vip-carousel-dots">
+        ${vipPinnedSquads.map((_, i) => `
+          <button type="button" class="vip-dot ${i === currentVipPinnedIndex ? 'active' : ''}" onclick="selectVipPinnedSlide(${i})" title="Анкета ${i + 1} из ${totalCount}"></button>
+        `).join('')}
+      </div>
+      <button type="button" class="vip-carousel-btn next" onclick="nextVipPinnedSlide(event)" title="Следующая анкета">
+        <svg><use href="#icon-chevron-right"/></svg>
+      </button>
+    </div>
+  ` : '';
+
+  const counterBadgeHtml = totalCount > 1 ? `
+    <span class="vip-carousel-counter" title="Каждые 10 секунд анкеты переключаются">
+      ${currentVipPinnedIndex + 1}/${totalCount}
+    </span>
+  ` : '';
+
   bar.innerHTML = `
-    <div class="vip-pinned-capsule ${isBoosted ? 'boosted' : 'premium'}">
+    <div class="vip-pinned-capsule ${isBoosted ? 'boosted' : 'premium'} vip-fade-in" id="vipCurrentCapsule">
+      ${totalCount > 1 ? '<div class="vip-pinned-progress-bar" key="prog_' + currentVipPinnedIndex + '_' + Date.now() + '"></div>' : ''}
       <div class="vip-pinned-left">
         <div class="vip-pinned-badge">
           <svg><use href="#icon-badge-vip"/></svg>
           <span>VIP СБОР</span>
+          ${counterBadgeHtml}
         </div>
         <div class="vip-pinned-avatar" data-username="${safeName}">
           ${avatarHtml}
@@ -408,6 +518,7 @@ function renderVipSquadPinnedBar() {
         </div>
       </div>
       <div class="vip-pinned-actions">
+        ${dotsHtml}
         ${!isMe ? `
           <button type="button" class="btn-vip-join" data-username="${safeName}" title="Написать игроку">
             <svg><use href="#icon-chat"/></svg>
@@ -416,7 +527,7 @@ function renderVipSquadPinnedBar() {
         ` : `
           <span class="vip-my-squad-tag">Ваш закреп</span>
         `}
-        <button type="button" class="btn-vip-dismiss" data-dismiss-user="${safeName}" title="Скрыть это объявление навсегда">
+        <button type="button" class="btn-vip-dismiss" data-dismiss-user="${safeName}" data-squad-id="${escapeHtml(squad.id || 'sq')}" title="Скрыть эту анкету">
           <svg><use href="#icon-close-sm"/></svg>
         </button>
       </div>
@@ -446,13 +557,22 @@ function renderVipSquadPinnedBar() {
     dismissBtn.onclick = (e) => {
       e.stopPropagation();
       const targetUser = dismissBtn.dataset.dismissUser;
-      localStorage.setItem(`lobbivo_dismissed_vip_${targetUser}`, 'true');
-      bar.classList.add('dismissing');
-      setTimeout(() => {
+      const squadId = dismissBtn.dataset.squadId || 'sq';
+      localStorage.setItem(`lobbivo_dismissed_vip_${targetUser}_${squadId}`, 'true');
+      
+      // Удаляем из текущего списка
+      vipPinnedSquads.splice(currentVipPinnedIndex, 1);
+      if (vipPinnedSquads.length === 0) {
         bar.style.display = 'none';
-        bar.classList.remove('dismissing');
         bar.innerHTML = '';
-      }, 240);
+        stopVipPinnedRotation();
+      } else {
+        if (currentVipPinnedIndex >= vipPinnedSquads.length) {
+          currentVipPinnedIndex = 0;
+        }
+        renderVipPinnedCardContent();
+        startVipPinnedRotation();
+      }
     };
   }
 }
@@ -1154,10 +1274,10 @@ function confirmPaidDm() {
   const userCoins = typeof currentUserData.coins === 'number' ? currentUserData.coins : 0;
 
   if (userCoins < cost) {
-    showNotification('Недостаточно коинов', `Для открытия диалога требуется ${cost} LC. Пополните ваш баланс.`);
+    showNotification('Недостаточно коинов', `Для открытия диалога требуется ${cost} LC. Выполняйте задания профиля и получайте коины бесплатно!`);
     if (typeof openCoinModal === 'function') {
       closePaidDmModal();
-      openCoinModal('shop');
+      openCoinModal('earn');
     }
     return;
   }

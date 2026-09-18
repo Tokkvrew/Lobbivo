@@ -214,10 +214,38 @@ const RetentionEngine = (function() {
   //  СРОЧНЫЙ ПОИСК «ИЩУ ПРЯМО СЕЙЧАС» (FAST MATCH ENGINE)
   // ============================================================
 
+  let fastMatchTimerInterval = null;
+
+  function formatUrgentRemaining(ms) {
+    if (ms <= 0) return '00:00:00';
+    const totalSec = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSec / 3600);
+    const minutes = Math.floor((totalSec % 3600) / 60);
+    const seconds = totalSec % 60;
+    const pad = n => String(n).padStart(2, '0');
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  }
+
+  function formatUrgentRemainingShort(ms) {
+    if (ms <= 0) return '0м';
+    const totalSec = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSec / 3600);
+    const minutes = Math.floor((totalSec % 3600) / 60);
+    if (hours > 0) return `${hours}ч ${minutes}м`;
+    return `${minutes}м`;
+  }
+
   function isSquadUrgent(squad, username) {
     const sqUrgent = squad && squad.urgentUntil && squad.urgentUntil > Date.now();
     const userUrgent = AppState.users[username] && AppState.users[username].urgentUntil && AppState.users[username].urgentUntil > Date.now();
     return Boolean(sqUrgent || userUrgent);
+  }
+
+  function getUrgentRemainingMs(squad, username) {
+    const now = Date.now();
+    const sqMs = (squad && squad.urgentUntil && squad.urgentUntil > now) ? (squad.urgentUntil - now) : 0;
+    const userMs = (AppState.users[username] && AppState.users[username].urgentUntil && AppState.users[username].urgentUntil > now) ? (AppState.users[username].urgentUntil - now) : 0;
+    return Math.max(sqMs, userMs);
   }
 
   function toggleMyFastMatch() {
@@ -230,23 +258,43 @@ const RetentionEngine = (function() {
     const user = AppState.users[AppState.currentUser];
     if (!user) return;
 
-    const isCurrentlyUrgent = Boolean(user.urgentUntil && user.urgentUntil > Date.now());
+    let squads = user.squads;
+    if (!Array.isArray(squads)) {
+      if (squads && typeof squads === 'object') {
+        squads = Object.values(squads);
+        user.squads = squads;
+      } else {
+        squads = [];
+        user.squads = squads;
+      }
+    }
+
     const TWO_HOURS = 2 * 60 * 60 * 1000;
+    const isCurrentlyUrgent = Boolean(user.urgentUntil && user.urgentUntil > Date.now());
+
+    // Если у пользователя пока нет ни одной анкеты, открываем модалку создания
+    if (squads.length === 0) {
+      user.urgentUntil = Date.now() + TWO_HOURS;
+      saveUsers(AppState.currentUser, true);
+      updateFastMatchUI();
+      showNotification('Создайте анкету', 'Срочный сбор активен! Создайте вашу первую анкету, и она сразу появится в топе с пульсацией.');
+      if (typeof openCreateSquadModal === 'function') {
+        openCreateSquadModal();
+      }
+      return;
+    }
 
     if (isCurrentlyUrgent) {
       user.urgentUntil = 0;
-      if (Array.isArray(user.squads)) {
-        user.squads.forEach(s => { s.urgentUntil = 0; });
-      }
+      squads.forEach(s => { if (s) s.urgentUntil = 0; });
       showNotification('Срочный поиск отключен', 'Ваш статус переведен в обычный режим');
     } else {
-      user.urgentUntil = Date.now() + TWO_HOURS;
-      if (Array.isArray(user.squads)) {
-        user.squads.forEach(s => { s.urgentUntil = Date.now() + TWO_HOURS; });
-      }
+      const urgentUntilTime = Date.now() + TWO_HOURS;
+      user.urgentUntil = urgentUntilTime;
+      squads.forEach(s => { if (s) s.urgentUntil = urgentUntilTime; });
       playCyberSound('karma');
       triggerHaptic('success');
-      showNotification('Срочный поиск активен!', 'Ваша анкета закреплена на 2 часа с яркой пульсацией!');
+      showNotification('Срочный сбор активен!', 'Ваша анкета закреплена в самом верху каталога на 2 часа с яркой пульсацией!');
     }
 
     saveUsers(AppState.currentUser, true);
@@ -262,14 +310,58 @@ const RetentionEngine = (function() {
   function updateFastMatchUI() {
     const fastMatchBtn = document.getElementById('fastMatchHeroBtn');
     const fastMatchBadge = document.getElementById('fastMatchHeroBadge');
+    const heroBar = document.getElementById('fastMatchHeroBar');
     if (!fastMatchBtn) return;
 
     const user = AppState.currentUser ? AppState.users[AppState.currentUser] : null;
-    const isUrgent = Boolean(user && user.urgentUntil && user.urgentUntil > Date.now());
+    const now = Date.now();
+    const isUrgent = Boolean(user && user.urgentUntil && user.urgentUntil > now);
 
     fastMatchBtn.classList.toggle('active', isUrgent);
-    if (fastMatchBadge) {
-      fastMatchBadge.style.display = isUrgent ? 'inline-flex' : 'none';
+    if (heroBar) heroBar.classList.toggle('urgent-active', isUrgent);
+
+    if (isUrgent) {
+      const remainingMs = user.urgentUntil - now;
+      const formatted = formatUrgentRemaining(remainingMs);
+      if (fastMatchBadge) {
+        fastMatchBadge.style.display = 'inline-flex';
+        fastMatchBadge.innerHTML = `<svg style="width:11px;height:11px;margin-right:4px;"><use href="#icon-clock"/></svg><span>АКТИВЕН ${formatted}</span>`;
+      }
+      fastMatchBtn.innerHTML = `<svg><use href="#icon-bolt-fast"/></svg><span>Срочный сбор (${formatted})</span>`;
+
+      // Динамически обновляем карточки с таймером в DOM без полной перерисовки
+      document.querySelectorAll('.urgent-card-timer-val').forEach(el => {
+        el.textContent = formatted;
+      });
+
+      if (!fastMatchTimerInterval) {
+        fastMatchTimerInterval = setInterval(() => {
+          updateFastMatchUI();
+        }, 1000);
+      }
+    } else {
+      if (fastMatchBadge) {
+        fastMatchBadge.style.display = 'none';
+      }
+      fastMatchBtn.innerHTML = `<svg><use href="#icon-bolt-fast"/></svg><span>Включить срочный сбор</span>`;
+      if (fastMatchTimerInterval) {
+        clearInterval(fastMatchTimerInterval);
+        fastMatchTimerInterval = null;
+      }
+      // Если время только что вышло
+      if (user && user.urgentUntil && user.urgentUntil <= now) {
+        user.urgentUntil = 0;
+        if (Array.isArray(user.squads)) {
+          user.squads.forEach(s => { if (s) s.urgentUntil = 0; });
+        }
+        saveUsers(AppState.currentUser, true);
+        if (typeof renderPlayers === 'function') {
+          renderPlayers(AppState.selectedGameFilter || 'all');
+        }
+        if (typeof renderMySquads === 'function') {
+          renderMySquads();
+        }
+      }
     }
   }
 
@@ -353,10 +445,11 @@ const RetentionEngine = (function() {
             created: Date.now(),
             lastSeen: Date.now()
           };
-        saveUsers(tgUsername, true);
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof renderProfile === 'function') renderProfile();
-        showNotification('Вход через Telegram', `Добро пожаловать, ${escapeHtml(AppState.users[tgUsername].name)}!`);
+          saveUsers(tgUsername, true);
+          if (typeof updateUI === 'function') updateUI();
+          if (typeof renderProfile === 'function') renderProfile();
+          showNotification('Вход через Telegram', `Добро пожаловать, ${escapeHtml(AppState.users[tgUsername].name)}!`);
+        }
       }
     }
   }
@@ -384,6 +477,10 @@ const RetentionEngine = (function() {
     getKarma: getUserKarma,
     toggleFastMatch: toggleMyFastMatch,
     isUrgent: isSquadUrgent,
+    getUrgentRemainingMs: getUrgentRemainingMs,
+    formatUrgentRemaining: formatUrgentRemaining,
+    formatUrgentRemainingShort: formatUrgentRemainingShort,
+    updateFastMatchUI: updateFastMatchUI,
     copyDiscord: copyDiscordTag,
     openTelegram: openTelegramContact,
     haptic: triggerHaptic

@@ -364,6 +364,7 @@ function submitSquad() {
         device,
         desc: description,
         createdAt: Date.now(),
+        urgentUntil: (userData.urgentUntil && userData.urgentUntil > Date.now()) ? userData.urgentUntil : 0,
         active: true
       });
       showNotification('Анкета опубликована', 'Ваша анкета теперь видна в каталоге игроков!');
@@ -532,9 +533,9 @@ function openCoinModal(tab = 'earn') {
   const modal = document.getElementById('coinModal');
   if (!modal) return;
 
+  if (tab === 'buy') tab = 'earn';
   switchCoinTab(tab);
   renderCoinModal();
-  updateCoinConverterLive();
   modal.classList.add('show');
 }
 
@@ -551,6 +552,8 @@ function switchCoinTab(tab = 'earn') {
   const shopContent = document.getElementById('coinShopContent');
   const buyContent = document.getElementById('coinBuyContent');
 
+  if (tab === 'buy') tab = 'earn';
+
   [tabEarnBtn, tabShopBtn, tabBuyBtn].forEach(b => b?.classList.remove('active'));
   if (earnContent) earnContent.style.display = 'none';
   if (shopContent) shopContent.style.display = 'none';
@@ -562,9 +565,6 @@ function switchCoinTab(tab = 'earn') {
       shopContent.style.display = 'block';
       renderShopItems();
     }
-  } else if (tab === 'buy') {
-    tabBuyBtn?.classList.add('active');
-    if (buyContent) buyContent.style.display = 'block';
   } else {
     tabEarnBtn?.classList.add('active');
     if (earnContent) earnContent.style.display = 'block';
@@ -912,8 +912,8 @@ function buyShopItem(type, id, cost, duration = 30) {
 
   if (userCoins < finalCost) {
     const diff = finalCost - userCoins;
-    showNotification('Недостаточно монет', `Вам не хватает ${diff} LC. Выполните задания или пополните баланс!`);
-    switchCoinTab('buy');
+    showNotification('Недостаточно монет', `Вам не хватает ${diff} LC. Выполняйте простые задания профиля и получайте монеты бесплатно!`);
+    switchCoinTab('earn');
     return;
   }
 
@@ -1356,10 +1356,10 @@ function openShopItemPreview(category, itemId, options = {}) {
         const diff = finalCost - userCoins;
         actionBtn.className = 'btn btn-primary preview-action-btn';
         actionBtn.disabled = false;
-        actionBtnText.textContent = `Не хватает ${diff} LC • Пополнить`;
+        actionBtnText.textContent = `Не хватает ${diff} LC • Заработать`;
         actionBtn.onclick = () => {
           closeShopItemPreview();
-          switchCoinTab('buy');
+          switchCoinTab('earn');
         };
       }
     }
@@ -1794,6 +1794,7 @@ function updateUI() {
   updateChatBadge();
   if (typeof updateAdminBadges === 'function') updateAdminBadges();
   if (typeof updateChatMuteUI === 'function') updateChatMuteUI();
+  if (typeof RetentionEngine !== 'undefined') RetentionEngine.updateFastMatchUI();
 
   // Если модалка монет открыта, обновляем её в реальном времени
   const coinModal = document.getElementById('coinModal');
@@ -2623,7 +2624,14 @@ function init() {
   // Вкладки Lobbivo Coin Hub
   document.getElementById('tabCoinEarnBtn')?.addEventListener('click', () => switchCoinTab('earn'));
   document.getElementById('tabCoinShopBtn')?.addEventListener('click', () => switchCoinTab('shop'));
-  document.getElementById('tabCoinBuyBtn')?.addEventListener('click', () => switchCoinTab('buy'));
+  document.getElementById('tabCoinBuyBtn')?.addEventListener('click', () => switchCoinTab('earn'));
+
+  // Кнопка заработать коины в платном диалоге
+  document.getElementById('paidDmTopUpBtn')?.addEventListener('click', () => {
+    const paidDmModal = document.getElementById('paidDmModal');
+    if (paidDmModal) paidDmModal.classList.remove('show', 'open');
+    openCoinModal('earn');
+  });
 
   // Переключение категорий магазина
   document.getElementById('shopCategoryNav')?.addEventListener('click', (e) => {
